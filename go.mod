@@ -1,4 +1,4 @@
-module github.com/rabarar/meshtastic/go/gen/go/meshtastic
+module github.com/rabarar/meshtastic/go
 
 go 1.24.2
 
