@@ -11,7 +11,7 @@
 // 	protoc        v5.29.3
 // source: nanopb.proto
 
-package meshtastic
+package generated
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

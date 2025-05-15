@@ -300,6 +300,7 @@ type AdminMessage struct {
 	//	*AdminMessage_RemoveIgnoredNode
 	//	*AdminMessage_BeginEditSettings
 	//	*AdminMessage_CommitEditSettings
+	//	*AdminMessage_AddContact
 	//	*AdminMessage_FactoryResetDevice
 	//	*AdminMessage_RebootOtaSeconds
 	//	*AdminMessage_ExitSimulator
@@ -752,6 +753,15 @@ func (x *AdminMessage) GetCommitEditSettings() bool {
 	return false
 }
 
+func (x *AdminMessage) GetAddContact() *SharedContact {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*AdminMessage_AddContact); ok {
+			return x.AddContact
+		}
+	}
+	return nil
+}
+
 func (x *AdminMessage) GetFactoryResetDevice() int32 {
 	if x != nil {
 		if x, ok := x.PayloadVariant.(*AdminMessage_FactoryResetDevice); ok {
@@ -1047,6 +1057,11 @@ type AdminMessage_CommitEditSettings struct {
 	CommitEditSettings bool `protobuf:"varint,65,opt,name=commit_edit_settings,json=commitEditSettings,proto3,oneof"`
 }
 
+type AdminMessage_AddContact struct {
+	// Add a contact (User) to the nodedb
+	AddContact *SharedContact `protobuf:"bytes,66,opt,name=add_contact,json=addContact,proto3,oneof"`
+}
+
 type AdminMessage_FactoryResetDevice struct {
 	// Tell the node to factory reset config everything; all device state and configuration will be returned to factory defaults and BLE bonds will be cleared.
 	FactoryResetDevice int32 `protobuf:"varint,94,opt,name=factory_reset_device,json=factoryResetDevice,proto3,oneof"`
@@ -1171,6 +1186,8 @@ func (*AdminMessage_RemoveIgnoredNode) isAdminMessage_PayloadVariant() {}
 func (*AdminMessage_BeginEditSettings) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_CommitEditSettings) isAdminMessage_PayloadVariant() {}
+
+func (*AdminMessage_AddContact) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_FactoryResetDevice) isAdminMessage_PayloadVariant() {}
 
@@ -1307,12 +1324,66 @@ func (x *NodeRemoteHardwarePinsResponse) GetNodeRemoteHardwarePins() []*NodeRemo
 	return nil
 }
 
+type SharedContact struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The node number of the contact
+	NodeNum uint32 `protobuf:"varint,1,opt,name=node_num,json=nodeNum,proto3" json:"node_num,omitempty"`
+	// The User of the contact
+	User          *User `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SharedContact) Reset() {
+	*x = SharedContact{}
+	mi := &file_meshtastic_admin_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SharedContact) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SharedContact) ProtoMessage() {}
+
+func (x *SharedContact) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_admin_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SharedContact.ProtoReflect.Descriptor instead.
+func (*SharedContact) Descriptor() ([]byte, []int) {
+	return file_meshtastic_admin_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *SharedContact) GetNodeNum() uint32 {
+	if x != nil {
+		return x.NodeNum
+	}
+	return 0
+}
+
+func (x *SharedContact) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
 var File_meshtastic_admin_proto protoreflect.FileDescriptor
 
 const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"\x16meshtastic/admin.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\x1a\x1ameshtastic/device_ui.proto\"\xfd\x1e\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\x1a\x1ameshtastic/device_ui.proto\"\xbb\x1f\n" +
 	"\fAdminMessage\x12'\n" +
 	"\x0fsession_passkey\x18e \x01(\fR\x0esessionPasskey\x120\n" +
 	"\x13get_channel_request\x18\x01 \x01(\rH\x00R\x11getChannelRequest\x12G\n" +
@@ -1362,7 +1433,9 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x10set_ignored_node\x18/ \x01(\rH\x00R\x0esetIgnoredNode\x120\n" +
 	"\x13remove_ignored_node\x180 \x01(\rH\x00R\x11removeIgnoredNode\x120\n" +
 	"\x13begin_edit_settings\x18@ \x01(\bH\x00R\x11beginEditSettings\x122\n" +
-	"\x14commit_edit_settings\x18A \x01(\bH\x00R\x12commitEditSettings\x122\n" +
+	"\x14commit_edit_settings\x18A \x01(\bH\x00R\x12commitEditSettings\x12<\n" +
+	"\vadd_contact\x18B \x01(\v2\x19.meshtastic.SharedContactH\x00R\n" +
+	"addContact\x122\n" +
 	"\x14factory_reset_device\x18^ \x01(\x05H\x00R\x12factoryResetDevice\x12.\n" +
 	"\x12reboot_ota_seconds\x18_ \x01(\x05H\x00R\x10rebootOtaSeconds\x12'\n" +
 	"\x0eexit_simulator\x18` \x01(\bH\x00R\rexitSimulator\x12'\n" +
@@ -1408,7 +1481,10 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"short_name\x18\x04 \x01(\tR\tshortName\"~\n" +
 	"\x1eNodeRemoteHardwarePinsResponse\x12\\\n" +
-	"\x19node_remote_hardware_pins\x18\x01 \x03(\v2!.meshtastic.NodeRemoteHardwarePinR\x16nodeRemoteHardwarePinsBa\n" +
+	"\x19node_remote_hardware_pins\x18\x01 \x03(\v2!.meshtastic.NodeRemoteHardwarePinR\x16nodeRemoteHardwarePins\"P\n" +
+	"\rSharedContact\x12\x19\n" +
+	"\bnode_num\x18\x01 \x01(\rR\anodeNum\x12$\n" +
+	"\x04user\x18\x02 \x01(\v2\x10.meshtastic.UserR\x04userBa\n" +
 	"\x13com.geeksville.meshB\vAdminProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
@@ -1424,7 +1500,7 @@ func file_meshtastic_admin_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_meshtastic_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_meshtastic_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_meshtastic_admin_proto_goTypes = []any{
 	(AdminMessage_ConfigType)(0),           // 0: meshtastic.AdminMessage.ConfigType
 	(AdminMessage_ModuleConfigType)(0),     // 1: meshtastic.AdminMessage.ModuleConfigType
@@ -1432,43 +1508,46 @@ var file_meshtastic_admin_proto_goTypes = []any{
 	(*AdminMessage)(nil),                   // 3: meshtastic.AdminMessage
 	(*HamParameters)(nil),                  // 4: meshtastic.HamParameters
 	(*NodeRemoteHardwarePinsResponse)(nil), // 5: meshtastic.NodeRemoteHardwarePinsResponse
-	(*Channel)(nil),                        // 6: meshtastic.Channel
-	(*User)(nil),                           // 7: meshtastic.User
-	(*Config)(nil),                         // 8: meshtastic.Config
-	(*ModuleConfig)(nil),                   // 9: meshtastic.ModuleConfig
-	(*DeviceMetadata)(nil),                 // 10: meshtastic.DeviceMetadata
-	(*DeviceConnectionStatus)(nil),         // 11: meshtastic.DeviceConnectionStatus
-	(*Position)(nil),                       // 12: meshtastic.Position
-	(*DeviceUIConfig)(nil),                 // 13: meshtastic.DeviceUIConfig
-	(*NodeRemoteHardwarePin)(nil),          // 14: meshtastic.NodeRemoteHardwarePin
+	(*SharedContact)(nil),                  // 6: meshtastic.SharedContact
+	(*Channel)(nil),                        // 7: meshtastic.Channel
+	(*User)(nil),                           // 8: meshtastic.User
+	(*Config)(nil),                         // 9: meshtastic.Config
+	(*ModuleConfig)(nil),                   // 10: meshtastic.ModuleConfig
+	(*DeviceMetadata)(nil),                 // 11: meshtastic.DeviceMetadata
+	(*DeviceConnectionStatus)(nil),         // 12: meshtastic.DeviceConnectionStatus
+	(*Position)(nil),                       // 13: meshtastic.Position
+	(*DeviceUIConfig)(nil),                 // 14: meshtastic.DeviceUIConfig
+	(*NodeRemoteHardwarePin)(nil),          // 15: meshtastic.NodeRemoteHardwarePin
 }
 var file_meshtastic_admin_proto_depIdxs = []int32{
-	6,  // 0: meshtastic.AdminMessage.get_channel_response:type_name -> meshtastic.Channel
-	7,  // 1: meshtastic.AdminMessage.get_owner_response:type_name -> meshtastic.User
+	7,  // 0: meshtastic.AdminMessage.get_channel_response:type_name -> meshtastic.Channel
+	8,  // 1: meshtastic.AdminMessage.get_owner_response:type_name -> meshtastic.User
 	0,  // 2: meshtastic.AdminMessage.get_config_request:type_name -> meshtastic.AdminMessage.ConfigType
-	8,  // 3: meshtastic.AdminMessage.get_config_response:type_name -> meshtastic.Config
+	9,  // 3: meshtastic.AdminMessage.get_config_response:type_name -> meshtastic.Config
 	1,  // 4: meshtastic.AdminMessage.get_module_config_request:type_name -> meshtastic.AdminMessage.ModuleConfigType
-	9,  // 5: meshtastic.AdminMessage.get_module_config_response:type_name -> meshtastic.ModuleConfig
-	10, // 6: meshtastic.AdminMessage.get_device_metadata_response:type_name -> meshtastic.DeviceMetadata
-	11, // 7: meshtastic.AdminMessage.get_device_connection_status_response:type_name -> meshtastic.DeviceConnectionStatus
+	10, // 5: meshtastic.AdminMessage.get_module_config_response:type_name -> meshtastic.ModuleConfig
+	11, // 6: meshtastic.AdminMessage.get_device_metadata_response:type_name -> meshtastic.DeviceMetadata
+	12, // 7: meshtastic.AdminMessage.get_device_connection_status_response:type_name -> meshtastic.DeviceConnectionStatus
 	4,  // 8: meshtastic.AdminMessage.set_ham_mode:type_name -> meshtastic.HamParameters
 	5,  // 9: meshtastic.AdminMessage.get_node_remote_hardware_pins_response:type_name -> meshtastic.NodeRemoteHardwarePinsResponse
 	2,  // 10: meshtastic.AdminMessage.backup_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
 	2,  // 11: meshtastic.AdminMessage.restore_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
 	2,  // 12: meshtastic.AdminMessage.remove_backup_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
-	7,  // 13: meshtastic.AdminMessage.set_owner:type_name -> meshtastic.User
-	6,  // 14: meshtastic.AdminMessage.set_channel:type_name -> meshtastic.Channel
-	8,  // 15: meshtastic.AdminMessage.set_config:type_name -> meshtastic.Config
-	9,  // 16: meshtastic.AdminMessage.set_module_config:type_name -> meshtastic.ModuleConfig
-	12, // 17: meshtastic.AdminMessage.set_fixed_position:type_name -> meshtastic.Position
-	13, // 18: meshtastic.AdminMessage.get_ui_config_response:type_name -> meshtastic.DeviceUIConfig
-	13, // 19: meshtastic.AdminMessage.store_ui_config:type_name -> meshtastic.DeviceUIConfig
-	14, // 20: meshtastic.NodeRemoteHardwarePinsResponse.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	8,  // 13: meshtastic.AdminMessage.set_owner:type_name -> meshtastic.User
+	7,  // 14: meshtastic.AdminMessage.set_channel:type_name -> meshtastic.Channel
+	9,  // 15: meshtastic.AdminMessage.set_config:type_name -> meshtastic.Config
+	10, // 16: meshtastic.AdminMessage.set_module_config:type_name -> meshtastic.ModuleConfig
+	13, // 17: meshtastic.AdminMessage.set_fixed_position:type_name -> meshtastic.Position
+	14, // 18: meshtastic.AdminMessage.get_ui_config_response:type_name -> meshtastic.DeviceUIConfig
+	14, // 19: meshtastic.AdminMessage.store_ui_config:type_name -> meshtastic.DeviceUIConfig
+	6,  // 20: meshtastic.AdminMessage.add_contact:type_name -> meshtastic.SharedContact
+	15, // 21: meshtastic.NodeRemoteHardwarePinsResponse.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
+	8,  // 22: meshtastic.SharedContact.user:type_name -> meshtastic.User
+	23, // [23:23] is the sub-list for method output_type
+	23, // [23:23] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_admin_proto_init() }
@@ -1527,6 +1606,7 @@ func file_meshtastic_admin_proto_init() {
 		(*AdminMessage_RemoveIgnoredNode)(nil),
 		(*AdminMessage_BeginEditSettings)(nil),
 		(*AdminMessage_CommitEditSettings)(nil),
+		(*AdminMessage_AddContact)(nil),
 		(*AdminMessage_FactoryResetDevice)(nil),
 		(*AdminMessage_RebootOtaSeconds)(nil),
 		(*AdminMessage_ExitSimulator)(nil),
@@ -1541,7 +1621,7 @@ func file_meshtastic_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_admin_proto_rawDesc), len(file_meshtastic_admin_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

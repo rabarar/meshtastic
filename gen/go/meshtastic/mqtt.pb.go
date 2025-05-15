@@ -118,8 +118,11 @@ type MapReport struct {
 	PositionPrecision uint32 `protobuf:"varint,12,opt,name=position_precision,json=positionPrecision,proto3" json:"position_precision,omitempty"`
 	// Number of online nodes (heard in the last 2 hours) this node has in its list that were received locally (not via MQTT)
 	NumOnlineLocalNodes uint32 `protobuf:"varint,13,opt,name=num_online_local_nodes,json=numOnlineLocalNodes,proto3" json:"num_online_local_nodes,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// User has opted in to share their location (map report) with the mqtt server
+	// Controlled by map_report.should_report_location
+	HasOptedReportLocation bool `protobuf:"varint,14,opt,name=has_opted_report_location,json=hasOptedReportLocation,proto3" json:"has_opted_report_location,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *MapReport) Reset() {
@@ -243,6 +246,13 @@ func (x *MapReport) GetNumOnlineLocalNodes() uint32 {
 	return 0
 }
 
+func (x *MapReport) GetHasOptedReportLocation() bool {
+	if x != nil {
+		return x.HasOptedReportLocation
+	}
+	return false
+}
+
 var File_meshtastic_mqtt_proto protoreflect.FileDescriptor
 
 const file_meshtastic_mqtt_proto_rawDesc = "" +
@@ -254,7 +264,7 @@ const file_meshtastic_mqtt_proto_rawDesc = "" +
 	"\n" +
 	"channel_id\x18\x02 \x01(\tR\tchannelId\x12\x1d\n" +
 	"\n" +
-	"gateway_id\x18\x03 \x01(\tR\tgatewayId\"\xe2\x04\n" +
+	"gateway_id\x18\x03 \x01(\tR\tgatewayId\"\x9d\x05\n" +
 	"\tMapReport\x12\x1b\n" +
 	"\tlong_name\x18\x01 \x01(\tR\blongName\x12\x1d\n" +
 	"\n" +
@@ -272,7 +282,8 @@ const file_meshtastic_mqtt_proto_rawDesc = "" +
 	"longitudeI\x12\x1a\n" +
 	"\baltitude\x18\v \x01(\x05R\baltitude\x12-\n" +
 	"\x12position_precision\x18\f \x01(\rR\x11positionPrecision\x123\n" +
-	"\x16num_online_local_nodes\x18\r \x01(\rR\x13numOnlineLocalNodesB`\n" +
+	"\x16num_online_local_nodes\x18\r \x01(\rR\x13numOnlineLocalNodes\x129\n" +
+	"\x19has_opted_report_location\x18\x0e \x01(\bR\x16hasOptedReportLocationB`\n" +
 	"\x13com.geeksville.meshB\n" +
 	"MQTTProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 

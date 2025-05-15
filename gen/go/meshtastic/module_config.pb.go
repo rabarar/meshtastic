@@ -309,6 +309,9 @@ const (
 	ModuleConfig_SerialConfig_CALTOPO ModuleConfig_SerialConfig_Serial_Mode = 5
 	// Ecowitt WS85 weather station
 	ModuleConfig_SerialConfig_WS85 ModuleConfig_SerialConfig_Serial_Mode = 6
+	// VE.Direct is a serial protocol used by Victron Energy products
+	// https://beta.ivc.no/wiki/index.php/Victron_VE_Direct_DIY_Cable
+	ModuleConfig_SerialConfig_VE_DIRECT ModuleConfig_SerialConfig_Serial_Mode = 7
 )
 
 // Enum value maps for ModuleConfig_SerialConfig_Serial_Mode.
@@ -321,15 +324,17 @@ var (
 		4: "NMEA",
 		5: "CALTOPO",
 		6: "WS85",
+		7: "VE_DIRECT",
 	}
 	ModuleConfig_SerialConfig_Serial_Mode_value = map[string]int32{
-		"DEFAULT": 0,
-		"SIMPLE":  1,
-		"PROTO":   2,
-		"TEXTMSG": 3,
-		"NMEA":    4,
-		"CALTOPO": 5,
-		"WS85":    6,
+		"DEFAULT":   0,
+		"SIMPLE":    1,
+		"PROTO":     2,
+		"TEXTMSG":   3,
+		"NMEA":      4,
+		"CALTOPO":   5,
+		"WS85":      6,
+		"VE_DIRECT": 7,
 	}
 )
 
@@ -924,8 +929,10 @@ type ModuleConfig_MapReportSettings struct {
 	PublishIntervalSecs uint32 `protobuf:"varint,1,opt,name=publish_interval_secs,json=publishIntervalSecs,proto3" json:"publish_interval_secs,omitempty"`
 	// Bits of precision for the location sent (default of 32 is full precision).
 	PositionPrecision uint32 `protobuf:"varint,2,opt,name=position_precision,json=positionPrecision,proto3" json:"position_precision,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Whether we have opted-in to report our location to the map
+	ShouldReportLocation bool `protobuf:"varint,3,opt,name=should_report_location,json=shouldReportLocation,proto3" json:"should_report_location,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *ModuleConfig_MapReportSettings) Reset() {
@@ -970,6 +977,13 @@ func (x *ModuleConfig_MapReportSettings) GetPositionPrecision() uint32 {
 		return x.PositionPrecision
 	}
 	return 0
+}
+
+func (x *ModuleConfig_MapReportSettings) GetShouldReportLocation() bool {
+	if x != nil {
+		return x.ShouldReportLocation
+	}
+	return false
 }
 
 // RemoteHardwareModule Config
@@ -2227,7 +2241,7 @@ var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\"\xf11\n" +
+	"meshtastic\"\xb72\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2260,10 +2274,11 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x17proxy_to_client_enabled\x18\t \x01(\bR\x14proxyToClientEnabled\x122\n" +
 	"\x15map_reporting_enabled\x18\n" +
 	" \x01(\bR\x13mapReportingEnabled\x12Z\n" +
-	"\x13map_report_settings\x18\v \x01(\v2*.meshtastic.ModuleConfig.MapReportSettingsR\x11mapReportSettings\x1av\n" +
+	"\x13map_report_settings\x18\v \x01(\v2*.meshtastic.ModuleConfig.MapReportSettingsR\x11mapReportSettings\x1a\xac\x01\n" +
 	"\x11MapReportSettings\x122\n" +
 	"\x15publish_interval_secs\x18\x01 \x01(\rR\x13publishIntervalSecs\x12-\n" +
-	"\x12position_precision\x18\x02 \x01(\rR\x11positionPrecision\x1a\xb3\x01\n" +
+	"\x12position_precision\x18\x02 \x01(\rR\x11positionPrecision\x124\n" +
+	"\x16should_report_location\x18\x03 \x01(\bR\x14shouldReportLocation\x1a\xb3\x01\n" +
 	"\x14RemoteHardwareConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12;\n" +
 	"\x1aallow_undefined_pin_access\x18\x02 \x01(\bR\x17allowUndefinedPinAccess\x12D\n" +
@@ -2315,7 +2330,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12<\n" +
 	"\x1apaxcounter_update_interval\x18\x02 \x01(\rR\x18paxcounterUpdateInterval\x12%\n" +
 	"\x0ewifi_threshold\x18\x03 \x01(\x05R\rwifiThreshold\x12#\n" +
-	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xb7\x05\n" +
+	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xc6\x05\n" +
 	"\fSerialConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x12\n" +
 	"\x04echo\x18\x02 \x01(\bR\x04echo\x12\x10\n" +
@@ -2345,7 +2360,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\vBAUD_230400\x10\f\x12\x0f\n" +
 	"\vBAUD_460800\x10\r\x12\x0f\n" +
 	"\vBAUD_576000\x10\x0e\x12\x0f\n" +
-	"\vBAUD_921600\x10\x0f\"_\n" +
+	"\vBAUD_921600\x10\x0f\"n\n" +
 	"\vSerial_Mode\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\n" +
 	"\n" +
@@ -2354,7 +2369,8 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\aTEXTMSG\x10\x03\x12\b\n" +
 	"\x04NMEA\x10\x04\x12\v\n" +
 	"\aCALTOPO\x10\x05\x12\b\n" +
-	"\x04WS85\x10\x06\x1a\xac\x04\n" +
+	"\x04WS85\x10\x06\x12\r\n" +
+	"\tVE_DIRECT\x10\a\x1a\xac\x04\n" +
 	"\x1aExternalNotificationConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x1b\n" +
 	"\toutput_ms\x18\x02 \x01(\rR\boutputMs\x12\x16\n" +

@@ -101,6 +101,8 @@ const (
 	TelemetrySensorType_DPS310 TelemetrySensorType = 36
 	// RAKWireless RAK12035 Soil Moisture Sensor Module
 	TelemetrySensorType_RAK12035 TelemetrySensorType = 37
+	// MAX17261 lipo battery gauge
+	TelemetrySensorType_MAX17261 TelemetrySensorType = 38
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -144,6 +146,7 @@ var (
 		35: "DFROBOT_RAIN",
 		36: "DPS310",
 		37: "RAK12035",
+		38: "MAX17261",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -184,6 +187,7 @@ var (
 		"DFROBOT_RAIN":  35,
 		"DPS310":        36,
 		"RAK12035":      37,
+		"MAX17261":      38,
 	}
 )
 
@@ -980,6 +984,115 @@ func (x *HealthMetrics) GetTemperature() float32 {
 	return 0
 }
 
+// Linux host metrics
+type HostMetrics struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Host system uptime
+	UptimeSeconds uint32 `protobuf:"varint,1,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
+	// Host system free memory
+	FreememBytes uint64 `protobuf:"varint,2,opt,name=freemem_bytes,json=freememBytes,proto3" json:"freemem_bytes,omitempty"`
+	// Host system disk space free for /
+	Diskfree1Bytes uint64 `protobuf:"varint,3,opt,name=diskfree1_bytes,json=diskfree1Bytes,proto3" json:"diskfree1_bytes,omitempty"`
+	// Secondary system disk space free
+	Diskfree2Bytes *uint64 `protobuf:"varint,4,opt,name=diskfree2_bytes,json=diskfree2Bytes,proto3,oneof" json:"diskfree2_bytes,omitempty"`
+	// Tertiary disk space free
+	Diskfree3Bytes *uint64 `protobuf:"varint,5,opt,name=diskfree3_bytes,json=diskfree3Bytes,proto3,oneof" json:"diskfree3_bytes,omitempty"`
+	// Host system one minute load in 1/100ths
+	Load1 uint32 `protobuf:"varint,6,opt,name=load1,proto3" json:"load1,omitempty"`
+	// Host system five minute load  in 1/100ths
+	Load5 uint32 `protobuf:"varint,7,opt,name=load5,proto3" json:"load5,omitempty"`
+	// Host system fifteen minute load  in 1/100ths
+	Load15        uint32 `protobuf:"varint,8,opt,name=load15,proto3" json:"load15,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HostMetrics) Reset() {
+	*x = HostMetrics{}
+	mi := &file_meshtastic_telemetry_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HostMetrics) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HostMetrics) ProtoMessage() {}
+
+func (x *HostMetrics) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_telemetry_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HostMetrics.ProtoReflect.Descriptor instead.
+func (*HostMetrics) Descriptor() ([]byte, []int) {
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *HostMetrics) GetUptimeSeconds() uint32 {
+	if x != nil {
+		return x.UptimeSeconds
+	}
+	return 0
+}
+
+func (x *HostMetrics) GetFreememBytes() uint64 {
+	if x != nil {
+		return x.FreememBytes
+	}
+	return 0
+}
+
+func (x *HostMetrics) GetDiskfree1Bytes() uint64 {
+	if x != nil {
+		return x.Diskfree1Bytes
+	}
+	return 0
+}
+
+func (x *HostMetrics) GetDiskfree2Bytes() uint64 {
+	if x != nil && x.Diskfree2Bytes != nil {
+		return *x.Diskfree2Bytes
+	}
+	return 0
+}
+
+func (x *HostMetrics) GetDiskfree3Bytes() uint64 {
+	if x != nil && x.Diskfree3Bytes != nil {
+		return *x.Diskfree3Bytes
+	}
+	return 0
+}
+
+func (x *HostMetrics) GetLoad1() uint32 {
+	if x != nil {
+		return x.Load1
+	}
+	return 0
+}
+
+func (x *HostMetrics) GetLoad5() uint32 {
+	if x != nil {
+		return x.Load5
+	}
+	return 0
+}
+
+func (x *HostMetrics) GetLoad15() uint32 {
+	if x != nil {
+		return x.Load15
+	}
+	return 0
+}
+
 // Types of Measurements the telemetry module is equipped to handle
 type Telemetry struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -993,6 +1106,7 @@ type Telemetry struct {
 	//	*Telemetry_PowerMetrics
 	//	*Telemetry_LocalStats
 	//	*Telemetry_HealthMetrics
+	//	*Telemetry_HostMetrics
 	Variant       isTelemetry_Variant `protobuf_oneof:"variant"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1000,7 +1114,7 @@ type Telemetry struct {
 
 func (x *Telemetry) Reset() {
 	*x = Telemetry{}
-	mi := &file_meshtastic_telemetry_proto_msgTypes[6]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1012,7 +1126,7 @@ func (x *Telemetry) String() string {
 func (*Telemetry) ProtoMessage() {}
 
 func (x *Telemetry) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_telemetry_proto_msgTypes[6]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1025,7 +1139,7 @@ func (x *Telemetry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Telemetry.ProtoReflect.Descriptor instead.
 func (*Telemetry) Descriptor() ([]byte, []int) {
-	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{6}
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Telemetry) GetTime() uint32 {
@@ -1096,6 +1210,15 @@ func (x *Telemetry) GetHealthMetrics() *HealthMetrics {
 	return nil
 }
 
+func (x *Telemetry) GetHostMetrics() *HostMetrics {
+	if x != nil {
+		if x, ok := x.Variant.(*Telemetry_HostMetrics); ok {
+			return x.HostMetrics
+		}
+	}
+	return nil
+}
+
 type isTelemetry_Variant interface {
 	isTelemetry_Variant()
 }
@@ -1130,6 +1253,11 @@ type Telemetry_HealthMetrics struct {
 	HealthMetrics *HealthMetrics `protobuf:"bytes,7,opt,name=health_metrics,json=healthMetrics,proto3,oneof"`
 }
 
+type Telemetry_HostMetrics struct {
+	// Linux host metrics
+	HostMetrics *HostMetrics `protobuf:"bytes,8,opt,name=host_metrics,json=hostMetrics,proto3,oneof"`
+}
+
 func (*Telemetry_DeviceMetrics) isTelemetry_Variant() {}
 
 func (*Telemetry_EnvironmentMetrics) isTelemetry_Variant() {}
@@ -1141,6 +1269,8 @@ func (*Telemetry_PowerMetrics) isTelemetry_Variant() {}
 func (*Telemetry_LocalStats) isTelemetry_Variant() {}
 
 func (*Telemetry_HealthMetrics) isTelemetry_Variant() {}
+
+func (*Telemetry_HostMetrics) isTelemetry_Variant() {}
 
 // NAU7802 Telemetry configuration, for saving to flash
 type Nau7802Config struct {
@@ -1155,7 +1285,7 @@ type Nau7802Config struct {
 
 func (x *Nau7802Config) Reset() {
 	*x = Nau7802Config{}
-	mi := &file_meshtastic_telemetry_proto_msgTypes[7]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1167,7 +1297,7 @@ func (x *Nau7802Config) String() string {
 func (*Nau7802Config) ProtoMessage() {}
 
 func (x *Nau7802Config) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_telemetry_proto_msgTypes[7]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1180,7 +1310,7 @@ func (x *Nau7802Config) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Nau7802Config.ProtoReflect.Descriptor instead.
 func (*Nau7802Config) Descriptor() ([]byte, []int) {
-	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{7}
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Nau7802Config) GetZeroOffset() int32 {
@@ -1340,7 +1470,18 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"_heart_bpmB\a\n" +
 	"\x05_spO2B\x0e\n" +
-	"\f_temperature\"\xd2\x03\n" +
+	"\f_temperature\"\xca\x02\n" +
+	"\vHostMetrics\x12%\n" +
+	"\x0euptime_seconds\x18\x01 \x01(\rR\ruptimeSeconds\x12#\n" +
+	"\rfreemem_bytes\x18\x02 \x01(\x04R\ffreememBytes\x12'\n" +
+	"\x0fdiskfree1_bytes\x18\x03 \x01(\x04R\x0ediskfree1Bytes\x12,\n" +
+	"\x0fdiskfree2_bytes\x18\x04 \x01(\x04H\x00R\x0ediskfree2Bytes\x88\x01\x01\x12,\n" +
+	"\x0fdiskfree3_bytes\x18\x05 \x01(\x04H\x01R\x0ediskfree3Bytes\x88\x01\x01\x12\x14\n" +
+	"\x05load1\x18\x06 \x01(\rR\x05load1\x12\x14\n" +
+	"\x05load5\x18\a \x01(\rR\x05load5\x12\x16\n" +
+	"\x06load15\x18\b \x01(\rR\x06load15B\x12\n" +
+	"\x10_diskfree2_bytesB\x12\n" +
+	"\x10_diskfree3_bytes\"\x90\x04\n" +
 	"\tTelemetry\x12\x12\n" +
 	"\x04time\x18\x01 \x01(\aR\x04time\x12B\n" +
 	"\x0edevice_metrics\x18\x02 \x01(\v2\x19.meshtastic.DeviceMetricsH\x00R\rdeviceMetrics\x12Q\n" +
@@ -1349,13 +1490,14 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\rpower_metrics\x18\x05 \x01(\v2\x18.meshtastic.PowerMetricsH\x00R\fpowerMetrics\x129\n" +
 	"\vlocal_stats\x18\x06 \x01(\v2\x16.meshtastic.LocalStatsH\x00R\n" +
 	"localStats\x12B\n" +
-	"\x0ehealth_metrics\x18\a \x01(\v2\x19.meshtastic.HealthMetricsH\x00R\rhealthMetricsB\t\n" +
+	"\x0ehealth_metrics\x18\a \x01(\v2\x19.meshtastic.HealthMetricsH\x00R\rhealthMetrics\x12<\n" +
+	"\fhost_metrics\x18\b \x01(\v2\x17.meshtastic.HostMetricsH\x00R\vhostMetricsB\t\n" +
 	"\avariant\"]\n" +
 	"\rNau7802Config\x12\x1e\n" +
 	"\n" +
 	"zeroOffset\x18\x01 \x01(\x05R\n" +
 	"zeroOffset\x12,\n" +
-	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\x91\x04\n" +
+	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\x9f\x04\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -1405,7 +1547,8 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\fDFROBOT_RAIN\x10#\x12\n" +
 	"\n" +
 	"\x06DPS310\x10$\x12\f\n" +
-	"\bRAK12035\x10%Be\n" +
+	"\bRAK12035\x10%\x12\f\n" +
+	"\bMAX17261\x10&Be\n" +
 	"\x13com.geeksville.meshB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
@@ -1421,7 +1564,7 @@ func file_meshtastic_telemetry_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_telemetry_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_meshtastic_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_meshtastic_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_meshtastic_telemetry_proto_goTypes = []any{
 	(TelemetrySensorType)(0),   // 0: meshtastic.TelemetrySensorType
 	(*DeviceMetrics)(nil),      // 1: meshtastic.DeviceMetrics
@@ -1430,8 +1573,9 @@ var file_meshtastic_telemetry_proto_goTypes = []any{
 	(*AirQualityMetrics)(nil),  // 4: meshtastic.AirQualityMetrics
 	(*LocalStats)(nil),         // 5: meshtastic.LocalStats
 	(*HealthMetrics)(nil),      // 6: meshtastic.HealthMetrics
-	(*Telemetry)(nil),          // 7: meshtastic.Telemetry
-	(*Nau7802Config)(nil),      // 8: meshtastic.Nau7802Config
+	(*HostMetrics)(nil),        // 7: meshtastic.HostMetrics
+	(*Telemetry)(nil),          // 8: meshtastic.Telemetry
+	(*Nau7802Config)(nil),      // 9: meshtastic.Nau7802Config
 }
 var file_meshtastic_telemetry_proto_depIdxs = []int32{
 	1, // 0: meshtastic.Telemetry.device_metrics:type_name -> meshtastic.DeviceMetrics
@@ -1440,11 +1584,12 @@ var file_meshtastic_telemetry_proto_depIdxs = []int32{
 	3, // 3: meshtastic.Telemetry.power_metrics:type_name -> meshtastic.PowerMetrics
 	5, // 4: meshtastic.Telemetry.local_stats:type_name -> meshtastic.LocalStats
 	6, // 5: meshtastic.Telemetry.health_metrics:type_name -> meshtastic.HealthMetrics
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	7, // 6: meshtastic.Telemetry.host_metrics:type_name -> meshtastic.HostMetrics
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_telemetry_proto_init() }
@@ -1457,13 +1602,15 @@ func file_meshtastic_telemetry_proto_init() {
 	file_meshtastic_telemetry_proto_msgTypes[2].OneofWrappers = []any{}
 	file_meshtastic_telemetry_proto_msgTypes[3].OneofWrappers = []any{}
 	file_meshtastic_telemetry_proto_msgTypes[5].OneofWrappers = []any{}
-	file_meshtastic_telemetry_proto_msgTypes[6].OneofWrappers = []any{
+	file_meshtastic_telemetry_proto_msgTypes[6].OneofWrappers = []any{}
+	file_meshtastic_telemetry_proto_msgTypes[7].OneofWrappers = []any{
 		(*Telemetry_DeviceMetrics)(nil),
 		(*Telemetry_EnvironmentMetrics)(nil),
 		(*Telemetry_AirQualityMetrics)(nil),
 		(*Telemetry_PowerMetrics)(nil),
 		(*Telemetry_LocalStats)(nil),
 		(*Telemetry_HealthMetrics)(nil),
+		(*Telemetry_HostMetrics)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1471,7 +1618,7 @@ func file_meshtastic_telemetry_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_telemetry_proto_rawDesc), len(file_meshtastic_telemetry_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
