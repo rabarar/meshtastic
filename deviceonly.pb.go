@@ -132,9 +132,11 @@ type UserLite struct {
 	Role Config_DeviceConfig_Role `protobuf:"varint,6,opt,name=role,proto3,enum=meshtastic.Config_DeviceConfig_Role" json:"role,omitempty"`
 	// The public key of the user's device.
 	// This is sent out to other nodes on the mesh to allow them to compute a shared secret key.
-	PublicKey     []byte `protobuf:"bytes,7,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	PublicKey []byte `protobuf:"bytes,7,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	// Whether or not the node can be messaged
+	IsUnmessagable *bool `protobuf:"varint,9,opt,name=is_unmessagable,json=isUnmessagable,proto3,oneof" json:"is_unmessagable,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *UserLite) Reset() {
@@ -215,6 +217,13 @@ func (x *UserLite) GetPublicKey() []byte {
 		return x.PublicKey
 	}
 	return nil
+}
+
+func (x *UserLite) GetIsUnmessagable() bool {
+	if x != nil && x.IsUnmessagable != nil {
+		return *x.IsUnmessagable
+	}
+	return false
 }
 
 type NodeInfoLite struct {
@@ -719,7 +728,7 @@ const file_meshtastic_deviceonly_proto_rawDesc = "" +
 	"longitudeI\x12\x1a\n" +
 	"\baltitude\x18\x03 \x01(\x05R\baltitude\x12\x12\n" +
 	"\x04time\x18\x04 \x01(\aR\x04time\x12G\n" +
-	"\x0flocation_source\x18\x05 \x01(\x0e2\x1e.meshtastic.Position.LocSourceR\x0elocationSource\"\x94\x02\n" +
+	"\x0flocation_source\x18\x05 \x01(\x0e2\x1e.meshtastic.Position.LocSourceR\x0elocationSource\"\xd6\x02\n" +
 	"\bUserLite\x12\x1c\n" +
 	"\amacaddr\x18\x01 \x01(\fB\x02\x18\x01R\amacaddr\x12\x1b\n" +
 	"\tlong_name\x18\x02 \x01(\tR\blongName\x12\x1d\n" +
@@ -730,7 +739,9 @@ const file_meshtastic_deviceonly_proto_rawDesc = "" +
 	"isLicensed\x128\n" +
 	"\x04role\x18\x06 \x01(\x0e2$.meshtastic.Config.DeviceConfig.RoleR\x04role\x12\x1d\n" +
 	"\n" +
-	"public_key\x18\a \x01(\fR\tpublicKey\"\xb3\x03\n" +
+	"public_key\x18\a \x01(\fR\tpublicKey\x12,\n" +
+	"\x0fis_unmessagable\x18\t \x01(\bH\x00R\x0eisUnmessagable\x88\x01\x01B\x12\n" +
+	"\x10_is_unmessagable\"\xb3\x03\n" +
 	"\fNodeInfoLite\x12\x10\n" +
 	"\x03num\x18\x01 \x01(\rR\x03num\x12(\n" +
 	"\x04user\x18\x02 \x01(\v2\x14.meshtastic.UserLiteR\x04user\x124\n" +
@@ -847,6 +858,7 @@ func file_meshtastic_deviceonly_proto_init() {
 	file_meshtastic_config_proto_init()
 	file_meshtastic_localonly_proto_init()
 	file_nanopb_proto_init()
+	file_meshtastic_deviceonly_proto_msgTypes[1].OneofWrappers = []any{}
 	file_meshtastic_deviceonly_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

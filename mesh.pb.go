@@ -1527,9 +1527,11 @@ type User struct {
 	Role Config_DeviceConfig_Role `protobuf:"varint,7,opt,name=role,proto3,enum=meshtastic.Config_DeviceConfig_Role" json:"role,omitempty"`
 	// The public key of the user's device.
 	// This is sent out to other nodes on the mesh to allow them to compute a shared secret key.
-	PublicKey     []byte `protobuf:"bytes,8,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	PublicKey []byte `protobuf:"bytes,8,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	// Whether or not the node can be messaged
+	IsUnmessagable *bool `protobuf:"varint,9,opt,name=is_unmessagable,json=isUnmessagable,proto3,oneof" json:"is_unmessagable,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *User) Reset() {
@@ -1617,6 +1619,13 @@ func (x *User) GetPublicKey() []byte {
 		return x.PublicKey
 	}
 	return nil
+}
+
+func (x *User) GetIsUnmessagable() bool {
+	if x != nil && x.IsUnmessagable != nil {
+		return *x.IsUnmessagable
+	}
+	return false
 }
 
 // A message used in a traceroute
@@ -4187,7 +4196,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\r_altitude_haeB\x1e\n" +
 	"\x1c_altitude_geoidal_separationB\x0f\n" +
 	"\r_ground_speedB\x0f\n" +
-	"\r_ground_track\"\xa0\x02\n" +
+	"\r_ground_track\"\xe2\x02\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\tlong_name\x18\x02 \x01(\tR\blongName\x12\x1d\n" +
@@ -4199,7 +4208,9 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"isLicensed\x128\n" +
 	"\x04role\x18\a \x01(\x0e2$.meshtastic.Config.DeviceConfig.RoleR\x04role\x12\x1d\n" +
 	"\n" +
-	"public_key\x18\b \x01(\fR\tpublicKey\"\x81\x01\n" +
+	"public_key\x18\b \x01(\fR\tpublicKey\x12,\n" +
+	"\x0fis_unmessagable\x18\t \x01(\bH\x00R\x0eisUnmessagable\x88\x01\x01B\x12\n" +
+	"\x10_is_unmessagable\"\x81\x01\n" +
 	"\x0eRouteDiscovery\x12\x14\n" +
 	"\x05route\x18\x01 \x03(\aR\x05route\x12\x1f\n" +
 	"\vsnr_towards\x18\x02 \x03(\x05R\n" +
@@ -4714,6 +4725,7 @@ func file_meshtastic_mesh_proto_init() {
 	file_meshtastic_xmodem_proto_init()
 	file_meshtastic_device_ui_proto_init()
 	file_meshtastic_mesh_proto_msgTypes[0].OneofWrappers = []any{}
+	file_meshtastic_mesh_proto_msgTypes[1].OneofWrappers = []any{}
 	file_meshtastic_mesh_proto_msgTypes[3].OneofWrappers = []any{
 		(*Routing_RouteRequest)(nil),
 		(*Routing_RouteReply)(nil),
