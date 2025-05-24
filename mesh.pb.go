@@ -2481,9 +2481,13 @@ type NodeInfo struct {
 	IsFavorite bool `protobuf:"varint,10,opt,name=is_favorite,json=isFavorite,proto3" json:"is_favorite,omitempty"`
 	// True if node is in our ignored list
 	// Persists between NodeDB internal clean ups
-	IsIgnored     bool `protobuf:"varint,11,opt,name=is_ignored,json=isIgnored,proto3" json:"is_ignored,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	IsIgnored bool `protobuf:"varint,11,opt,name=is_ignored,json=isIgnored,proto3" json:"is_ignored,omitempty"`
+	// True if node public key has been verified.
+	// Persists between NodeDB internal clean ups
+	// LSB 0 of the bitfield
+	IsKeyManuallyVerified bool `protobuf:"varint,12,opt,name=is_key_manually_verified,json=isKeyManuallyVerified,proto3" json:"is_key_manually_verified,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *NodeInfo) Reset() {
@@ -2589,6 +2593,13 @@ func (x *NodeInfo) GetIsFavorite() bool {
 func (x *NodeInfo) GetIsIgnored() bool {
 	if x != nil {
 		return x.IsIgnored
+	}
+	return false
+}
+
+func (x *NodeInfo) GetIsKeyManuallyVerified() bool {
+	if x != nil {
+		return x.IsKeyManuallyVerified
 	}
 	return false
 }
@@ -4316,7 +4327,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\bNO_DELAY\x10\x00\x12\x15\n" +
 	"\x11DELAYED_BROADCAST\x10\x01\x12\x12\n" +
 	"\x0eDELAYED_DIRECT\x10\x02B\x11\n" +
-	"\x0fpayload_variant\"\x8c\x03\n" +
+	"\x0fpayload_variant\"\xc5\x03\n" +
 	"\bNodeInfo\x12\x10\n" +
 	"\x03num\x18\x01 \x01(\rR\x03num\x12$\n" +
 	"\x04user\x18\x02 \x01(\v2\x10.meshtastic.UserR\x04user\x120\n" +
@@ -4332,7 +4343,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	" \x01(\bR\n" +
 	"isFavorite\x12\x1d\n" +
 	"\n" +
-	"is_ignored\x18\v \x01(\bR\tisIgnoredB\f\n" +
+	"is_ignored\x18\v \x01(\bR\tisIgnored\x127\n" +
+	"\x18is_key_manually_verified\x18\f \x01(\bR\x15isKeyManuallyVerifiedB\f\n" +
 	"\n" +
 	"_hops_away\"\xad\x01\n" +
 	"\n" +

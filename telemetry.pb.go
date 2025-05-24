@@ -103,6 +103,8 @@ const (
 	TelemetrySensorType_RAK12035 TelemetrySensorType = 37
 	// MAX17261 lipo battery gauge
 	TelemetrySensorType_MAX17261 TelemetrySensorType = 38
+	// PCT2075 Temperature Sensor
+	TelemetrySensorType_PCT2075 TelemetrySensorType = 39
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -147,6 +149,7 @@ var (
 		36: "DPS310",
 		37: "RAK12035",
 		38: "MAX17261",
+		39: "PCT2075",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -188,6 +191,7 @@ var (
 		"DPS310":        36,
 		"RAK12035":      37,
 		"MAX17261":      38,
+		"PCT2075":       39,
 	}
 )
 
@@ -1002,7 +1006,10 @@ type HostMetrics struct {
 	// Host system five minute load  in 1/100ths
 	Load5 uint32 `protobuf:"varint,7,opt,name=load5,proto3" json:"load5,omitempty"`
 	// Host system fifteen minute load  in 1/100ths
-	Load15        uint32 `protobuf:"varint,8,opt,name=load15,proto3" json:"load15,omitempty"`
+	Load15 uint32 `protobuf:"varint,8,opt,name=load15,proto3" json:"load15,omitempty"`
+	// Optional User-provided string for arbitrary host system information
+	// that doesn't make sense as a dedicated entry.
+	UserString    *string `protobuf:"bytes,9,opt,name=user_string,json=userString,proto3,oneof" json:"user_string,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1091,6 +1098,13 @@ func (x *HostMetrics) GetLoad15() uint32 {
 		return x.Load15
 	}
 	return 0
+}
+
+func (x *HostMetrics) GetUserString() string {
+	if x != nil && x.UserString != nil {
+		return *x.UserString
+	}
+	return ""
 }
 
 // Types of Measurements the telemetry module is equipped to handle
@@ -1470,7 +1484,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"_heart_bpmB\a\n" +
 	"\x05_spO2B\x0e\n" +
-	"\f_temperature\"\xca\x02\n" +
+	"\f_temperature\"\x80\x03\n" +
 	"\vHostMetrics\x12%\n" +
 	"\x0euptime_seconds\x18\x01 \x01(\rR\ruptimeSeconds\x12#\n" +
 	"\rfreemem_bytes\x18\x02 \x01(\x04R\ffreememBytes\x12'\n" +
@@ -1479,9 +1493,12 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0fdiskfree3_bytes\x18\x05 \x01(\x04H\x01R\x0ediskfree3Bytes\x88\x01\x01\x12\x14\n" +
 	"\x05load1\x18\x06 \x01(\rR\x05load1\x12\x14\n" +
 	"\x05load5\x18\a \x01(\rR\x05load5\x12\x16\n" +
-	"\x06load15\x18\b \x01(\rR\x06load15B\x12\n" +
+	"\x06load15\x18\b \x01(\rR\x06load15\x12$\n" +
+	"\vuser_string\x18\t \x01(\tH\x02R\n" +
+	"userString\x88\x01\x01B\x12\n" +
 	"\x10_diskfree2_bytesB\x12\n" +
-	"\x10_diskfree3_bytes\"\x90\x04\n" +
+	"\x10_diskfree3_bytesB\x0e\n" +
+	"\f_user_string\"\x90\x04\n" +
 	"\tTelemetry\x12\x12\n" +
 	"\x04time\x18\x01 \x01(\aR\x04time\x12B\n" +
 	"\x0edevice_metrics\x18\x02 \x01(\v2\x19.meshtastic.DeviceMetricsH\x00R\rdeviceMetrics\x12Q\n" +
@@ -1497,7 +1514,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"zeroOffset\x18\x01 \x01(\x05R\n" +
 	"zeroOffset\x12,\n" +
-	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\x9f\x04\n" +
+	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xac\x04\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -1548,7 +1565,8 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"\x06DPS310\x10$\x12\f\n" +
 	"\bRAK12035\x10%\x12\f\n" +
-	"\bMAX17261\x10&Be\n" +
+	"\bMAX17261\x10&\x12\v\n" +
+	"\aPCT2075\x10'Be\n" +
 	"\x13com.geeksville.meshB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (

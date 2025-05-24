@@ -255,7 +255,10 @@ type NodeInfoLite struct {
 	// Persists between NodeDB internal clean ups
 	IsIgnored bool `protobuf:"varint,11,opt,name=is_ignored,json=isIgnored,proto3" json:"is_ignored,omitempty"`
 	// Last byte of the node number of the node that should be used as the next hop to reach this node.
-	NextHop       uint32 `protobuf:"varint,12,opt,name=next_hop,json=nextHop,proto3" json:"next_hop,omitempty"`
+	NextHop uint32 `protobuf:"varint,12,opt,name=next_hop,json=nextHop,proto3" json:"next_hop,omitempty"`
+	// Bitfield for storing booleans.
+	// LSB 0 is_key_manually_verified
+	Bitfield      uint32 `protobuf:"varint,13,opt,name=bitfield,proto3" json:"bitfield,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -370,6 +373,13 @@ func (x *NodeInfoLite) GetIsIgnored() bool {
 func (x *NodeInfoLite) GetNextHop() uint32 {
 	if x != nil {
 		return x.NextHop
+	}
+	return 0
+}
+
+func (x *NodeInfoLite) GetBitfield() uint32 {
+	if x != nil {
+		return x.Bitfield
 	}
 	return 0
 }
@@ -741,7 +751,7 @@ const file_meshtastic_deviceonly_proto_rawDesc = "" +
 	"\n" +
 	"public_key\x18\a \x01(\fR\tpublicKey\x12,\n" +
 	"\x0fis_unmessagable\x18\t \x01(\bH\x00R\x0eisUnmessagable\x88\x01\x01B\x12\n" +
-	"\x10_is_unmessagable\"\xb3\x03\n" +
+	"\x10_is_unmessagable\"\xcf\x03\n" +
 	"\fNodeInfoLite\x12\x10\n" +
 	"\x03num\x18\x01 \x01(\rR\x03num\x12(\n" +
 	"\x04user\x18\x02 \x01(\v2\x14.meshtastic.UserLiteR\x04user\x124\n" +
@@ -758,7 +768,8 @@ const file_meshtastic_deviceonly_proto_rawDesc = "" +
 	"isFavorite\x12\x1d\n" +
 	"\n" +
 	"is_ignored\x18\v \x01(\bR\tisIgnored\x12\x19\n" +
-	"\bnext_hop\x18\f \x01(\rR\anextHopB\f\n" +
+	"\bnext_hop\x18\f \x01(\rR\anextHop\x12\x1a\n" +
+	"\bbitfield\x18\r \x01(\rR\bbitfieldB\f\n" +
 	"\n" +
 	"_hops_away\"\xd9\x03\n" +
 	"\vDeviceState\x12/\n" +
