@@ -218,6 +218,68 @@ func (Config_DeviceConfig_RebroadcastMode) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_config_proto_rawDescGZIP(), []int{0, 0, 1}
 }
 
+// Defines buzzer behavior for audio feedback
+type Config_DeviceConfig_BuzzerMode int32
+
+const (
+	// Default behavior.
+	// Buzzer is enabled for all audio feedback including button presses and alerts.
+	Config_DeviceConfig_ALL_ENABLED Config_DeviceConfig_BuzzerMode = 0
+	// Disabled.
+	// All buzzer audio feedback is disabled.
+	Config_DeviceConfig_DISABLED Config_DeviceConfig_BuzzerMode = 1
+	// Notifications Only.
+	// Buzzer is enabled only for notifications and alerts, but not for button presses.
+	// External notification config determines the specifics of the notification behavior.
+	Config_DeviceConfig_NOTIFICATIONS_ONLY Config_DeviceConfig_BuzzerMode = 2
+	// Non-notification system buzzer tones only.
+	// Buzzer is enabled only for non-notification tones such as button presses, startup, shutdown, but not for alerts.
+	Config_DeviceConfig_SYSTEM_ONLY Config_DeviceConfig_BuzzerMode = 3
+)
+
+// Enum value maps for Config_DeviceConfig_BuzzerMode.
+var (
+	Config_DeviceConfig_BuzzerMode_name = map[int32]string{
+		0: "ALL_ENABLED",
+		1: "DISABLED",
+		2: "NOTIFICATIONS_ONLY",
+		3: "SYSTEM_ONLY",
+	}
+	Config_DeviceConfig_BuzzerMode_value = map[string]int32{
+		"ALL_ENABLED":        0,
+		"DISABLED":           1,
+		"NOTIFICATIONS_ONLY": 2,
+		"SYSTEM_ONLY":        3,
+	}
+)
+
+func (x Config_DeviceConfig_BuzzerMode) Enum() *Config_DeviceConfig_BuzzerMode {
+	p := new(Config_DeviceConfig_BuzzerMode)
+	*p = x
+	return p
+}
+
+func (x Config_DeviceConfig_BuzzerMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Config_DeviceConfig_BuzzerMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_meshtastic_config_proto_enumTypes[2].Descriptor()
+}
+
+func (Config_DeviceConfig_BuzzerMode) Type() protoreflect.EnumType {
+	return &file_meshtastic_config_proto_enumTypes[2]
+}
+
+func (x Config_DeviceConfig_BuzzerMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Config_DeviceConfig_BuzzerMode.Descriptor instead.
+func (Config_DeviceConfig_BuzzerMode) EnumDescriptor() ([]byte, []int) {
+	return file_meshtastic_config_proto_rawDescGZIP(), []int{0, 0, 2}
+}
+
 // Bit field of boolean configuration options, indicating which optional
 // fields to include when assembling POSITION messages.
 // Longitude, latitude, altitude, speed, heading, and DOP
@@ -297,11 +359,11 @@ func (x Config_PositionConfig_PositionFlags) String() string {
 }
 
 func (Config_PositionConfig_PositionFlags) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[2].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[3].Descriptor()
 }
 
 func (Config_PositionConfig_PositionFlags) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[2]
+	return &file_meshtastic_config_proto_enumTypes[3]
 }
 
 func (x Config_PositionConfig_PositionFlags) Number() protoreflect.EnumNumber {
@@ -349,11 +411,11 @@ func (x Config_PositionConfig_GpsMode) String() string {
 }
 
 func (Config_PositionConfig_GpsMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[3].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[4].Descriptor()
 }
 
 func (Config_PositionConfig_GpsMode) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[3]
+	return &file_meshtastic_config_proto_enumTypes[4]
 }
 
 func (x Config_PositionConfig_GpsMode) Number() protoreflect.EnumNumber {
@@ -397,11 +459,11 @@ func (x Config_NetworkConfig_AddressMode) String() string {
 }
 
 func (Config_NetworkConfig_AddressMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[4].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[5].Descriptor()
 }
 
 func (Config_NetworkConfig_AddressMode) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[4]
+	return &file_meshtastic_config_proto_enumTypes[5]
 }
 
 func (x Config_NetworkConfig_AddressMode) Number() protoreflect.EnumNumber {
@@ -446,11 +508,11 @@ func (x Config_NetworkConfig_ProtocolFlags) String() string {
 }
 
 func (Config_NetworkConfig_ProtocolFlags) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[5].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[6].Descriptor()
 }
 
 func (Config_NetworkConfig_ProtocolFlags) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[5]
+	return &file_meshtastic_config_proto_enumTypes[6]
 }
 
 func (x Config_NetworkConfig_ProtocolFlags) Number() protoreflect.EnumNumber {
@@ -518,11 +580,11 @@ func (x Config_DisplayConfig_GpsCoordinateFormat) String() string {
 }
 
 func (Config_DisplayConfig_GpsCoordinateFormat) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[6].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[7].Descriptor()
 }
 
 func (Config_DisplayConfig_GpsCoordinateFormat) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[6]
+	return &file_meshtastic_config_proto_enumTypes[7]
 }
 
 func (x Config_DisplayConfig_GpsCoordinateFormat) Number() protoreflect.EnumNumber {
@@ -567,11 +629,11 @@ func (x Config_DisplayConfig_DisplayUnits) String() string {
 }
 
 func (Config_DisplayConfig_DisplayUnits) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[7].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[8].Descriptor()
 }
 
 func (Config_DisplayConfig_DisplayUnits) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[7]
+	return &file_meshtastic_config_proto_enumTypes[8]
 }
 
 func (x Config_DisplayConfig_DisplayUnits) Number() protoreflect.EnumNumber {
@@ -628,11 +690,11 @@ func (x Config_DisplayConfig_OledType) String() string {
 }
 
 func (Config_DisplayConfig_OledType) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[8].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[9].Descriptor()
 }
 
 func (Config_DisplayConfig_OledType) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[8]
+	return &file_meshtastic_config_proto_enumTypes[9]
 }
 
 func (x Config_DisplayConfig_OledType) Number() protoreflect.EnumNumber {
@@ -684,11 +746,11 @@ func (x Config_DisplayConfig_DisplayMode) String() string {
 }
 
 func (Config_DisplayConfig_DisplayMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[9].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[10].Descriptor()
 }
 
 func (Config_DisplayConfig_DisplayMode) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[9]
+	return &file_meshtastic_config_proto_enumTypes[10]
 }
 
 func (x Config_DisplayConfig_DisplayMode) Number() protoreflect.EnumNumber {
@@ -756,11 +818,11 @@ func (x Config_DisplayConfig_CompassOrientation) String() string {
 }
 
 func (Config_DisplayConfig_CompassOrientation) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[10].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[11].Descriptor()
 }
 
 func (Config_DisplayConfig_CompassOrientation) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[10]
+	return &file_meshtastic_config_proto_enumTypes[11]
 }
 
 func (x Config_DisplayConfig_CompassOrientation) Number() protoreflect.EnumNumber {
@@ -819,6 +881,8 @@ const (
 	Config_LoRaConfig_PH_868 Config_LoRaConfig_RegionCode = 20
 	// Philippines 915mhz
 	Config_LoRaConfig_PH_915 Config_LoRaConfig_RegionCode = 21
+	// Australia / New Zealand 433MHz
+	Config_LoRaConfig_ANZ_433 Config_LoRaConfig_RegionCode = 22
 )
 
 // Enum value maps for Config_LoRaConfig_RegionCode.
@@ -846,6 +910,7 @@ var (
 		19: "PH_433",
 		20: "PH_868",
 		21: "PH_915",
+		22: "ANZ_433",
 	}
 	Config_LoRaConfig_RegionCode_value = map[string]int32{
 		"UNSET":   0,
@@ -870,6 +935,7 @@ var (
 		"PH_433":  19,
 		"PH_868":  20,
 		"PH_915":  21,
+		"ANZ_433": 22,
 	}
 )
 
@@ -884,11 +950,11 @@ func (x Config_LoRaConfig_RegionCode) String() string {
 }
 
 func (Config_LoRaConfig_RegionCode) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[11].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[12].Descriptor()
 }
 
 func (Config_LoRaConfig_RegionCode) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[11]
+	return &file_meshtastic_config_proto_enumTypes[12]
 }
 
 func (x Config_LoRaConfig_RegionCode) Number() protoreflect.EnumNumber {
@@ -967,11 +1033,11 @@ func (x Config_LoRaConfig_ModemPreset) String() string {
 }
 
 func (Config_LoRaConfig_ModemPreset) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[12].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[13].Descriptor()
 }
 
 func (Config_LoRaConfig_ModemPreset) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[12]
+	return &file_meshtastic_config_proto_enumTypes[13]
 }
 
 func (x Config_LoRaConfig_ModemPreset) Number() protoreflect.EnumNumber {
@@ -1019,11 +1085,11 @@ func (x Config_BluetoothConfig_PairingMode) String() string {
 }
 
 func (Config_BluetoothConfig_PairingMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[13].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[14].Descriptor()
 }
 
 func (Config_BluetoothConfig_PairingMode) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[13]
+	return &file_meshtastic_config_proto_enumTypes[14]
 }
 
 func (x Config_BluetoothConfig_PairingMode) Number() protoreflect.EnumNumber {
@@ -1282,8 +1348,11 @@ type Config_DeviceConfig struct {
 	Tzdef string `protobuf:"bytes,11,opt,name=tzdef,proto3" json:"tzdef,omitempty"`
 	// If true, disable the default blinking LED (LED_PIN) behavior on the device
 	LedHeartbeatDisabled bool `protobuf:"varint,12,opt,name=led_heartbeat_disabled,json=ledHeartbeatDisabled,proto3" json:"led_heartbeat_disabled,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// Controls buzzer behavior for audio feedback
+	// Defaults to ENABLED
+	BuzzerMode    Config_DeviceConfig_BuzzerMode `protobuf:"varint,13,opt,name=buzzer_mode,json=buzzerMode,proto3,enum=meshtastic.Config_DeviceConfig_BuzzerMode" json:"buzzer_mode,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Config_DeviceConfig) Reset() {
@@ -1393,6 +1462,13 @@ func (x *Config_DeviceConfig) GetLedHeartbeatDisabled() bool {
 		return x.LedHeartbeatDisabled
 	}
 	return false
+}
+
+func (x *Config_DeviceConfig) GetBuzzerMode() Config_DeviceConfig_BuzzerMode {
+	if x != nil {
+		return x.BuzzerMode
+	}
+	return Config_DeviceConfig_ALL_ENABLED
 }
 
 // Position Config
@@ -1714,8 +1790,10 @@ type Config_NetworkConfig struct {
 	RsyslogServer string `protobuf:"bytes,9,opt,name=rsyslog_server,json=rsyslogServer,proto3" json:"rsyslog_server,omitempty"`
 	// Flags for enabling/disabling network protocols
 	EnabledProtocols uint32 `protobuf:"varint,10,opt,name=enabled_protocols,json=enabledProtocols,proto3" json:"enabled_protocols,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Enable/Disable ipv6 support
+	Ipv6Enabled   bool `protobuf:"varint,11,opt,name=ipv6_enabled,json=ipv6Enabled,proto3" json:"ipv6_enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Config_NetworkConfig) Reset() {
@@ -1809,6 +1887,13 @@ func (x *Config_NetworkConfig) GetEnabledProtocols() uint32 {
 		return x.EnabledProtocols
 	}
 	return 0
+}
+
+func (x *Config_NetworkConfig) GetIpv6Enabled() bool {
+	if x != nil {
+		return x.Ipv6Enabled
+	}
+	return false
 }
 
 // Display Config
@@ -2470,7 +2555,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x9e1\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xf12\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2484,7 +2569,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"sessionkey\x18\t \x01(\v2#.meshtastic.Config.SessionkeyConfigH\x00R\n" +
 	"sessionkey\x129\n" +
 	"\tdevice_ui\x18\n" +
-	" \x01(\v2\x1a.meshtastic.DeviceUIConfigH\x00R\bdeviceUi\x1a\xde\x06\n" +
+	" \x01(\v2\x1a.meshtastic.DeviceUIConfigH\x00R\bdeviceUi\x1a\x81\b\n" +
 	"\fDeviceConfig\x128\n" +
 	"\x04role\x18\x01 \x01(\x0e2$.meshtastic.Config.DeviceConfig.RoleR\x04role\x12)\n" +
 	"\x0eserial_enabled\x18\x02 \x01(\bB\x02\x18\x01R\rserialEnabled\x12\x1f\n" +
@@ -2500,7 +2585,9 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x14disable_triple_click\x18\n" +
 	" \x01(\bR\x12disableTripleClick\x12\x14\n" +
 	"\x05tzdef\x18\v \x01(\tR\x05tzdef\x124\n" +
-	"\x16led_heartbeat_disabled\x18\f \x01(\bR\x14ledHeartbeatDisabled\"\xbf\x01\n" +
+	"\x16led_heartbeat_disabled\x18\f \x01(\bR\x14ledHeartbeatDisabled\x12K\n" +
+	"\vbuzzer_mode\x18\r \x01(\x0e2*.meshtastic.Config.DeviceConfig.BuzzerModeR\n" +
+	"buzzerMode\"\xbf\x01\n" +
 	"\x04Role\x12\n" +
 	"\n" +
 	"\x06CLIENT\x10\x00\x12\x0f\n" +
@@ -2526,7 +2613,13 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"KNOWN_ONLY\x10\x03\x12\b\n" +
 	"\x04NONE\x10\x04\x12\x16\n" +
-	"\x12CORE_PORTNUMS_ONLY\x10\x05\x1a\xfa\x06\n" +
+	"\x12CORE_PORTNUMS_ONLY\x10\x05\"T\n" +
+	"\n" +
+	"BuzzerMode\x12\x0f\n" +
+	"\vALL_ENABLED\x10\x00\x12\f\n" +
+	"\bDISABLED\x10\x01\x12\x16\n" +
+	"\x12NOTIFICATIONS_ONLY\x10\x02\x12\x0f\n" +
+	"\vSYSTEM_ONLY\x10\x03\x1a\xfa\x06\n" +
 	"\x0ePositionConfig\x126\n" +
 	"\x17position_broadcast_secs\x18\x01 \x01(\rR\x15positionBroadcastSecs\x12G\n" +
 	" position_broadcast_smart_enabled\x18\x02 \x01(\bR\x1dpositionBroadcastSmartEnabled\x12%\n" +
@@ -2570,7 +2663,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\als_secs\x18\a \x01(\rR\x06lsSecs\x12\"\n" +
 	"\rmin_wake_secs\x18\b \x01(\rR\vminWakeSecs\x12;\n" +
 	"\x1adevice_battery_ina_address\x18\t \x01(\rR\x17deviceBatteryInaAddress\x12)\n" +
-	"\x10powermon_enables\x18  \x01(\x04R\x0fpowermonEnables\x1a\xda\x04\n" +
+	"\x10powermon_enables\x18  \x01(\x04R\x0fpowermonEnables\x1a\xfd\x04\n" +
 	"\rNetworkConfig\x12!\n" +
 	"\fwifi_enabled\x18\x01 \x01(\bR\vwifiEnabled\x12\x1b\n" +
 	"\twifi_ssid\x18\x03 \x01(\tR\bwifiSsid\x12\x19\n" +
@@ -2584,7 +2677,8 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"ipv4Config\x12%\n" +
 	"\x0ersyslog_server\x18\t \x01(\tR\rrsyslogServer\x12+\n" +
 	"\x11enabled_protocols\x18\n" +
-	" \x01(\rR\x10enabledProtocols\x1a`\n" +
+	" \x01(\rR\x10enabledProtocols\x12!\n" +
+	"\fipv6_enabled\x18\v \x01(\bR\vipv6Enabled\x1a`\n" +
 	"\n" +
 	"IpV4Config\x12\x0e\n" +
 	"\x02ip\x18\x01 \x01(\aR\x02ip\x12\x18\n" +
@@ -2645,7 +2739,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x12DEGREES_0_INVERTED\x10\x04\x12\x17\n" +
 	"\x13DEGREES_90_INVERTED\x10\x05\x12\x18\n" +
 	"\x14DEGREES_180_INVERTED\x10\x06\x12\x18\n" +
-	"\x14DEGREES_270_INVERTED\x10\a\x1a\x93\t\n" +
+	"\x14DEGREES_270_INVERTED\x10\a\x1a\xa0\t\n" +
 	"\n" +
 	"LoRaConfig\x12\x1d\n" +
 	"\n" +
@@ -2671,7 +2765,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x0fignore_incoming\x18g \x03(\rR\x0eignoreIncoming\x12\x1f\n" +
 	"\vignore_mqtt\x18h \x01(\bR\n" +
 	"ignoreMqtt\x12)\n" +
-	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\"\xf1\x01\n" +
+	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\"\xfe\x01\n" +
 	"\n" +
 	"RegionCode\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\x06\n" +
@@ -2707,7 +2801,8 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x06PH_868\x10\x14\x12\n" +
 	"\n" +
-	"\x06PH_915\x10\x15\"\xa9\x01\n" +
+	"\x06PH_915\x10\x15\x12\v\n" +
+	"\aANZ_433\x10\x16\"\xa9\x01\n" +
 	"\vModemPreset\x12\r\n" +
 	"\tLONG_FAST\x10\x00\x12\r\n" +
 	"\tLONG_SLOW\x10\x01\x12\x16\n" +
@@ -2757,65 +2852,67 @@ func file_meshtastic_config_proto_rawDescGZIP() []byte {
 	return file_meshtastic_config_proto_rawDescData
 }
 
-var file_meshtastic_config_proto_enumTypes = make([]protoimpl.EnumInfo, 14)
+var file_meshtastic_config_proto_enumTypes = make([]protoimpl.EnumInfo, 15)
 var file_meshtastic_config_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_meshtastic_config_proto_goTypes = []any{
 	(Config_DeviceConfig_Role)(0),                 // 0: meshtastic.Config.DeviceConfig.Role
 	(Config_DeviceConfig_RebroadcastMode)(0),      // 1: meshtastic.Config.DeviceConfig.RebroadcastMode
-	(Config_PositionConfig_PositionFlags)(0),      // 2: meshtastic.Config.PositionConfig.PositionFlags
-	(Config_PositionConfig_GpsMode)(0),            // 3: meshtastic.Config.PositionConfig.GpsMode
-	(Config_NetworkConfig_AddressMode)(0),         // 4: meshtastic.Config.NetworkConfig.AddressMode
-	(Config_NetworkConfig_ProtocolFlags)(0),       // 5: meshtastic.Config.NetworkConfig.ProtocolFlags
-	(Config_DisplayConfig_GpsCoordinateFormat)(0), // 6: meshtastic.Config.DisplayConfig.GpsCoordinateFormat
-	(Config_DisplayConfig_DisplayUnits)(0),        // 7: meshtastic.Config.DisplayConfig.DisplayUnits
-	(Config_DisplayConfig_OledType)(0),            // 8: meshtastic.Config.DisplayConfig.OledType
-	(Config_DisplayConfig_DisplayMode)(0),         // 9: meshtastic.Config.DisplayConfig.DisplayMode
-	(Config_DisplayConfig_CompassOrientation)(0),  // 10: meshtastic.Config.DisplayConfig.CompassOrientation
-	(Config_LoRaConfig_RegionCode)(0),             // 11: meshtastic.Config.LoRaConfig.RegionCode
-	(Config_LoRaConfig_ModemPreset)(0),            // 12: meshtastic.Config.LoRaConfig.ModemPreset
-	(Config_BluetoothConfig_PairingMode)(0),       // 13: meshtastic.Config.BluetoothConfig.PairingMode
-	(*Config)(nil),                                // 14: meshtastic.Config
-	(*Config_DeviceConfig)(nil),                   // 15: meshtastic.Config.DeviceConfig
-	(*Config_PositionConfig)(nil),                 // 16: meshtastic.Config.PositionConfig
-	(*Config_PowerConfig)(nil),                    // 17: meshtastic.Config.PowerConfig
-	(*Config_NetworkConfig)(nil),                  // 18: meshtastic.Config.NetworkConfig
-	(*Config_DisplayConfig)(nil),                  // 19: meshtastic.Config.DisplayConfig
-	(*Config_LoRaConfig)(nil),                     // 20: meshtastic.Config.LoRaConfig
-	(*Config_BluetoothConfig)(nil),                // 21: meshtastic.Config.BluetoothConfig
-	(*Config_SecurityConfig)(nil),                 // 22: meshtastic.Config.SecurityConfig
-	(*Config_SessionkeyConfig)(nil),               // 23: meshtastic.Config.SessionkeyConfig
-	(*Config_NetworkConfig_IpV4Config)(nil),       // 24: meshtastic.Config.NetworkConfig.IpV4Config
-	(*DeviceUIConfig)(nil),                        // 25: meshtastic.DeviceUIConfig
+	(Config_DeviceConfig_BuzzerMode)(0),           // 2: meshtastic.Config.DeviceConfig.BuzzerMode
+	(Config_PositionConfig_PositionFlags)(0),      // 3: meshtastic.Config.PositionConfig.PositionFlags
+	(Config_PositionConfig_GpsMode)(0),            // 4: meshtastic.Config.PositionConfig.GpsMode
+	(Config_NetworkConfig_AddressMode)(0),         // 5: meshtastic.Config.NetworkConfig.AddressMode
+	(Config_NetworkConfig_ProtocolFlags)(0),       // 6: meshtastic.Config.NetworkConfig.ProtocolFlags
+	(Config_DisplayConfig_GpsCoordinateFormat)(0), // 7: meshtastic.Config.DisplayConfig.GpsCoordinateFormat
+	(Config_DisplayConfig_DisplayUnits)(0),        // 8: meshtastic.Config.DisplayConfig.DisplayUnits
+	(Config_DisplayConfig_OledType)(0),            // 9: meshtastic.Config.DisplayConfig.OledType
+	(Config_DisplayConfig_DisplayMode)(0),         // 10: meshtastic.Config.DisplayConfig.DisplayMode
+	(Config_DisplayConfig_CompassOrientation)(0),  // 11: meshtastic.Config.DisplayConfig.CompassOrientation
+	(Config_LoRaConfig_RegionCode)(0),             // 12: meshtastic.Config.LoRaConfig.RegionCode
+	(Config_LoRaConfig_ModemPreset)(0),            // 13: meshtastic.Config.LoRaConfig.ModemPreset
+	(Config_BluetoothConfig_PairingMode)(0),       // 14: meshtastic.Config.BluetoothConfig.PairingMode
+	(*Config)(nil),                                // 15: meshtastic.Config
+	(*Config_DeviceConfig)(nil),                   // 16: meshtastic.Config.DeviceConfig
+	(*Config_PositionConfig)(nil),                 // 17: meshtastic.Config.PositionConfig
+	(*Config_PowerConfig)(nil),                    // 18: meshtastic.Config.PowerConfig
+	(*Config_NetworkConfig)(nil),                  // 19: meshtastic.Config.NetworkConfig
+	(*Config_DisplayConfig)(nil),                  // 20: meshtastic.Config.DisplayConfig
+	(*Config_LoRaConfig)(nil),                     // 21: meshtastic.Config.LoRaConfig
+	(*Config_BluetoothConfig)(nil),                // 22: meshtastic.Config.BluetoothConfig
+	(*Config_SecurityConfig)(nil),                 // 23: meshtastic.Config.SecurityConfig
+	(*Config_SessionkeyConfig)(nil),               // 24: meshtastic.Config.SessionkeyConfig
+	(*Config_NetworkConfig_IpV4Config)(nil),       // 25: meshtastic.Config.NetworkConfig.IpV4Config
+	(*DeviceUIConfig)(nil),                        // 26: meshtastic.DeviceUIConfig
 }
 var file_meshtastic_config_proto_depIdxs = []int32{
-	15, // 0: meshtastic.Config.device:type_name -> meshtastic.Config.DeviceConfig
-	16, // 1: meshtastic.Config.position:type_name -> meshtastic.Config.PositionConfig
-	17, // 2: meshtastic.Config.power:type_name -> meshtastic.Config.PowerConfig
-	18, // 3: meshtastic.Config.network:type_name -> meshtastic.Config.NetworkConfig
-	19, // 4: meshtastic.Config.display:type_name -> meshtastic.Config.DisplayConfig
-	20, // 5: meshtastic.Config.lora:type_name -> meshtastic.Config.LoRaConfig
-	21, // 6: meshtastic.Config.bluetooth:type_name -> meshtastic.Config.BluetoothConfig
-	22, // 7: meshtastic.Config.security:type_name -> meshtastic.Config.SecurityConfig
-	23, // 8: meshtastic.Config.sessionkey:type_name -> meshtastic.Config.SessionkeyConfig
-	25, // 9: meshtastic.Config.device_ui:type_name -> meshtastic.DeviceUIConfig
+	16, // 0: meshtastic.Config.device:type_name -> meshtastic.Config.DeviceConfig
+	17, // 1: meshtastic.Config.position:type_name -> meshtastic.Config.PositionConfig
+	18, // 2: meshtastic.Config.power:type_name -> meshtastic.Config.PowerConfig
+	19, // 3: meshtastic.Config.network:type_name -> meshtastic.Config.NetworkConfig
+	20, // 4: meshtastic.Config.display:type_name -> meshtastic.Config.DisplayConfig
+	21, // 5: meshtastic.Config.lora:type_name -> meshtastic.Config.LoRaConfig
+	22, // 6: meshtastic.Config.bluetooth:type_name -> meshtastic.Config.BluetoothConfig
+	23, // 7: meshtastic.Config.security:type_name -> meshtastic.Config.SecurityConfig
+	24, // 8: meshtastic.Config.sessionkey:type_name -> meshtastic.Config.SessionkeyConfig
+	26, // 9: meshtastic.Config.device_ui:type_name -> meshtastic.DeviceUIConfig
 	0,  // 10: meshtastic.Config.DeviceConfig.role:type_name -> meshtastic.Config.DeviceConfig.Role
 	1,  // 11: meshtastic.Config.DeviceConfig.rebroadcast_mode:type_name -> meshtastic.Config.DeviceConfig.RebroadcastMode
-	3,  // 12: meshtastic.Config.PositionConfig.gps_mode:type_name -> meshtastic.Config.PositionConfig.GpsMode
-	4,  // 13: meshtastic.Config.NetworkConfig.address_mode:type_name -> meshtastic.Config.NetworkConfig.AddressMode
-	24, // 14: meshtastic.Config.NetworkConfig.ipv4_config:type_name -> meshtastic.Config.NetworkConfig.IpV4Config
-	6,  // 15: meshtastic.Config.DisplayConfig.gps_format:type_name -> meshtastic.Config.DisplayConfig.GpsCoordinateFormat
-	7,  // 16: meshtastic.Config.DisplayConfig.units:type_name -> meshtastic.Config.DisplayConfig.DisplayUnits
-	8,  // 17: meshtastic.Config.DisplayConfig.oled:type_name -> meshtastic.Config.DisplayConfig.OledType
-	9,  // 18: meshtastic.Config.DisplayConfig.displaymode:type_name -> meshtastic.Config.DisplayConfig.DisplayMode
-	10, // 19: meshtastic.Config.DisplayConfig.compass_orientation:type_name -> meshtastic.Config.DisplayConfig.CompassOrientation
-	12, // 20: meshtastic.Config.LoRaConfig.modem_preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
-	11, // 21: meshtastic.Config.LoRaConfig.region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
-	13, // 22: meshtastic.Config.BluetoothConfig.mode:type_name -> meshtastic.Config.BluetoothConfig.PairingMode
-	23, // [23:23] is the sub-list for method output_type
-	23, // [23:23] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	2,  // 12: meshtastic.Config.DeviceConfig.buzzer_mode:type_name -> meshtastic.Config.DeviceConfig.BuzzerMode
+	4,  // 13: meshtastic.Config.PositionConfig.gps_mode:type_name -> meshtastic.Config.PositionConfig.GpsMode
+	5,  // 14: meshtastic.Config.NetworkConfig.address_mode:type_name -> meshtastic.Config.NetworkConfig.AddressMode
+	25, // 15: meshtastic.Config.NetworkConfig.ipv4_config:type_name -> meshtastic.Config.NetworkConfig.IpV4Config
+	7,  // 16: meshtastic.Config.DisplayConfig.gps_format:type_name -> meshtastic.Config.DisplayConfig.GpsCoordinateFormat
+	8,  // 17: meshtastic.Config.DisplayConfig.units:type_name -> meshtastic.Config.DisplayConfig.DisplayUnits
+	9,  // 18: meshtastic.Config.DisplayConfig.oled:type_name -> meshtastic.Config.DisplayConfig.OledType
+	10, // 19: meshtastic.Config.DisplayConfig.displaymode:type_name -> meshtastic.Config.DisplayConfig.DisplayMode
+	11, // 20: meshtastic.Config.DisplayConfig.compass_orientation:type_name -> meshtastic.Config.DisplayConfig.CompassOrientation
+	13, // 21: meshtastic.Config.LoRaConfig.modem_preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
+	12, // 22: meshtastic.Config.LoRaConfig.region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
+	14, // 23: meshtastic.Config.BluetoothConfig.mode:type_name -> meshtastic.Config.BluetoothConfig.PairingMode
+	24, // [24:24] is the sub-list for method output_type
+	24, // [24:24] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_config_proto_init() }
@@ -2841,7 +2938,7 @@ func file_meshtastic_config_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_config_proto_rawDesc), len(file_meshtastic_config_proto_rawDesc)),
-			NumEnums:      14,
+			NumEnums:      15,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,

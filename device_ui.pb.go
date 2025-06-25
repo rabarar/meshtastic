@@ -111,6 +111,8 @@ const (
 	Language_SLOVENIAN Language = 15
 	// Ukrainian
 	Language_UKRAINIAN Language = 16
+	// Bulgarian
+	Language_BULGARIAN Language = 17
 	// Simplified Chinese (experimental)
 	Language_SIMPLIFIED_CHINESE Language = 30
 	// Traditional Chinese (experimental)
@@ -137,6 +139,7 @@ var (
 		14: "NORWEGIAN",
 		15: "SLOVENIAN",
 		16: "UKRAINIAN",
+		17: "BULGARIAN",
 		30: "SIMPLIFIED_CHINESE",
 		31: "TRADITIONAL_CHINESE",
 	}
@@ -158,6 +161,7 @@ var (
 		"NORWEGIAN":           14,
 		"SLOVENIAN":           15,
 		"UKRAINIAN":           16,
+		"BULGARIAN":           17,
 		"SIMPLIFIED_CHINESE":  30,
 		"TRADITIONAL_CHINESE": 31,
 	}
@@ -718,7 +722,7 @@ const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"\x05Theme\x12\b\n" +
 	"\x04DARK\x10\x00\x12\t\n" +
 	"\x05LIGHT\x10\x01\x12\a\n" +
-	"\x03RED\x10\x02*\x9a\x02\n" +
+	"\x03RED\x10\x02*\xa9\x02\n" +
 	"\bLanguage\x12\v\n" +
 	"\aENGLISH\x10\x00\x12\n" +
 	"\n" +
@@ -741,7 +745,8 @@ const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"\x05GREEK\x10\r\x12\r\n" +
 	"\tNORWEGIAN\x10\x0e\x12\r\n" +
 	"\tSLOVENIAN\x10\x0f\x12\r\n" +
-	"\tUKRAINIAN\x10\x10\x12\x16\n" +
+	"\tUKRAINIAN\x10\x10\x12\r\n" +
+	"\tBULGARIAN\x10\x11\x12\x16\n" +
 	"\x12SIMPLIFIED_CHINESE\x10\x1e\x12\x17\n" +
 	"\x13TRADITIONAL_CHINESE\x10\x1fBd\n" +
 	"\x13com.geeksville.meshB\x0eDeviceUIProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"

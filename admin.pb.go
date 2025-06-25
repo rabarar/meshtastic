@@ -243,6 +243,64 @@ func (AdminMessage_BackupLocation) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_admin_proto_rawDescGZIP(), []int{0, 2}
 }
 
+// Three stages of this request.
+type KeyVerificationAdmin_MessageType int32
+
+const (
+	// This is the first stage, where a client initiates
+	KeyVerificationAdmin_INITIATE_VERIFICATION KeyVerificationAdmin_MessageType = 0
+	// After the nonce has been returned over the mesh, the client prompts for the security number
+	// And uses this message to provide it to the node.
+	KeyVerificationAdmin_PROVIDE_SECURITY_NUMBER KeyVerificationAdmin_MessageType = 1
+	// Once the user has compared the verification message, this message notifies the node.
+	KeyVerificationAdmin_DO_VERIFY KeyVerificationAdmin_MessageType = 2
+	// This is the cancel path, can be taken at any point
+	KeyVerificationAdmin_DO_NOT_VERIFY KeyVerificationAdmin_MessageType = 3
+)
+
+// Enum value maps for KeyVerificationAdmin_MessageType.
+var (
+	KeyVerificationAdmin_MessageType_name = map[int32]string{
+		0: "INITIATE_VERIFICATION",
+		1: "PROVIDE_SECURITY_NUMBER",
+		2: "DO_VERIFY",
+		3: "DO_NOT_VERIFY",
+	}
+	KeyVerificationAdmin_MessageType_value = map[string]int32{
+		"INITIATE_VERIFICATION":   0,
+		"PROVIDE_SECURITY_NUMBER": 1,
+		"DO_VERIFY":               2,
+		"DO_NOT_VERIFY":           3,
+	}
+)
+
+func (x KeyVerificationAdmin_MessageType) Enum() *KeyVerificationAdmin_MessageType {
+	p := new(KeyVerificationAdmin_MessageType)
+	*p = x
+	return p
+}
+
+func (x KeyVerificationAdmin_MessageType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (KeyVerificationAdmin_MessageType) Descriptor() protoreflect.EnumDescriptor {
+	return file_meshtastic_admin_proto_enumTypes[3].Descriptor()
+}
+
+func (KeyVerificationAdmin_MessageType) Type() protoreflect.EnumType {
+	return &file_meshtastic_admin_proto_enumTypes[3]
+}
+
+func (x KeyVerificationAdmin_MessageType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use KeyVerificationAdmin_MessageType.Descriptor instead.
+func (KeyVerificationAdmin_MessageType) EnumDescriptor() ([]byte, []int) {
+	return file_meshtastic_admin_proto_rawDescGZIP(), []int{4, 0}
+}
+
 // This message is handled by the Admin module and is responsible for all settings/channel read/write operations.
 // This message is used to do settings operations to both remote AND local nodes.
 // (Prior to 1.2 these operations were done via special ToRadio operations)
@@ -281,6 +339,7 @@ type AdminMessage struct {
 	//	*AdminMessage_BackupPreferences
 	//	*AdminMessage_RestorePreferences
 	//	*AdminMessage_RemoveBackupPreferences
+	//	*AdminMessage_SendInputEvent
 	//	*AdminMessage_SetOwner
 	//	*AdminMessage_SetChannel
 	//	*AdminMessage_SetConfig
@@ -301,6 +360,7 @@ type AdminMessage struct {
 	//	*AdminMessage_BeginEditSettings
 	//	*AdminMessage_CommitEditSettings
 	//	*AdminMessage_AddContact
+	//	*AdminMessage_KeyVerification
 	//	*AdminMessage_FactoryResetDevice
 	//	*AdminMessage_RebootOtaSeconds
 	//	*AdminMessage_ExitSimulator
@@ -582,6 +642,15 @@ func (x *AdminMessage) GetRemoveBackupPreferences() AdminMessage_BackupLocation 
 	return AdminMessage_FLASH
 }
 
+func (x *AdminMessage) GetSendInputEvent() *AdminMessage_InputEvent {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*AdminMessage_SendInputEvent); ok {
+			return x.SendInputEvent
+		}
+	}
+	return nil
+}
+
 func (x *AdminMessage) GetSetOwner() *User {
 	if x != nil {
 		if x, ok := x.PayloadVariant.(*AdminMessage_SetOwner); ok {
@@ -757,6 +826,15 @@ func (x *AdminMessage) GetAddContact() *SharedContact {
 	if x != nil {
 		if x, ok := x.PayloadVariant.(*AdminMessage_AddContact); ok {
 			return x.AddContact
+		}
+	}
+	return nil
+}
+
+func (x *AdminMessage) GetKeyVerification() *KeyVerificationAdmin {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*AdminMessage_KeyVerification); ok {
+			return x.KeyVerification
 		}
 	}
 	return nil
@@ -956,6 +1034,12 @@ type AdminMessage_RemoveBackupPreferences struct {
 	RemoveBackupPreferences AdminMessage_BackupLocation `protobuf:"varint,26,opt,name=remove_backup_preferences,json=removeBackupPreferences,proto3,enum=meshtastic.AdminMessage_BackupLocation,oneof"`
 }
 
+type AdminMessage_SendInputEvent struct {
+	// Send an input event to the node.
+	// This is used to trigger physical input events like button presses, touch events, etc.
+	SendInputEvent *AdminMessage_InputEvent `protobuf:"bytes,27,opt,name=send_input_event,json=sendInputEvent,proto3,oneof"`
+}
+
 type AdminMessage_SetOwner struct {
 	// Set the owner for this node
 	SetOwner *User `protobuf:"bytes,32,opt,name=set_owner,json=setOwner,proto3,oneof"`
@@ -1062,6 +1146,11 @@ type AdminMessage_AddContact struct {
 	AddContact *SharedContact `protobuf:"bytes,66,opt,name=add_contact,json=addContact,proto3,oneof"`
 }
 
+type AdminMessage_KeyVerification struct {
+	// Initiate or respond to a key verification request
+	KeyVerification *KeyVerificationAdmin `protobuf:"bytes,67,opt,name=key_verification,json=keyVerification,proto3,oneof"`
+}
+
 type AdminMessage_FactoryResetDevice struct {
 	// Tell the node to factory reset config everything; all device state and configuration will be returned to factory defaults and BLE bonds will be cleared.
 	FactoryResetDevice int32 `protobuf:"varint,94,opt,name=factory_reset_device,json=factoryResetDevice,proto3,oneof"`
@@ -1149,6 +1238,8 @@ func (*AdminMessage_RestorePreferences) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_RemoveBackupPreferences) isAdminMessage_PayloadVariant() {}
 
+func (*AdminMessage_SendInputEvent) isAdminMessage_PayloadVariant() {}
+
 func (*AdminMessage_SetOwner) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_SetChannel) isAdminMessage_PayloadVariant() {}
@@ -1188,6 +1279,8 @@ func (*AdminMessage_BeginEditSettings) isAdminMessage_PayloadVariant() {}
 func (*AdminMessage_CommitEditSettings) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_AddContact) isAdminMessage_PayloadVariant() {}
+
+func (*AdminMessage_KeyVerification) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_FactoryResetDevice) isAdminMessage_PayloadVariant() {}
 
@@ -1329,7 +1422,9 @@ type SharedContact struct {
 	// The node number of the contact
 	NodeNum uint32 `protobuf:"varint,1,opt,name=node_num,json=nodeNum,proto3" json:"node_num,omitempty"`
 	// The User of the contact
-	User          *User `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	User *User `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	// Add this contact to the blocked / ignored list
+	ShouldIgnore  bool `protobuf:"varint,3,opt,name=should_ignore,json=shouldIgnore,proto3" json:"should_ignore,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1378,12 +1473,164 @@ func (x *SharedContact) GetUser() *User {
 	return nil
 }
 
+func (x *SharedContact) GetShouldIgnore() bool {
+	if x != nil {
+		return x.ShouldIgnore
+	}
+	return false
+}
+
+// This message is used by a client to initiate or complete a key verification
+type KeyVerificationAdmin struct {
+	state       protoimpl.MessageState           `protogen:"open.v1"`
+	MessageType KeyVerificationAdmin_MessageType `protobuf:"varint,1,opt,name=message_type,json=messageType,proto3,enum=meshtastic.KeyVerificationAdmin_MessageType" json:"message_type,omitempty"`
+	// The nodenum we're requesting
+	RemoteNodenum uint32 `protobuf:"varint,2,opt,name=remote_nodenum,json=remoteNodenum,proto3" json:"remote_nodenum,omitempty"`
+	// The nonce is used to track the connection
+	Nonce uint64 `protobuf:"varint,3,opt,name=nonce,proto3" json:"nonce,omitempty"`
+	// The 4 digit code generated by the remote node, and communicated outside the mesh
+	SecurityNumber *uint32 `protobuf:"varint,4,opt,name=security_number,json=securityNumber,proto3,oneof" json:"security_number,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *KeyVerificationAdmin) Reset() {
+	*x = KeyVerificationAdmin{}
+	mi := &file_meshtastic_admin_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeyVerificationAdmin) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeyVerificationAdmin) ProtoMessage() {}
+
+func (x *KeyVerificationAdmin) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_admin_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeyVerificationAdmin.ProtoReflect.Descriptor instead.
+func (*KeyVerificationAdmin) Descriptor() ([]byte, []int) {
+	return file_meshtastic_admin_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *KeyVerificationAdmin) GetMessageType() KeyVerificationAdmin_MessageType {
+	if x != nil {
+		return x.MessageType
+	}
+	return KeyVerificationAdmin_INITIATE_VERIFICATION
+}
+
+func (x *KeyVerificationAdmin) GetRemoteNodenum() uint32 {
+	if x != nil {
+		return x.RemoteNodenum
+	}
+	return 0
+}
+
+func (x *KeyVerificationAdmin) GetNonce() uint64 {
+	if x != nil {
+		return x.Nonce
+	}
+	return 0
+}
+
+func (x *KeyVerificationAdmin) GetSecurityNumber() uint32 {
+	if x != nil && x.SecurityNumber != nil {
+		return *x.SecurityNumber
+	}
+	return 0
+}
+
+// Input event message to be sent to the node.
+type AdminMessage_InputEvent struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The input event code
+	EventCode uint32 `protobuf:"varint,1,opt,name=event_code,json=eventCode,proto3" json:"event_code,omitempty"`
+	// Keyboard character code
+	KbChar uint32 `protobuf:"varint,2,opt,name=kb_char,json=kbChar,proto3" json:"kb_char,omitempty"`
+	// The touch X coordinate
+	TouchX uint32 `protobuf:"varint,3,opt,name=touch_x,json=touchX,proto3" json:"touch_x,omitempty"`
+	// The touch Y coordinate
+	TouchY        uint32 `protobuf:"varint,4,opt,name=touch_y,json=touchY,proto3" json:"touch_y,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminMessage_InputEvent) Reset() {
+	*x = AdminMessage_InputEvent{}
+	mi := &file_meshtastic_admin_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminMessage_InputEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminMessage_InputEvent) ProtoMessage() {}
+
+func (x *AdminMessage_InputEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_admin_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminMessage_InputEvent.ProtoReflect.Descriptor instead.
+func (*AdminMessage_InputEvent) Descriptor() ([]byte, []int) {
+	return file_meshtastic_admin_proto_rawDescGZIP(), []int{0, 0}
+}
+
+func (x *AdminMessage_InputEvent) GetEventCode() uint32 {
+	if x != nil {
+		return x.EventCode
+	}
+	return 0
+}
+
+func (x *AdminMessage_InputEvent) GetKbChar() uint32 {
+	if x != nil {
+		return x.KbChar
+	}
+	return 0
+}
+
+func (x *AdminMessage_InputEvent) GetTouchX() uint32 {
+	if x != nil {
+		return x.TouchX
+	}
+	return 0
+}
+
+func (x *AdminMessage_InputEvent) GetTouchY() uint32 {
+	if x != nil {
+		return x.TouchY
+	}
+	return 0
+}
+
 var File_meshtastic_admin_proto protoreflect.FileDescriptor
 
 const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"\x16meshtastic/admin.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\x1a\x1ameshtastic/device_ui.proto\"\xbb\x1f\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\x1a\x1ameshtastic/device_ui.proto\"\xd3!\n" +
 	"\fAdminMessage\x12'\n" +
 	"\x0fsession_passkey\x18e \x01(\fR\x0esessionPasskey\x120\n" +
 	"\x13get_channel_request\x18\x01 \x01(\rH\x00R\x11getChannelRequest\x12G\n" +
@@ -1412,7 +1659,8 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\tset_scale\x18\x17 \x01(\rH\x00R\bsetScale\x12X\n" +
 	"\x12backup_preferences\x18\x18 \x01(\x0e2'.meshtastic.AdminMessage.BackupLocationH\x00R\x11backupPreferences\x12Z\n" +
 	"\x13restore_preferences\x18\x19 \x01(\x0e2'.meshtastic.AdminMessage.BackupLocationH\x00R\x12restorePreferences\x12e\n" +
-	"\x19remove_backup_preferences\x18\x1a \x01(\x0e2'.meshtastic.AdminMessage.BackupLocationH\x00R\x17removeBackupPreferences\x12/\n" +
+	"\x19remove_backup_preferences\x18\x1a \x01(\x0e2'.meshtastic.AdminMessage.BackupLocationH\x00R\x17removeBackupPreferences\x12O\n" +
+	"\x10send_input_event\x18\x1b \x01(\v2#.meshtastic.AdminMessage.InputEventH\x00R\x0esendInputEvent\x12/\n" +
 	"\tset_owner\x18  \x01(\v2\x10.meshtastic.UserH\x00R\bsetOwner\x126\n" +
 	"\vset_channel\x18! \x01(\v2\x13.meshtastic.ChannelH\x00R\n" +
 	"setChannel\x123\n" +
@@ -1435,14 +1683,22 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x13begin_edit_settings\x18@ \x01(\bH\x00R\x11beginEditSettings\x122\n" +
 	"\x14commit_edit_settings\x18A \x01(\bH\x00R\x12commitEditSettings\x12<\n" +
 	"\vadd_contact\x18B \x01(\v2\x19.meshtastic.SharedContactH\x00R\n" +
-	"addContact\x122\n" +
+	"addContact\x12M\n" +
+	"\x10key_verification\x18C \x01(\v2 .meshtastic.KeyVerificationAdminH\x00R\x0fkeyVerification\x122\n" +
 	"\x14factory_reset_device\x18^ \x01(\x05H\x00R\x12factoryResetDevice\x12.\n" +
 	"\x12reboot_ota_seconds\x18_ \x01(\x05H\x00R\x10rebootOtaSeconds\x12'\n" +
 	"\x0eexit_simulator\x18` \x01(\bH\x00R\rexitSimulator\x12'\n" +
 	"\x0ereboot_seconds\x18a \x01(\x05H\x00R\rrebootSeconds\x12+\n" +
 	"\x10shutdown_seconds\x18b \x01(\x05H\x00R\x0fshutdownSeconds\x122\n" +
 	"\x14factory_reset_config\x18c \x01(\x05H\x00R\x12factoryResetConfig\x12#\n" +
-	"\fnodedb_reset\x18d \x01(\x05H\x00R\vnodedbReset\"\xd6\x01\n" +
+	"\fnodedb_reset\x18d \x01(\x05H\x00R\vnodedbReset\x1av\n" +
+	"\n" +
+	"InputEvent\x12\x1d\n" +
+	"\n" +
+	"event_code\x18\x01 \x01(\rR\teventCode\x12\x17\n" +
+	"\akb_char\x18\x02 \x01(\rR\x06kbChar\x12\x17\n" +
+	"\atouch_x\x18\x03 \x01(\rR\x06touchX\x12\x17\n" +
+	"\atouch_y\x18\x04 \x01(\rR\x06touchY\"\xd6\x01\n" +
 	"\n" +
 	"ConfigType\x12\x11\n" +
 	"\rDEVICE_CONFIG\x10\x00\x12\x13\n" +
@@ -1481,10 +1737,22 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"short_name\x18\x04 \x01(\tR\tshortName\"~\n" +
 	"\x1eNodeRemoteHardwarePinsResponse\x12\\\n" +
-	"\x19node_remote_hardware_pins\x18\x01 \x03(\v2!.meshtastic.NodeRemoteHardwarePinR\x16nodeRemoteHardwarePins\"P\n" +
+	"\x19node_remote_hardware_pins\x18\x01 \x03(\v2!.meshtastic.NodeRemoteHardwarePinR\x16nodeRemoteHardwarePins\"u\n" +
 	"\rSharedContact\x12\x19\n" +
 	"\bnode_num\x18\x01 \x01(\rR\anodeNum\x12$\n" +
-	"\x04user\x18\x02 \x01(\v2\x10.meshtastic.UserR\x04userBa\n" +
+	"\x04user\x18\x02 \x01(\v2\x10.meshtastic.UserR\x04user\x12#\n" +
+	"\rshould_ignore\x18\x03 \x01(\bR\fshouldIgnore\"\xcf\x02\n" +
+	"\x14KeyVerificationAdmin\x12O\n" +
+	"\fmessage_type\x18\x01 \x01(\x0e2,.meshtastic.KeyVerificationAdmin.MessageTypeR\vmessageType\x12%\n" +
+	"\x0eremote_nodenum\x18\x02 \x01(\rR\rremoteNodenum\x12\x14\n" +
+	"\x05nonce\x18\x03 \x01(\x04R\x05nonce\x12,\n" +
+	"\x0fsecurity_number\x18\x04 \x01(\rH\x00R\x0esecurityNumber\x88\x01\x01\"g\n" +
+	"\vMessageType\x12\x19\n" +
+	"\x15INITIATE_VERIFICATION\x10\x00\x12\x1b\n" +
+	"\x17PROVIDE_SECURITY_NUMBER\x10\x01\x12\r\n" +
+	"\tDO_VERIFY\x10\x02\x12\x11\n" +
+	"\rDO_NOT_VERIFY\x10\x03B\x12\n" +
+	"\x10_security_numberBa\n" +
 	"\x13com.geeksville.meshB\vAdminProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
@@ -1499,55 +1767,61 @@ func file_meshtastic_admin_proto_rawDescGZIP() []byte {
 	return file_meshtastic_admin_proto_rawDescData
 }
 
-var file_meshtastic_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_meshtastic_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_meshtastic_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_meshtastic_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_meshtastic_admin_proto_goTypes = []any{
 	(AdminMessage_ConfigType)(0),           // 0: meshtastic.AdminMessage.ConfigType
 	(AdminMessage_ModuleConfigType)(0),     // 1: meshtastic.AdminMessage.ModuleConfigType
 	(AdminMessage_BackupLocation)(0),       // 2: meshtastic.AdminMessage.BackupLocation
-	(*AdminMessage)(nil),                   // 3: meshtastic.AdminMessage
-	(*HamParameters)(nil),                  // 4: meshtastic.HamParameters
-	(*NodeRemoteHardwarePinsResponse)(nil), // 5: meshtastic.NodeRemoteHardwarePinsResponse
-	(*SharedContact)(nil),                  // 6: meshtastic.SharedContact
-	(*Channel)(nil),                        // 7: meshtastic.Channel
-	(*User)(nil),                           // 8: meshtastic.User
-	(*Config)(nil),                         // 9: meshtastic.Config
-	(*ModuleConfig)(nil),                   // 10: meshtastic.ModuleConfig
-	(*DeviceMetadata)(nil),                 // 11: meshtastic.DeviceMetadata
-	(*DeviceConnectionStatus)(nil),         // 12: meshtastic.DeviceConnectionStatus
-	(*Position)(nil),                       // 13: meshtastic.Position
-	(*DeviceUIConfig)(nil),                 // 14: meshtastic.DeviceUIConfig
-	(*NodeRemoteHardwarePin)(nil),          // 15: meshtastic.NodeRemoteHardwarePin
+	(KeyVerificationAdmin_MessageType)(0),  // 3: meshtastic.KeyVerificationAdmin.MessageType
+	(*AdminMessage)(nil),                   // 4: meshtastic.AdminMessage
+	(*HamParameters)(nil),                  // 5: meshtastic.HamParameters
+	(*NodeRemoteHardwarePinsResponse)(nil), // 6: meshtastic.NodeRemoteHardwarePinsResponse
+	(*SharedContact)(nil),                  // 7: meshtastic.SharedContact
+	(*KeyVerificationAdmin)(nil),           // 8: meshtastic.KeyVerificationAdmin
+	(*AdminMessage_InputEvent)(nil),        // 9: meshtastic.AdminMessage.InputEvent
+	(*Channel)(nil),                        // 10: meshtastic.Channel
+	(*User)(nil),                           // 11: meshtastic.User
+	(*Config)(nil),                         // 12: meshtastic.Config
+	(*ModuleConfig)(nil),                   // 13: meshtastic.ModuleConfig
+	(*DeviceMetadata)(nil),                 // 14: meshtastic.DeviceMetadata
+	(*DeviceConnectionStatus)(nil),         // 15: meshtastic.DeviceConnectionStatus
+	(*Position)(nil),                       // 16: meshtastic.Position
+	(*DeviceUIConfig)(nil),                 // 17: meshtastic.DeviceUIConfig
+	(*NodeRemoteHardwarePin)(nil),          // 18: meshtastic.NodeRemoteHardwarePin
 }
 var file_meshtastic_admin_proto_depIdxs = []int32{
-	7,  // 0: meshtastic.AdminMessage.get_channel_response:type_name -> meshtastic.Channel
-	8,  // 1: meshtastic.AdminMessage.get_owner_response:type_name -> meshtastic.User
+	10, // 0: meshtastic.AdminMessage.get_channel_response:type_name -> meshtastic.Channel
+	11, // 1: meshtastic.AdminMessage.get_owner_response:type_name -> meshtastic.User
 	0,  // 2: meshtastic.AdminMessage.get_config_request:type_name -> meshtastic.AdminMessage.ConfigType
-	9,  // 3: meshtastic.AdminMessage.get_config_response:type_name -> meshtastic.Config
+	12, // 3: meshtastic.AdminMessage.get_config_response:type_name -> meshtastic.Config
 	1,  // 4: meshtastic.AdminMessage.get_module_config_request:type_name -> meshtastic.AdminMessage.ModuleConfigType
-	10, // 5: meshtastic.AdminMessage.get_module_config_response:type_name -> meshtastic.ModuleConfig
-	11, // 6: meshtastic.AdminMessage.get_device_metadata_response:type_name -> meshtastic.DeviceMetadata
-	12, // 7: meshtastic.AdminMessage.get_device_connection_status_response:type_name -> meshtastic.DeviceConnectionStatus
-	4,  // 8: meshtastic.AdminMessage.set_ham_mode:type_name -> meshtastic.HamParameters
-	5,  // 9: meshtastic.AdminMessage.get_node_remote_hardware_pins_response:type_name -> meshtastic.NodeRemoteHardwarePinsResponse
+	13, // 5: meshtastic.AdminMessage.get_module_config_response:type_name -> meshtastic.ModuleConfig
+	14, // 6: meshtastic.AdminMessage.get_device_metadata_response:type_name -> meshtastic.DeviceMetadata
+	15, // 7: meshtastic.AdminMessage.get_device_connection_status_response:type_name -> meshtastic.DeviceConnectionStatus
+	5,  // 8: meshtastic.AdminMessage.set_ham_mode:type_name -> meshtastic.HamParameters
+	6,  // 9: meshtastic.AdminMessage.get_node_remote_hardware_pins_response:type_name -> meshtastic.NodeRemoteHardwarePinsResponse
 	2,  // 10: meshtastic.AdminMessage.backup_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
 	2,  // 11: meshtastic.AdminMessage.restore_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
 	2,  // 12: meshtastic.AdminMessage.remove_backup_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
-	8,  // 13: meshtastic.AdminMessage.set_owner:type_name -> meshtastic.User
-	7,  // 14: meshtastic.AdminMessage.set_channel:type_name -> meshtastic.Channel
-	9,  // 15: meshtastic.AdminMessage.set_config:type_name -> meshtastic.Config
-	10, // 16: meshtastic.AdminMessage.set_module_config:type_name -> meshtastic.ModuleConfig
-	13, // 17: meshtastic.AdminMessage.set_fixed_position:type_name -> meshtastic.Position
-	14, // 18: meshtastic.AdminMessage.get_ui_config_response:type_name -> meshtastic.DeviceUIConfig
-	14, // 19: meshtastic.AdminMessage.store_ui_config:type_name -> meshtastic.DeviceUIConfig
-	6,  // 20: meshtastic.AdminMessage.add_contact:type_name -> meshtastic.SharedContact
-	15, // 21: meshtastic.NodeRemoteHardwarePinsResponse.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
-	8,  // 22: meshtastic.SharedContact.user:type_name -> meshtastic.User
-	23, // [23:23] is the sub-list for method output_type
-	23, // [23:23] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	9,  // 13: meshtastic.AdminMessage.send_input_event:type_name -> meshtastic.AdminMessage.InputEvent
+	11, // 14: meshtastic.AdminMessage.set_owner:type_name -> meshtastic.User
+	10, // 15: meshtastic.AdminMessage.set_channel:type_name -> meshtastic.Channel
+	12, // 16: meshtastic.AdminMessage.set_config:type_name -> meshtastic.Config
+	13, // 17: meshtastic.AdminMessage.set_module_config:type_name -> meshtastic.ModuleConfig
+	16, // 18: meshtastic.AdminMessage.set_fixed_position:type_name -> meshtastic.Position
+	17, // 19: meshtastic.AdminMessage.get_ui_config_response:type_name -> meshtastic.DeviceUIConfig
+	17, // 20: meshtastic.AdminMessage.store_ui_config:type_name -> meshtastic.DeviceUIConfig
+	7,  // 21: meshtastic.AdminMessage.add_contact:type_name -> meshtastic.SharedContact
+	8,  // 22: meshtastic.AdminMessage.key_verification:type_name -> meshtastic.KeyVerificationAdmin
+	18, // 23: meshtastic.NodeRemoteHardwarePinsResponse.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
+	11, // 24: meshtastic.SharedContact.user:type_name -> meshtastic.User
+	3,  // 25: meshtastic.KeyVerificationAdmin.message_type:type_name -> meshtastic.KeyVerificationAdmin.MessageType
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_admin_proto_init() }
@@ -1587,6 +1861,7 @@ func file_meshtastic_admin_proto_init() {
 		(*AdminMessage_BackupPreferences)(nil),
 		(*AdminMessage_RestorePreferences)(nil),
 		(*AdminMessage_RemoveBackupPreferences)(nil),
+		(*AdminMessage_SendInputEvent)(nil),
 		(*AdminMessage_SetOwner)(nil),
 		(*AdminMessage_SetChannel)(nil),
 		(*AdminMessage_SetConfig)(nil),
@@ -1607,6 +1882,7 @@ func file_meshtastic_admin_proto_init() {
 		(*AdminMessage_BeginEditSettings)(nil),
 		(*AdminMessage_CommitEditSettings)(nil),
 		(*AdminMessage_AddContact)(nil),
+		(*AdminMessage_KeyVerification)(nil),
 		(*AdminMessage_FactoryResetDevice)(nil),
 		(*AdminMessage_RebootOtaSeconds)(nil),
 		(*AdminMessage_ExitSimulator)(nil),
@@ -1615,13 +1891,14 @@ func file_meshtastic_admin_proto_init() {
 		(*AdminMessage_FactoryResetConfig)(nil),
 		(*AdminMessage_NodedbReset)(nil),
 	}
+	file_meshtastic_admin_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_admin_proto_rawDesc), len(file_meshtastic_admin_proto_rawDesc)),
-			NumEnums:      3,
-			NumMessages:   4,
+			NumEnums:      4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

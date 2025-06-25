@@ -87,6 +87,8 @@ const (
 	PortNum_DETECTION_SENSOR_APP PortNum = 10
 	// Same as Text Message but used for critical alerts.
 	PortNum_ALERT_APP PortNum = 11
+	// Module/port for handling key verification requests.
+	PortNum_KEY_VERIFICATION_APP PortNum = 12
 	// Provides a 'ping' service that replies to any packet it receives.
 	// Also serves as a small example module.
 	// ENCODING: ASCII Plaintext
@@ -170,6 +172,7 @@ var (
 		9:   "AUDIO_APP",
 		10:  "DETECTION_SENSOR_APP",
 		11:  "ALERT_APP",
+		12:  "KEY_VERIFICATION_APP",
 		32:  "REPLY_APP",
 		33:  "IP_TUNNEL_APP",
 		34:  "PAXCOUNTER_APP",
@@ -202,6 +205,7 @@ var (
 		"AUDIO_APP":                   9,
 		"DETECTION_SENSOR_APP":        10,
 		"ALERT_APP":                   11,
+		"KEY_VERIFICATION_APP":        12,
 		"REPLY_APP":                   32,
 		"IP_TUNNEL_APP":               33,
 		"PAXCOUNTER_APP":              34,
@@ -255,7 +259,7 @@ var File_meshtastic_portnums_proto protoreflect.FileDescriptor
 const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\n" +
 	"\x19meshtastic/portnums.proto\x12\n" +
-	"meshtastic*\xcb\x04\n" +
+	"meshtastic*\xe5\x04\n" +
 	"\aPortNum\x12\x0f\n" +
 	"\vUNKNOWN_APP\x10\x00\x12\x14\n" +
 	"\x10TEXT_MESSAGE_APP\x10\x01\x12\x17\n" +
@@ -269,7 +273,8 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\tAUDIO_APP\x10\t\x12\x18\n" +
 	"\x14DETECTION_SENSOR_APP\x10\n" +
 	"\x12\r\n" +
-	"\tALERT_APP\x10\v\x12\r\n" +
+	"\tALERT_APP\x10\v\x12\x18\n" +
+	"\x14KEY_VERIFICATION_APP\x10\f\x12\r\n" +
 	"\tREPLY_APP\x10 \x12\x11\n" +
 	"\rIP_TUNNEL_APP\x10!\x12\x12\n" +
 	"\x0ePAXCOUNTER_APP\x10\"\x12\x0e\n" +

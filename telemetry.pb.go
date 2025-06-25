@@ -105,6 +105,8 @@ const (
 	TelemetrySensorType_MAX17261 TelemetrySensorType = 38
 	// PCT2075 Temperature Sensor
 	TelemetrySensorType_PCT2075 TelemetrySensorType = 39
+	// ADS1X15 ADC
+	TelemetrySensorType_ADS1X15 TelemetrySensorType = 40
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -150,6 +152,7 @@ var (
 		37: "RAK12035",
 		38: "MAX17261",
 		39: "PCT2075",
+		40: "ADS1X15",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -192,6 +195,7 @@ var (
 		"RAK12035":      37,
 		"MAX17261":      38,
 		"PCT2075":       39,
+		"ADS1X15":       40,
 	}
 )
 
@@ -555,7 +559,27 @@ type PowerMetrics struct {
 	// Voltage (Ch3)
 	Ch3Voltage *float32 `protobuf:"fixed32,5,opt,name=ch3_voltage,json=ch3Voltage,proto3,oneof" json:"ch3_voltage,omitempty"`
 	// Current (Ch3)
-	Ch3Current    *float32 `protobuf:"fixed32,6,opt,name=ch3_current,json=ch3Current,proto3,oneof" json:"ch3_current,omitempty"`
+	Ch3Current *float32 `protobuf:"fixed32,6,opt,name=ch3_current,json=ch3Current,proto3,oneof" json:"ch3_current,omitempty"`
+	// Voltage (Ch4)
+	Ch4Voltage *float32 `protobuf:"fixed32,7,opt,name=ch4_voltage,json=ch4Voltage,proto3,oneof" json:"ch4_voltage,omitempty"`
+	// Current (Ch4)
+	Ch4Current *float32 `protobuf:"fixed32,8,opt,name=ch4_current,json=ch4Current,proto3,oneof" json:"ch4_current,omitempty"`
+	// Voltage (Ch5)
+	Ch5Voltage *float32 `protobuf:"fixed32,9,opt,name=ch5_voltage,json=ch5Voltage,proto3,oneof" json:"ch5_voltage,omitempty"`
+	// Current (Ch5)
+	Ch5Current *float32 `protobuf:"fixed32,10,opt,name=ch5_current,json=ch5Current,proto3,oneof" json:"ch5_current,omitempty"`
+	// Voltage (Ch6)
+	Ch6Voltage *float32 `protobuf:"fixed32,11,opt,name=ch6_voltage,json=ch6Voltage,proto3,oneof" json:"ch6_voltage,omitempty"`
+	// Current (Ch6)
+	Ch6Current *float32 `protobuf:"fixed32,12,opt,name=ch6_current,json=ch6Current,proto3,oneof" json:"ch6_current,omitempty"`
+	// Voltage (Ch7)
+	Ch7Voltage *float32 `protobuf:"fixed32,13,opt,name=ch7_voltage,json=ch7Voltage,proto3,oneof" json:"ch7_voltage,omitempty"`
+	// Current (Ch7)
+	Ch7Current *float32 `protobuf:"fixed32,14,opt,name=ch7_current,json=ch7Current,proto3,oneof" json:"ch7_current,omitempty"`
+	// Voltage (Ch8)
+	Ch8Voltage *float32 `protobuf:"fixed32,15,opt,name=ch8_voltage,json=ch8Voltage,proto3,oneof" json:"ch8_voltage,omitempty"`
+	// Current (Ch8)
+	Ch8Current    *float32 `protobuf:"fixed32,16,opt,name=ch8_current,json=ch8Current,proto3,oneof" json:"ch8_current,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -628,6 +652,76 @@ func (x *PowerMetrics) GetCh3Voltage() float32 {
 func (x *PowerMetrics) GetCh3Current() float32 {
 	if x != nil && x.Ch3Current != nil {
 		return *x.Ch3Current
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh4Voltage() float32 {
+	if x != nil && x.Ch4Voltage != nil {
+		return *x.Ch4Voltage
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh4Current() float32 {
+	if x != nil && x.Ch4Current != nil {
+		return *x.Ch4Current
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh5Voltage() float32 {
+	if x != nil && x.Ch5Voltage != nil {
+		return *x.Ch5Voltage
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh5Current() float32 {
+	if x != nil && x.Ch5Current != nil {
+		return *x.Ch5Current
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh6Voltage() float32 {
+	if x != nil && x.Ch6Voltage != nil {
+		return *x.Ch6Voltage
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh6Current() float32 {
+	if x != nil && x.Ch6Current != nil {
+		return *x.Ch6Current
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh7Voltage() float32 {
+	if x != nil && x.Ch7Voltage != nil {
+		return *x.Ch7Voltage
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh7Current() float32 {
+	if x != nil && x.Ch7Current != nil {
+		return *x.Ch7Current
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh8Voltage() float32 {
+	if x != nil && x.Ch8Voltage != nil {
+		return *x.Ch8Voltage
+	}
+	return 0
+}
+
+func (x *PowerMetrics) GetCh8Current() float32 {
+	if x != nil && x.Ch8Current != nil {
+		return *x.Ch8Current
 	}
 	return 0
 }
@@ -813,8 +907,12 @@ type LocalStats struct {
 	// Number of times we canceled a packet to be relayed, because someone else did it before us.
 	// This will always be zero for ROUTERs/REPEATERs. If this number is high, some other node(s) is/are relaying faster than you.
 	NumTxRelayCanceled uint32 `protobuf:"varint,11,opt,name=num_tx_relay_canceled,json=numTxRelayCanceled,proto3" json:"num_tx_relay_canceled,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Number of bytes used in the heap
+	HeapTotalBytes uint32 `protobuf:"varint,12,opt,name=heap_total_bytes,json=heapTotalBytes,proto3" json:"heap_total_bytes,omitempty"`
+	// Number of bytes free in the heap
+	HeapFreeBytes uint32 `protobuf:"varint,13,opt,name=heap_free_bytes,json=heapFreeBytes,proto3" json:"heap_free_bytes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *LocalStats) Reset() {
@@ -920,6 +1018,20 @@ func (x *LocalStats) GetNumTxRelay() uint32 {
 func (x *LocalStats) GetNumTxRelayCanceled() uint32 {
 	if x != nil {
 		return x.NumTxRelayCanceled
+	}
+	return 0
+}
+
+func (x *LocalStats) GetHeapTotalBytes() uint32 {
+	if x != nil {
+		return x.HeapTotalBytes
+	}
+	return 0
+}
+
+func (x *LocalStats) GetHeapFreeBytes() uint32 {
+	if x != nil {
+		return x.HeapFreeBytes
 	}
 	return 0
 }
@@ -1413,7 +1525,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\f_rainfall_1hB\x0f\n" +
 	"\r_rainfall_24hB\x10\n" +
 	"\x0e_soil_moistureB\x13\n" +
-	"\x11_soil_temperature\"\xd2\x02\n" +
+	"\x11_soil_temperature\"\xee\x06\n" +
 	"\fPowerMetrics\x12$\n" +
 	"\vch1_voltage\x18\x01 \x01(\x02H\x00R\n" +
 	"ch1Voltage\x88\x01\x01\x12$\n" +
@@ -1426,13 +1538,45 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\vch3_voltage\x18\x05 \x01(\x02H\x04R\n" +
 	"ch3Voltage\x88\x01\x01\x12$\n" +
 	"\vch3_current\x18\x06 \x01(\x02H\x05R\n" +
-	"ch3Current\x88\x01\x01B\x0e\n" +
+	"ch3Current\x88\x01\x01\x12$\n" +
+	"\vch4_voltage\x18\a \x01(\x02H\x06R\n" +
+	"ch4Voltage\x88\x01\x01\x12$\n" +
+	"\vch4_current\x18\b \x01(\x02H\aR\n" +
+	"ch4Current\x88\x01\x01\x12$\n" +
+	"\vch5_voltage\x18\t \x01(\x02H\bR\n" +
+	"ch5Voltage\x88\x01\x01\x12$\n" +
+	"\vch5_current\x18\n" +
+	" \x01(\x02H\tR\n" +
+	"ch5Current\x88\x01\x01\x12$\n" +
+	"\vch6_voltage\x18\v \x01(\x02H\n" +
+	"R\n" +
+	"ch6Voltage\x88\x01\x01\x12$\n" +
+	"\vch6_current\x18\f \x01(\x02H\vR\n" +
+	"ch6Current\x88\x01\x01\x12$\n" +
+	"\vch7_voltage\x18\r \x01(\x02H\fR\n" +
+	"ch7Voltage\x88\x01\x01\x12$\n" +
+	"\vch7_current\x18\x0e \x01(\x02H\rR\n" +
+	"ch7Current\x88\x01\x01\x12$\n" +
+	"\vch8_voltage\x18\x0f \x01(\x02H\x0eR\n" +
+	"ch8Voltage\x88\x01\x01\x12$\n" +
+	"\vch8_current\x18\x10 \x01(\x02H\x0fR\n" +
+	"ch8Current\x88\x01\x01B\x0e\n" +
 	"\f_ch1_voltageB\x0e\n" +
 	"\f_ch1_currentB\x0e\n" +
 	"\f_ch2_voltageB\x0e\n" +
 	"\f_ch2_currentB\x0e\n" +
 	"\f_ch3_voltageB\x0e\n" +
-	"\f_ch3_current\"\xca\x06\n" +
+	"\f_ch3_currentB\x0e\n" +
+	"\f_ch4_voltageB\x0e\n" +
+	"\f_ch4_currentB\x0e\n" +
+	"\f_ch5_voltageB\x0e\n" +
+	"\f_ch5_currentB\x0e\n" +
+	"\f_ch6_voltageB\x0e\n" +
+	"\f_ch6_currentB\x0e\n" +
+	"\f_ch7_voltageB\x0e\n" +
+	"\f_ch7_currentB\x0e\n" +
+	"\f_ch8_voltageB\x0e\n" +
+	"\f_ch8_current\"\xca\x06\n" +
 	"\x11AirQualityMetrics\x12(\n" +
 	"\rpm10_standard\x18\x01 \x01(\rH\x00R\fpm10Standard\x88\x01\x01\x12(\n" +
 	"\rpm25_standard\x18\x02 \x01(\rH\x01R\fpm25Standard\x88\x01\x01\x12*\n" +
@@ -1461,7 +1605,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0f_particles_25umB\x11\n" +
 	"\x0f_particles_50umB\x12\n" +
 	"\x10_particles_100umB\x06\n" +
-	"\x04_co2\"\xc4\x03\n" +
+	"\x04_co2\"\x96\x04\n" +
 	"\n" +
 	"LocalStats\x12%\n" +
 	"\x0euptime_seconds\x18\x01 \x01(\rR\ruptimeSeconds\x12/\n" +
@@ -1476,7 +1620,9 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\fnum_tx_relay\x18\n" +
 	" \x01(\rR\n" +
 	"numTxRelay\x121\n" +
-	"\x15num_tx_relay_canceled\x18\v \x01(\rR\x12numTxRelayCanceled\"\x98\x01\n" +
+	"\x15num_tx_relay_canceled\x18\v \x01(\rR\x12numTxRelayCanceled\x12(\n" +
+	"\x10heap_total_bytes\x18\f \x01(\rR\x0eheapTotalBytes\x12&\n" +
+	"\x0fheap_free_bytes\x18\r \x01(\rR\rheapFreeBytes\"\x98\x01\n" +
 	"\rHealthMetrics\x12 \n" +
 	"\theart_bpm\x18\x01 \x01(\rH\x00R\bheartBpm\x88\x01\x01\x12\x17\n" +
 	"\x04spO2\x18\x02 \x01(\rH\x01R\x04spO2\x88\x01\x01\x12%\n" +
@@ -1514,7 +1660,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"zeroOffset\x18\x01 \x01(\x05R\n" +
 	"zeroOffset\x12,\n" +
-	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xac\x04\n" +
+	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xb9\x04\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -1566,7 +1712,8 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x06DPS310\x10$\x12\f\n" +
 	"\bRAK12035\x10%\x12\f\n" +
 	"\bMAX17261\x10&\x12\v\n" +
-	"\aPCT2075\x10'Be\n" +
+	"\aPCT2075\x10'\x12\v\n" +
+	"\aADS1X15\x10(Be\n" +
 	"\x13com.geeksville.meshB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
