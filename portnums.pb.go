@@ -146,6 +146,10 @@ const (
 	// Reticulum Network Stack Tunnel App
 	// ENCODING: Fragmented RNS Packet. Handled by Meshtastic RNS interface
 	PortNum_RETICULUM_TUNNEL_APP PortNum = 76
+	// App for transporting Cayenne Low Power Payload, popular for LoRaWAN sensor nodes. Offers ability to send
+	// arbitrary telemetry over meshtastic that is not covered by telemetry.proto
+	// ENCODING: CayenneLLP
+	PortNum_CAYENNE_APP PortNum = 77
 	// Private applications should use portnums >= 256.
 	// To simplify initial development and testing you can use "PRIVATE_APP"
 	// in your code without needing to rebuild protobuf files (via [regen-protos.sh](https://github.com/meshtastic/firmware/blob/master/bin/regen-protos.sh))
@@ -188,6 +192,7 @@ var (
 		73:  "MAP_REPORT_APP",
 		74:  "POWERSTRESS_APP",
 		76:  "RETICULUM_TUNNEL_APP",
+		77:  "CAYENNE_APP",
 		256: "PRIVATE_APP",
 		257: "ATAK_FORWARDER",
 		511: "MAX",
@@ -221,6 +226,7 @@ var (
 		"MAP_REPORT_APP":              73,
 		"POWERSTRESS_APP":             74,
 		"RETICULUM_TUNNEL_APP":        76,
+		"CAYENNE_APP":                 77,
 		"PRIVATE_APP":                 256,
 		"ATAK_FORWARDER":              257,
 		"MAX":                         511,
@@ -259,7 +265,7 @@ var File_meshtastic_portnums_proto protoreflect.FileDescriptor
 const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\n" +
 	"\x19meshtastic/portnums.proto\x12\n" +
-	"meshtastic*\xe5\x04\n" +
+	"meshtastic*\xf6\x04\n" +
 	"\aPortNum\x12\x0f\n" +
 	"\vUNKNOWN_APP\x10\x00\x12\x14\n" +
 	"\x10TEXT_MESSAGE_APP\x10\x01\x12\x17\n" +
@@ -290,7 +296,8 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\vATAK_PLUGIN\x10H\x12\x12\n" +
 	"\x0eMAP_REPORT_APP\x10I\x12\x13\n" +
 	"\x0fPOWERSTRESS_APP\x10J\x12\x18\n" +
-	"\x14RETICULUM_TUNNEL_APP\x10L\x12\x10\n" +
+	"\x14RETICULUM_TUNNEL_APP\x10L\x12\x0f\n" +
+	"\vCAYENNE_APP\x10M\x12\x10\n" +
 	"\vPRIVATE_APP\x10\x80\x02\x12\x13\n" +
 	"\x0eATAK_FORWARDER\x10\x81\x02\x12\b\n" +
 	"\x03MAX\x10\xff\x03B^\n" +
