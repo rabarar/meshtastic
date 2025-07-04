@@ -21,6 +21,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type CompassMode int32
+
+const (
+	// Compass with dynamic ring and heading
+	CompassMode_DYNAMIC CompassMode = 0
+	// Compass with fixed ring and heading
+	CompassMode_FIXED_RING CompassMode = 1
+	// Compass with heading and freeze option
+	CompassMode_FREEZE_HEADING CompassMode = 2
+)
+
+// Enum value maps for CompassMode.
+var (
+	CompassMode_name = map[int32]string{
+		0: "DYNAMIC",
+		1: "FIXED_RING",
+		2: "FREEZE_HEADING",
+	}
+	CompassMode_value = map[string]int32{
+		"DYNAMIC":        0,
+		"FIXED_RING":     1,
+		"FREEZE_HEADING": 2,
+	}
+)
+
+func (x CompassMode) Enum() *CompassMode {
+	p := new(CompassMode)
+	*p = x
+	return p
+}
+
+func (x CompassMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CompassMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_meshtastic_device_ui_proto_enumTypes[0].Descriptor()
+}
+
+func (CompassMode) Type() protoreflect.EnumType {
+	return &file_meshtastic_device_ui_proto_enumTypes[0]
+}
+
+func (x CompassMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CompassMode.Descriptor instead.
+func (CompassMode) EnumDescriptor() ([]byte, []int) {
+	return file_meshtastic_device_ui_proto_rawDescGZIP(), []int{0}
+}
+
 type Theme int32
 
 const (
@@ -57,11 +109,11 @@ func (x Theme) String() string {
 }
 
 func (Theme) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_device_ui_proto_enumTypes[0].Descriptor()
+	return file_meshtastic_device_ui_proto_enumTypes[1].Descriptor()
 }
 
 func (Theme) Type() protoreflect.EnumType {
-	return &file_meshtastic_device_ui_proto_enumTypes[0]
+	return &file_meshtastic_device_ui_proto_enumTypes[1]
 }
 
 func (x Theme) Number() protoreflect.EnumNumber {
@@ -70,7 +122,7 @@ func (x Theme) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Theme.Descriptor instead.
 func (Theme) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_device_ui_proto_rawDescGZIP(), []int{0}
+	return file_meshtastic_device_ui_proto_rawDescGZIP(), []int{1}
 }
 
 // Localization
@@ -178,11 +230,11 @@ func (x Language) String() string {
 }
 
 func (Language) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_device_ui_proto_enumTypes[1].Descriptor()
+	return file_meshtastic_device_ui_proto_enumTypes[2].Descriptor()
 }
 
 func (Language) Type() protoreflect.EnumType {
-	return &file_meshtastic_device_ui_proto_enumTypes[1]
+	return &file_meshtastic_device_ui_proto_enumTypes[2]
 }
 
 func (x Language) Number() protoreflect.EnumNumber {
@@ -191,7 +243,7 @@ func (x Language) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Language.Descriptor instead.
 func (Language) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_device_ui_proto_rawDescGZIP(), []int{1}
+	return file_meshtastic_device_ui_proto_rawDescGZIP(), []int{2}
 }
 
 type DeviceUIConfig struct {
@@ -221,9 +273,17 @@ type DeviceUIConfig struct {
 	// 8 integers for screen calibration data
 	CalibrationData []byte `protobuf:"bytes,14,opt,name=calibration_data,json=calibrationData,proto3" json:"calibration_data,omitempty"`
 	// Map related data
-	MapData       *Map `protobuf:"bytes,15,opt,name=map_data,json=mapData,proto3" json:"map_data,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	MapData *Map `protobuf:"bytes,15,opt,name=map_data,json=mapData,proto3" json:"map_data,omitempty"`
+	// Compass mode
+	CompassMode CompassMode `protobuf:"varint,16,opt,name=compass_mode,json=compassMode,proto3,enum=meshtastic.CompassMode" json:"compass_mode,omitempty"`
+	// RGB color for BaseUI
+	// 0xRRGGBB format, e.g. 0xFF0000 for red
+	ScreenRgbColor uint32 `protobuf:"varint,17,opt,name=screen_rgb_color,json=screenRgbColor,proto3" json:"screen_rgb_color,omitempty"`
+	// Clockface analog style
+	// true for analog clockface, false for digital clockface
+	IsClockfaceAnalog bool `protobuf:"varint,18,opt,name=is_clockface_analog,json=isClockfaceAnalog,proto3" json:"is_clockface_analog,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *DeviceUIConfig) Reset() {
@@ -359,6 +419,27 @@ func (x *DeviceUIConfig) GetMapData() *Map {
 		return x.MapData
 	}
 	return nil
+}
+
+func (x *DeviceUIConfig) GetCompassMode() CompassMode {
+	if x != nil {
+		return x.CompassMode
+	}
+	return CompassMode_DYNAMIC
+}
+
+func (x *DeviceUIConfig) GetScreenRgbColor() uint32 {
+	if x != nil {
+		return x.ScreenRgbColor
+	}
+	return 0
+}
+
+func (x *DeviceUIConfig) GetIsClockfaceAnalog() bool {
+	if x != nil {
+		return x.IsClockfaceAnalog
+	}
+	return false
 }
 
 type NodeFilter struct {
@@ -672,7 +753,7 @@ var File_meshtastic_device_ui_proto protoreflect.FileDescriptor
 const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"\n" +
 	"\x1ameshtastic/device_ui.proto\x12\n" +
-	"meshtastic\"\xfa\x04\n" +
+	"meshtastic\"\x90\x06\n" +
 	"\x0eDeviceUIConfig\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\rR\aversion\x12+\n" +
 	"\x11screen_brightness\x18\x02 \x01(\rR\x10screenBrightness\x12%\n" +
@@ -692,7 +773,10 @@ const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"nodeFilter\x12@\n" +
 	"\x0enode_highlight\x18\r \x01(\v2\x19.meshtastic.NodeHighlightR\rnodeHighlight\x12)\n" +
 	"\x10calibration_data\x18\x0e \x01(\fR\x0fcalibrationData\x12*\n" +
-	"\bmap_data\x18\x0f \x01(\v2\x0f.meshtastic.MapR\amapData\"\x83\x02\n" +
+	"\bmap_data\x18\x0f \x01(\v2\x0f.meshtastic.MapR\amapData\x12:\n" +
+	"\fcompass_mode\x18\x10 \x01(\x0e2\x17.meshtastic.CompassModeR\vcompassMode\x12(\n" +
+	"\x10screen_rgb_color\x18\x11 \x01(\rR\x0escreenRgbColor\x12.\n" +
+	"\x13is_clockface_analog\x18\x12 \x01(\bR\x11isClockfaceAnalog\"\x83\x02\n" +
 	"\n" +
 	"NodeFilter\x12%\n" +
 	"\x0eunknown_switch\x18\x01 \x01(\bR\runknownSwitch\x12%\n" +
@@ -718,7 +802,12 @@ const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"\x04home\x18\x01 \x01(\v2\x14.meshtastic.GeoPointR\x04home\x12\x14\n" +
 	"\x05style\x18\x02 \x01(\tR\x05style\x12\x1d\n" +
 	"\n" +
-	"follow_gps\x18\x03 \x01(\bR\tfollowGps*%\n" +
+	"follow_gps\x18\x03 \x01(\bR\tfollowGps*>\n" +
+	"\vCompassMode\x12\v\n" +
+	"\aDYNAMIC\x10\x00\x12\x0e\n" +
+	"\n" +
+	"FIXED_RING\x10\x01\x12\x12\n" +
+	"\x0eFREEZE_HEADING\x10\x02*%\n" +
 	"\x05Theme\x12\b\n" +
 	"\x04DARK\x10\x00\x12\t\n" +
 	"\x05LIGHT\x10\x01\x12\a\n" +
@@ -763,29 +852,31 @@ func file_meshtastic_device_ui_proto_rawDescGZIP() []byte {
 	return file_meshtastic_device_ui_proto_rawDescData
 }
 
-var file_meshtastic_device_ui_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_meshtastic_device_ui_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_meshtastic_device_ui_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_meshtastic_device_ui_proto_goTypes = []any{
-	(Theme)(0),             // 0: meshtastic.Theme
-	(Language)(0),          // 1: meshtastic.Language
-	(*DeviceUIConfig)(nil), // 2: meshtastic.DeviceUIConfig
-	(*NodeFilter)(nil),     // 3: meshtastic.NodeFilter
-	(*NodeHighlight)(nil),  // 4: meshtastic.NodeHighlight
-	(*GeoPoint)(nil),       // 5: meshtastic.GeoPoint
-	(*Map)(nil),            // 6: meshtastic.Map
+	(CompassMode)(0),       // 0: meshtastic.CompassMode
+	(Theme)(0),             // 1: meshtastic.Theme
+	(Language)(0),          // 2: meshtastic.Language
+	(*DeviceUIConfig)(nil), // 3: meshtastic.DeviceUIConfig
+	(*NodeFilter)(nil),     // 4: meshtastic.NodeFilter
+	(*NodeHighlight)(nil),  // 5: meshtastic.NodeHighlight
+	(*GeoPoint)(nil),       // 6: meshtastic.GeoPoint
+	(*Map)(nil),            // 7: meshtastic.Map
 }
 var file_meshtastic_device_ui_proto_depIdxs = []int32{
-	0, // 0: meshtastic.DeviceUIConfig.theme:type_name -> meshtastic.Theme
-	1, // 1: meshtastic.DeviceUIConfig.language:type_name -> meshtastic.Language
-	3, // 2: meshtastic.DeviceUIConfig.node_filter:type_name -> meshtastic.NodeFilter
-	4, // 3: meshtastic.DeviceUIConfig.node_highlight:type_name -> meshtastic.NodeHighlight
-	6, // 4: meshtastic.DeviceUIConfig.map_data:type_name -> meshtastic.Map
-	5, // 5: meshtastic.Map.home:type_name -> meshtastic.GeoPoint
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	1, // 0: meshtastic.DeviceUIConfig.theme:type_name -> meshtastic.Theme
+	2, // 1: meshtastic.DeviceUIConfig.language:type_name -> meshtastic.Language
+	4, // 2: meshtastic.DeviceUIConfig.node_filter:type_name -> meshtastic.NodeFilter
+	5, // 3: meshtastic.DeviceUIConfig.node_highlight:type_name -> meshtastic.NodeHighlight
+	7, // 4: meshtastic.DeviceUIConfig.map_data:type_name -> meshtastic.Map
+	0, // 5: meshtastic.DeviceUIConfig.compass_mode:type_name -> meshtastic.CompassMode
+	6, // 6: meshtastic.Map.home:type_name -> meshtastic.GeoPoint
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_device_ui_proto_init() }
@@ -798,7 +889,7 @@ func file_meshtastic_device_ui_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_device_ui_proto_rawDesc), len(file_meshtastic_device_ui_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      3,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,

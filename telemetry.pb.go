@@ -754,7 +754,11 @@ type AirQualityMetrics struct {
 	// 10.0um Particle Count
 	Particles_100Um *uint32 `protobuf:"varint,12,opt,name=particles_100um,json=particles100um,proto3,oneof" json:"particles_100um,omitempty"`
 	// CO2 concentration in ppm
-	Co2           *uint32 `protobuf:"varint,13,opt,name=co2,proto3,oneof" json:"co2,omitempty"`
+	Co2 *uint32 `protobuf:"varint,13,opt,name=co2,proto3,oneof" json:"co2,omitempty"`
+	// CO2 sensor temperature in degC
+	Co2Temperature *float32 `protobuf:"fixed32,14,opt,name=co2_temperature,json=co2Temperature,proto3,oneof" json:"co2_temperature,omitempty"`
+	// CO2 sensor relative humidity in %
+	Co2Humidity   *float32 `protobuf:"fixed32,15,opt,name=co2_humidity,json=co2Humidity,proto3,oneof" json:"co2_humidity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -876,6 +880,20 @@ func (x *AirQualityMetrics) GetParticles_100Um() uint32 {
 func (x *AirQualityMetrics) GetCo2() uint32 {
 	if x != nil && x.Co2 != nil {
 		return *x.Co2
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetCo2Temperature() float32 {
+	if x != nil && x.Co2Temperature != nil {
+		return *x.Co2Temperature
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetCo2Humidity() float32 {
+	if x != nil && x.Co2Humidity != nil {
+		return *x.Co2Humidity
 	}
 	return 0
 }
@@ -1576,7 +1594,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\f_ch7_voltageB\x0e\n" +
 	"\f_ch7_currentB\x0e\n" +
 	"\f_ch8_voltageB\x0e\n" +
-	"\f_ch8_current\"\xca\x06\n" +
+	"\f_ch8_current\"\xc5\a\n" +
 	"\x11AirQualityMetrics\x12(\n" +
 	"\rpm10_standard\x18\x01 \x01(\rH\x00R\fpm10Standard\x88\x01\x01\x12(\n" +
 	"\rpm25_standard\x18\x02 \x01(\rH\x01R\fpm25Standard\x88\x01\x01\x12*\n" +
@@ -1592,7 +1610,9 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0eparticles_50um\x18\v \x01(\rH\n" +
 	"R\rparticles50um\x88\x01\x01\x12,\n" +
 	"\x0fparticles_100um\x18\f \x01(\rH\vR\x0eparticles100um\x88\x01\x01\x12\x15\n" +
-	"\x03co2\x18\r \x01(\rH\fR\x03co2\x88\x01\x01B\x10\n" +
+	"\x03co2\x18\r \x01(\rH\fR\x03co2\x88\x01\x01\x12,\n" +
+	"\x0fco2_temperature\x18\x0e \x01(\x02H\rR\x0eco2Temperature\x88\x01\x01\x12&\n" +
+	"\fco2_humidity\x18\x0f \x01(\x02H\x0eR\vco2Humidity\x88\x01\x01B\x10\n" +
 	"\x0e_pm10_standardB\x10\n" +
 	"\x0e_pm25_standardB\x11\n" +
 	"\x0f_pm100_standardB\x15\n" +
@@ -1605,7 +1625,9 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0f_particles_25umB\x11\n" +
 	"\x0f_particles_50umB\x12\n" +
 	"\x10_particles_100umB\x06\n" +
-	"\x04_co2\"\x96\x04\n" +
+	"\x04_co2B\x12\n" +
+	"\x10_co2_temperatureB\x0f\n" +
+	"\r_co2_humidity\"\x96\x04\n" +
 	"\n" +
 	"LocalStats\x12%\n" +
 	"\x0euptime_seconds\x18\x01 \x01(\rR\ruptimeSeconds\x12/\n" +

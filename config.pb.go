@@ -883,6 +883,10 @@ const (
 	Config_LoRaConfig_PH_915 Config_LoRaConfig_RegionCode = 21
 	// Australia / New Zealand 433MHz
 	Config_LoRaConfig_ANZ_433 Config_LoRaConfig_RegionCode = 22
+	// Kazakhstan 433MHz
+	Config_LoRaConfig_KZ_433 Config_LoRaConfig_RegionCode = 23
+	// Kazakhstan 863MHz
+	Config_LoRaConfig_KZ_863 Config_LoRaConfig_RegionCode = 24
 )
 
 // Enum value maps for Config_LoRaConfig_RegionCode.
@@ -911,6 +915,8 @@ var (
 		20: "PH_868",
 		21: "PH_915",
 		22: "ANZ_433",
+		23: "KZ_433",
+		24: "KZ_863",
 	}
 	Config_LoRaConfig_RegionCode_value = map[string]int32{
 		"UNSET":   0,
@@ -936,6 +942,8 @@ var (
 		"PH_868":  20,
 		"PH_915":  21,
 		"ANZ_433": 22,
+		"KZ_433":  23,
+		"KZ_863":  24,
 	}
 )
 
@@ -2555,7 +2563,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xf12\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x893\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2739,7 +2747,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x12DEGREES_0_INVERTED\x10\x04\x12\x17\n" +
 	"\x13DEGREES_90_INVERTED\x10\x05\x12\x18\n" +
 	"\x14DEGREES_180_INVERTED\x10\x06\x12\x18\n" +
-	"\x14DEGREES_270_INVERTED\x10\a\x1a\xa0\t\n" +
+	"\x14DEGREES_270_INVERTED\x10\a\x1a\xb8\t\n" +
 	"\n" +
 	"LoRaConfig\x12\x1d\n" +
 	"\n" +
@@ -2765,7 +2773,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x0fignore_incoming\x18g \x03(\rR\x0eignoreIncoming\x12\x1f\n" +
 	"\vignore_mqtt\x18h \x01(\bR\n" +
 	"ignoreMqtt\x12)\n" +
-	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\"\xfe\x01\n" +
+	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\"\x96\x02\n" +
 	"\n" +
 	"RegionCode\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\x06\n" +
@@ -2802,7 +2810,11 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x06PH_868\x10\x14\x12\n" +
 	"\n" +
 	"\x06PH_915\x10\x15\x12\v\n" +
-	"\aANZ_433\x10\x16\"\xa9\x01\n" +
+	"\aANZ_433\x10\x16\x12\n" +
+	"\n" +
+	"\x06KZ_433\x10\x17\x12\n" +
+	"\n" +
+	"\x06KZ_863\x10\x18\"\xa9\x01\n" +
 	"\vModemPreset\x12\r\n" +
 	"\tLONG_FAST\x10\x00\x12\r\n" +
 	"\tLONG_SLOW\x10\x01\x12\x16\n" +
