@@ -254,32 +254,26 @@ const (
 	HardwareModel_NOMADSTAR_METEOR_PRO HardwareModel = 96
 	// Elecrow CrowPanel Advance models, ESP32-S3 and TFT with SX1262 radio plugin
 	HardwareModel_CROWPANEL HardwareModel = 97
-	// *
 	// Lilygo LINK32 board with sensors
 	HardwareModel_LINK_32 HardwareModel = 98
-	// *
 	// Seeed Tracker L1
 	HardwareModel_SEEED_WIO_TRACKER_L1 HardwareModel = 99
-	// *
 	// Seeed Tracker L1 EINK driver
 	HardwareModel_SEEED_WIO_TRACKER_L1_EINK HardwareModel = 100
 	// Reserved ID for future and past use
 	HardwareModel_QWANTZ_TINY_ARMS HardwareModel = 101
-	// *
 	// Lilygo T-Deck Pro
 	HardwareModel_T_DECK_PRO HardwareModel = 102
-	// *
 	// Lilygo TLora Pager
 	HardwareModel_T_LORA_PAGER HardwareModel = 103
-	// *
 	// GAT562 Mesh Trial Tracker
 	HardwareModel_GAT562_MESH_TRIAL_TRACKER HardwareModel = 104
-	// *
 	// RAKwireless WisMesh Tag
 	HardwareModel_WISMESH_TAG HardwareModel = 105
-	// *
 	// RAKwireless WisBlock Core RAK3312 https://docs.rakwireless.com/product-categories/wisduo/rak3112-module/overview/
 	HardwareModel_RAK3312 HardwareModel = 106
+	// Elecrow ThinkNode M5 https://www.elecrow.com/wiki/ThinkNode_M5_Meshtastic_LoRa_Signal_Transceiver_ESP32-S3.html
+	HardwareModel_THINKNODE_M5 HardwareModel = 107
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -396,6 +390,7 @@ var (
 		104: "GAT562_MESH_TRIAL_TRACKER",
 		105: "WISMESH_TAG",
 		106: "RAK3312",
+		107: "THINKNODE_M5",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -506,6 +501,7 @@ var (
 		"GAT562_MESH_TRIAL_TRACKER":    104,
 		"WISMESH_TAG":                  105,
 		"RAK3312":                      106,
+		"THINKNODE_M5":                 107,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -4611,7 +4607,7 @@ var File_meshtastic_mesh_proto protoreflect.FileDescriptor
 const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\n" +
 	"\x15meshtastic/mesh.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\x1emeshtastic/module_config.proto\x1a\x19meshtastic/portnums.proto\x1a\x1ameshtastic/telemetry.proto\x1a\x17meshtastic/xmodem.proto\x1a\x1ameshtastic/device_ui.proto\"\xa2\t\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x1emeshtastic/module_config.proto\x1a\x19meshtastic/portnums.proto\x1a\x1ameshtastic/telemetry.proto\x1a\x17meshtastic/xmodem.proto\"\xa2\t\n" +
 	"\bPosition\x12\"\n" +
 	"\n" +
 	"latitude_i\x18\x01 \x01(\x0fH\x00R\tlatitudeI\x88\x01\x01\x12$\n" +
@@ -4942,7 +4938,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\x95\x10\n" +
+	"\x0fpayload_variant*\xa7\x10\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -5063,7 +5059,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\fT_LORA_PAGER\x10g\x12\x1d\n" +
 	"\x19GAT562_MESH_TRIAL_TRACKER\x10h\x12\x0f\n" +
 	"\vWISMESH_TAG\x10i\x12\v\n" +
-	"\aRAK3312\x10j\x12\x0f\n" +
+	"\aRAK3312\x10j\x12\x10\n" +
+	"\fTHINKNODE_M5\x10k\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +
@@ -5231,11 +5228,11 @@ func file_meshtastic_mesh_proto_init() {
 	}
 	file_meshtastic_channel_proto_init()
 	file_meshtastic_config_proto_init()
+	file_meshtastic_device_ui_proto_init()
 	file_meshtastic_module_config_proto_init()
 	file_meshtastic_portnums_proto_init()
 	file_meshtastic_telemetry_proto_init()
 	file_meshtastic_xmodem_proto_init()
-	file_meshtastic_device_ui_proto_init()
 	file_meshtastic_mesh_proto_msgTypes[0].OneofWrappers = []any{}
 	file_meshtastic_mesh_proto_msgTypes[1].OneofWrappers = []any{}
 	file_meshtastic_mesh_proto_msgTypes[3].OneofWrappers = []any{

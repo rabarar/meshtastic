@@ -235,6 +235,10 @@ const (
 	// Non-notification system buzzer tones only.
 	// Buzzer is enabled only for non-notification tones such as button presses, startup, shutdown, but not for alerts.
 	Config_DeviceConfig_SYSTEM_ONLY Config_DeviceConfig_BuzzerMode = 3
+	// Direct Message notifications only.
+	// Buzzer is enabled only for direct messages and alerts, but not for button presses.
+	// External notification config determines the specifics of the notification behavior.
+	Config_DeviceConfig_DIRECT_MSG_ONLY Config_DeviceConfig_BuzzerMode = 4
 )
 
 // Enum value maps for Config_DeviceConfig_BuzzerMode.
@@ -244,12 +248,14 @@ var (
 		1: "DISABLED",
 		2: "NOTIFICATIONS_ONLY",
 		3: "SYSTEM_ONLY",
+		4: "DIRECT_MSG_ONLY",
 	}
 	Config_DeviceConfig_BuzzerMode_value = map[string]int32{
 		"ALL_ENABLED":        0,
 		"DISABLED":           1,
 		"NOTIFICATIONS_ONLY": 2,
 		"SYSTEM_ONLY":        3,
+		"DIRECT_MSG_ONLY":    4,
 	}
 )
 
@@ -2563,7 +2569,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x893\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x9e3\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2577,7 +2583,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"sessionkey\x18\t \x01(\v2#.meshtastic.Config.SessionkeyConfigH\x00R\n" +
 	"sessionkey\x129\n" +
 	"\tdevice_ui\x18\n" +
-	" \x01(\v2\x1a.meshtastic.DeviceUIConfigH\x00R\bdeviceUi\x1a\x81\b\n" +
+	" \x01(\v2\x1a.meshtastic.DeviceUIConfigH\x00R\bdeviceUi\x1a\x96\b\n" +
 	"\fDeviceConfig\x128\n" +
 	"\x04role\x18\x01 \x01(\x0e2$.meshtastic.Config.DeviceConfig.RoleR\x04role\x12)\n" +
 	"\x0eserial_enabled\x18\x02 \x01(\bB\x02\x18\x01R\rserialEnabled\x12\x1f\n" +
@@ -2621,13 +2627,14 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"KNOWN_ONLY\x10\x03\x12\b\n" +
 	"\x04NONE\x10\x04\x12\x16\n" +
-	"\x12CORE_PORTNUMS_ONLY\x10\x05\"T\n" +
+	"\x12CORE_PORTNUMS_ONLY\x10\x05\"i\n" +
 	"\n" +
 	"BuzzerMode\x12\x0f\n" +
 	"\vALL_ENABLED\x10\x00\x12\f\n" +
 	"\bDISABLED\x10\x01\x12\x16\n" +
 	"\x12NOTIFICATIONS_ONLY\x10\x02\x12\x0f\n" +
-	"\vSYSTEM_ONLY\x10\x03\x1a\xfa\x06\n" +
+	"\vSYSTEM_ONLY\x10\x03\x12\x13\n" +
+	"\x0fDIRECT_MSG_ONLY\x10\x04\x1a\xfa\x06\n" +
 	"\x0ePositionConfig\x126\n" +
 	"\x17position_broadcast_secs\x18\x01 \x01(\rR\x15positionBroadcastSecs\x12G\n" +
 	" position_broadcast_smart_enabled\x18\x02 \x01(\bR\x1dpositionBroadcastSmartEnabled\x12%\n" +

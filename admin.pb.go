@@ -1630,7 +1630,7 @@ var File_meshtastic_admin_proto protoreflect.FileDescriptor
 const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"\x16meshtastic/admin.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\x1a\x1ameshtastic/device_ui.proto\"\xd3!\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\xd3!\n" +
 	"\fAdminMessage\x12'\n" +
 	"\x0fsession_passkey\x18e \x01(\fR\x0esessionPasskey\x120\n" +
 	"\x13get_channel_request\x18\x01 \x01(\rH\x00R\x11getChannelRequest\x12G\n" +
@@ -1832,9 +1832,9 @@ func file_meshtastic_admin_proto_init() {
 	file_meshtastic_channel_proto_init()
 	file_meshtastic_config_proto_init()
 	file_meshtastic_connection_status_proto_init()
+	file_meshtastic_device_ui_proto_init()
 	file_meshtastic_mesh_proto_init()
 	file_meshtastic_module_config_proto_init()
-	file_meshtastic_device_ui_proto_init()
 	file_meshtastic_admin_proto_msgTypes[0].OneofWrappers = []any{
 		(*AdminMessage_GetChannelRequest)(nil),
 		(*AdminMessage_GetChannelResponse)(nil),

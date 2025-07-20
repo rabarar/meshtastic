@@ -107,6 +107,10 @@ const (
 	TelemetrySensorType_PCT2075 TelemetrySensorType = 39
 	// ADS1X15 ADC
 	TelemetrySensorType_ADS1X15 TelemetrySensorType = 40
+	// ADS1X15 ADC_ALT
+	TelemetrySensorType_ADS1X15_ALT TelemetrySensorType = 41
+	// Sensirion SFA30 Formaldehyde sensor
+	TelemetrySensorType_SFA30 TelemetrySensorType = 42
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -153,6 +157,8 @@ var (
 		38: "MAX17261",
 		39: "PCT2075",
 		40: "ADS1X15",
+		41: "ADS1X15_ALT",
+		42: "SFA30",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -196,6 +202,8 @@ var (
 		"MAX17261":      38,
 		"PCT2075":       39,
 		"ADS1X15":       40,
+		"ADS1X15_ALT":   41,
+		"SFA30":         42,
 	}
 )
 
@@ -758,9 +766,15 @@ type AirQualityMetrics struct {
 	// CO2 sensor temperature in degC
 	Co2Temperature *float32 `protobuf:"fixed32,14,opt,name=co2_temperature,json=co2Temperature,proto3,oneof" json:"co2_temperature,omitempty"`
 	// CO2 sensor relative humidity in %
-	Co2Humidity   *float32 `protobuf:"fixed32,15,opt,name=co2_humidity,json=co2Humidity,proto3,oneof" json:"co2_humidity,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Co2Humidity *float32 `protobuf:"fixed32,15,opt,name=co2_humidity,json=co2Humidity,proto3,oneof" json:"co2_humidity,omitempty"`
+	// Formaldehyde sensor formaldehyde concentration in ppb
+	FormFormaldehyde *float32 `protobuf:"fixed32,16,opt,name=form_formaldehyde,json=formFormaldehyde,proto3,oneof" json:"form_formaldehyde,omitempty"`
+	// Formaldehyde sensor relative humidity in %RH
+	FormHumidity *float32 `protobuf:"fixed32,17,opt,name=form_humidity,json=formHumidity,proto3,oneof" json:"form_humidity,omitempty"`
+	// Formaldehyde sensor temperature in degrees Celsius
+	FormTemperature *float32 `protobuf:"fixed32,18,opt,name=form_temperature,json=formTemperature,proto3,oneof" json:"form_temperature,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *AirQualityMetrics) Reset() {
@@ -894,6 +908,27 @@ func (x *AirQualityMetrics) GetCo2Temperature() float32 {
 func (x *AirQualityMetrics) GetCo2Humidity() float32 {
 	if x != nil && x.Co2Humidity != nil {
 		return *x.Co2Humidity
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetFormFormaldehyde() float32 {
+	if x != nil && x.FormFormaldehyde != nil {
+		return *x.FormFormaldehyde
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetFormHumidity() float32 {
+	if x != nil && x.FormHumidity != nil {
+		return *x.FormHumidity
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetFormTemperature() float32 {
+	if x != nil && x.FormTemperature != nil {
+		return *x.FormTemperature
 	}
 	return 0
 }
@@ -1594,7 +1629,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\f_ch7_voltageB\x0e\n" +
 	"\f_ch7_currentB\x0e\n" +
 	"\f_ch8_voltageB\x0e\n" +
-	"\f_ch8_current\"\xc5\a\n" +
+	"\f_ch8_current\"\x8e\t\n" +
 	"\x11AirQualityMetrics\x12(\n" +
 	"\rpm10_standard\x18\x01 \x01(\rH\x00R\fpm10Standard\x88\x01\x01\x12(\n" +
 	"\rpm25_standard\x18\x02 \x01(\rH\x01R\fpm25Standard\x88\x01\x01\x12*\n" +
@@ -1612,7 +1647,10 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0fparticles_100um\x18\f \x01(\rH\vR\x0eparticles100um\x88\x01\x01\x12\x15\n" +
 	"\x03co2\x18\r \x01(\rH\fR\x03co2\x88\x01\x01\x12,\n" +
 	"\x0fco2_temperature\x18\x0e \x01(\x02H\rR\x0eco2Temperature\x88\x01\x01\x12&\n" +
-	"\fco2_humidity\x18\x0f \x01(\x02H\x0eR\vco2Humidity\x88\x01\x01B\x10\n" +
+	"\fco2_humidity\x18\x0f \x01(\x02H\x0eR\vco2Humidity\x88\x01\x01\x120\n" +
+	"\x11form_formaldehyde\x18\x10 \x01(\x02H\x0fR\x10formFormaldehyde\x88\x01\x01\x12(\n" +
+	"\rform_humidity\x18\x11 \x01(\x02H\x10R\fformHumidity\x88\x01\x01\x12.\n" +
+	"\x10form_temperature\x18\x12 \x01(\x02H\x11R\x0fformTemperature\x88\x01\x01B\x10\n" +
 	"\x0e_pm10_standardB\x10\n" +
 	"\x0e_pm25_standardB\x11\n" +
 	"\x0f_pm100_standardB\x15\n" +
@@ -1627,7 +1665,10 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x10_particles_100umB\x06\n" +
 	"\x04_co2B\x12\n" +
 	"\x10_co2_temperatureB\x0f\n" +
-	"\r_co2_humidity\"\x96\x04\n" +
+	"\r_co2_humidityB\x14\n" +
+	"\x12_form_formaldehydeB\x10\n" +
+	"\x0e_form_humidityB\x13\n" +
+	"\x11_form_temperature\"\x96\x04\n" +
 	"\n" +
 	"LocalStats\x12%\n" +
 	"\x0euptime_seconds\x18\x01 \x01(\rR\ruptimeSeconds\x12/\n" +
@@ -1682,7 +1723,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"zeroOffset\x18\x01 \x01(\x05R\n" +
 	"zeroOffset\x12,\n" +
-	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xb9\x04\n" +
+	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xd5\x04\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -1735,7 +1776,9 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\bRAK12035\x10%\x12\f\n" +
 	"\bMAX17261\x10&\x12\v\n" +
 	"\aPCT2075\x10'\x12\v\n" +
-	"\aADS1X15\x10(Be\n" +
+	"\aADS1X15\x10(\x12\x0f\n" +
+	"\vADS1X15_ALT\x10)\x12\t\n" +
+	"\x05SFA30\x10*Be\n" +
 	"\x13com.geeksville.meshB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
