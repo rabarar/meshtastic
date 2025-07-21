@@ -956,6 +956,9 @@ const (
 	Routing_ADMIN_BAD_SESSION_KEY Routing_Error = 36
 	// Admin packet sent using PKC, but not from a public key on the admin key list
 	Routing_ADMIN_PUBLIC_KEY_UNAUTHORIZED Routing_Error = 37
+	// Airtime fairness rate limit exceeded for a packet
+	// This typically enforced per portnum and is used to prevent a single node from monopolizing airtime
+	Routing_RATE_LIMIT_EXCEEDED Routing_Error = 38
 )
 
 // Enum value maps for Routing_Error.
@@ -977,6 +980,7 @@ var (
 		35: "PKI_UNKNOWN_PUBKEY",
 		36: "ADMIN_BAD_SESSION_KEY",
 		37: "ADMIN_PUBLIC_KEY_UNAUTHORIZED",
+		38: "RATE_LIMIT_EXCEEDED",
 	}
 	Routing_Error_value = map[string]int32{
 		"NONE":                          0,
@@ -995,6 +999,7 @@ var (
 		"PKI_UNKNOWN_PUBKEY":            35,
 		"ADMIN_BAD_SESSION_KEY":         36,
 		"ADMIN_PUBLIC_KEY_UNAUTHORIZED": 37,
+		"RATE_LIMIT_EXCEEDED":           38,
 	}
 )
 
@@ -4679,12 +4684,12 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"snrTowards\x12\x1d\n" +
 	"\n" +
 	"route_back\x18\x03 \x03(\aR\trouteBack\x12\x19\n" +
-	"\bsnr_back\x18\x04 \x03(\x05R\asnrBack\"\x89\x04\n" +
+	"\bsnr_back\x18\x04 \x03(\x05R\asnrBack\"\xa2\x04\n" +
 	"\aRouting\x12A\n" +
 	"\rroute_request\x18\x01 \x01(\v2\x1a.meshtastic.RouteDiscoveryH\x00R\frouteRequest\x12=\n" +
 	"\vroute_reply\x18\x02 \x01(\v2\x1a.meshtastic.RouteDiscoveryH\x00R\n" +
 	"routeReply\x12>\n" +
-	"\ferror_reason\x18\x03 \x01(\x0e2\x19.meshtastic.Routing.ErrorH\x00R\verrorReason\"\xb0\x02\n" +
+	"\ferror_reason\x18\x03 \x01(\x0e2\x19.meshtastic.Routing.ErrorH\x00R\verrorReason\"\xc9\x02\n" +
 	"\x05Error\x12\b\n" +
 	"\x04NONE\x10\x00\x12\f\n" +
 	"\bNO_ROUTE\x10\x01\x12\v\n" +
@@ -4703,7 +4708,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"PKI_FAILED\x10\"\x12\x16\n" +
 	"\x12PKI_UNKNOWN_PUBKEY\x10#\x12\x19\n" +
 	"\x15ADMIN_BAD_SESSION_KEY\x10$\x12!\n" +
-	"\x1dADMIN_PUBLIC_KEY_UNAUTHORIZED\x10%B\t\n" +
+	"\x1dADMIN_PUBLIC_KEY_UNAUTHORIZED\x10%\x12\x17\n" +
+	"\x13RATE_LIMIT_EXCEEDED\x10&B\t\n" +
 	"\avariant\"\x9e\x02\n" +
 	"\x04Data\x12-\n" +
 	"\aportnum\x18\x01 \x01(\x0e2\x13.meshtastic.PortNumR\aportnum\x12\x18\n" +

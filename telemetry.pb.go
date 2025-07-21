@@ -111,6 +111,8 @@ const (
 	TelemetrySensorType_ADS1X15_ALT TelemetrySensorType = 41
 	// Sensirion SFA30 Formaldehyde sensor
 	TelemetrySensorType_SFA30 TelemetrySensorType = 42
+	// SEN5X PM SENSORS
+	TelemetrySensorType_SEN5X TelemetrySensorType = 43
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -159,6 +161,7 @@ var (
 		40: "ADS1X15",
 		41: "ADS1X15_ALT",
 		42: "SFA30",
+		43: "SEN5X",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -204,6 +207,7 @@ var (
 		"ADS1X15":       40,
 		"ADS1X15_ALT":   41,
 		"SFA30":         42,
+		"SEN5X":         43,
 	}
 )
 
@@ -737,29 +741,29 @@ func (x *PowerMetrics) GetCh8Current() float32 {
 // Air quality metrics
 type AirQualityMetrics struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Concentration Units Standard PM1.0
+	// Concentration Units Standard PM1.0 in ug/m3
 	Pm10Standard *uint32 `protobuf:"varint,1,opt,name=pm10_standard,json=pm10Standard,proto3,oneof" json:"pm10_standard,omitempty"`
-	// Concentration Units Standard PM2.5
+	// Concentration Units Standard PM2.5 in ug/m3
 	Pm25Standard *uint32 `protobuf:"varint,2,opt,name=pm25_standard,json=pm25Standard,proto3,oneof" json:"pm25_standard,omitempty"`
-	// Concentration Units Standard PM10.0
+	// Concentration Units Standard PM10.0 in ug/m3
 	Pm100Standard *uint32 `protobuf:"varint,3,opt,name=pm100_standard,json=pm100Standard,proto3,oneof" json:"pm100_standard,omitempty"`
-	// Concentration Units Environmental PM1.0
+	// Concentration Units Environmental PM1.0 in ug/m3
 	Pm10Environmental *uint32 `protobuf:"varint,4,opt,name=pm10_environmental,json=pm10Environmental,proto3,oneof" json:"pm10_environmental,omitempty"`
-	// Concentration Units Environmental PM2.5
+	// Concentration Units Environmental PM2.5 in ug/m3
 	Pm25Environmental *uint32 `protobuf:"varint,5,opt,name=pm25_environmental,json=pm25Environmental,proto3,oneof" json:"pm25_environmental,omitempty"`
-	// Concentration Units Environmental PM10.0
+	// Concentration Units Environmental PM10.0 in ug/m3
 	Pm100Environmental *uint32 `protobuf:"varint,6,opt,name=pm100_environmental,json=pm100Environmental,proto3,oneof" json:"pm100_environmental,omitempty"`
-	// 0.3um Particle Count
+	// 0.3um Particle Count in #/0.1l
 	Particles_03Um *uint32 `protobuf:"varint,7,opt,name=particles_03um,json=particles03um,proto3,oneof" json:"particles_03um,omitempty"`
-	// 0.5um Particle Count
+	// 0.5um Particle Count in #/0.1l
 	Particles_05Um *uint32 `protobuf:"varint,8,opt,name=particles_05um,json=particles05um,proto3,oneof" json:"particles_05um,omitempty"`
-	// 1.0um Particle Count
+	// 1.0um Particle Count in #/0.1l
 	Particles_10Um *uint32 `protobuf:"varint,9,opt,name=particles_10um,json=particles10um,proto3,oneof" json:"particles_10um,omitempty"`
-	// 2.5um Particle Count
+	// 2.5um Particle Count in #/0.1l
 	Particles_25Um *uint32 `protobuf:"varint,10,opt,name=particles_25um,json=particles25um,proto3,oneof" json:"particles_25um,omitempty"`
-	// 5.0um Particle Count
+	// 5.0um Particle Count in #/0.1l
 	Particles_50Um *uint32 `protobuf:"varint,11,opt,name=particles_50um,json=particles50um,proto3,oneof" json:"particles_50um,omitempty"`
-	// 10.0um Particle Count
+	// 10.0um Particle Count in #/0.1l
 	Particles_100Um *uint32 `protobuf:"varint,12,opt,name=particles_100um,json=particles100um,proto3,oneof" json:"particles_100um,omitempty"`
 	// CO2 concentration in ppm
 	Co2 *uint32 `protobuf:"varint,13,opt,name=co2,proto3,oneof" json:"co2,omitempty"`
@@ -773,8 +777,22 @@ type AirQualityMetrics struct {
 	FormHumidity *float32 `protobuf:"fixed32,17,opt,name=form_humidity,json=formHumidity,proto3,oneof" json:"form_humidity,omitempty"`
 	// Formaldehyde sensor temperature in degrees Celsius
 	FormTemperature *float32 `protobuf:"fixed32,18,opt,name=form_temperature,json=formTemperature,proto3,oneof" json:"form_temperature,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Concentration Units Standard PM4.0 in ug/m3
+	Pm40Standard *uint32 `protobuf:"varint,19,opt,name=pm40_standard,json=pm40Standard,proto3,oneof" json:"pm40_standard,omitempty"`
+	// 4.0um Particle Count in #/0.1l
+	Particles_40Um *uint32 `protobuf:"varint,20,opt,name=particles_40um,json=particles40um,proto3,oneof" json:"particles_40um,omitempty"`
+	// PM Sensor Temperature
+	PmTemperature *float32 `protobuf:"fixed32,21,opt,name=pm_temperature,json=pmTemperature,proto3,oneof" json:"pm_temperature,omitempty"`
+	// PM Sensor humidity
+	PmHumidity *float32 `protobuf:"fixed32,22,opt,name=pm_humidity,json=pmHumidity,proto3,oneof" json:"pm_humidity,omitempty"`
+	// PM Sensor VOC Index
+	PmVocIdx *float32 `protobuf:"fixed32,23,opt,name=pm_voc_idx,json=pmVocIdx,proto3,oneof" json:"pm_voc_idx,omitempty"`
+	// PM Sensor NOx Index
+	PmNoxIdx *float32 `protobuf:"fixed32,24,opt,name=pm_nox_idx,json=pmNoxIdx,proto3,oneof" json:"pm_nox_idx,omitempty"`
+	// Typical Particle Size in um
+	ParticlesTps  *float32 `protobuf:"fixed32,25,opt,name=particles_tps,json=particlesTps,proto3,oneof" json:"particles_tps,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AirQualityMetrics) Reset() {
@@ -929,6 +947,55 @@ func (x *AirQualityMetrics) GetFormHumidity() float32 {
 func (x *AirQualityMetrics) GetFormTemperature() float32 {
 	if x != nil && x.FormTemperature != nil {
 		return *x.FormTemperature
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetPm40Standard() uint32 {
+	if x != nil && x.Pm40Standard != nil {
+		return *x.Pm40Standard
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetParticles_40Um() uint32 {
+	if x != nil && x.Particles_40Um != nil {
+		return *x.Particles_40Um
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetPmTemperature() float32 {
+	if x != nil && x.PmTemperature != nil {
+		return *x.PmTemperature
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetPmHumidity() float32 {
+	if x != nil && x.PmHumidity != nil {
+		return *x.PmHumidity
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetPmVocIdx() float32 {
+	if x != nil && x.PmVocIdx != nil {
+		return *x.PmVocIdx
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetPmNoxIdx() float32 {
+	if x != nil && x.PmNoxIdx != nil {
+		return *x.PmNoxIdx
+	}
+	return 0
+}
+
+func (x *AirQualityMetrics) GetParticlesTps() float32 {
+	if x != nil && x.ParticlesTps != nil {
+		return *x.ParticlesTps
 	}
 	return 0
 }
@@ -1629,7 +1696,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\f_ch7_voltageB\x0e\n" +
 	"\f_ch7_currentB\x0e\n" +
 	"\f_ch8_voltageB\x0e\n" +
-	"\f_ch8_current\"\x8e\t\n" +
+	"\f_ch8_current\"\x9e\f\n" +
 	"\x11AirQualityMetrics\x12(\n" +
 	"\rpm10_standard\x18\x01 \x01(\rH\x00R\fpm10Standard\x88\x01\x01\x12(\n" +
 	"\rpm25_standard\x18\x02 \x01(\rH\x01R\fpm25Standard\x88\x01\x01\x12*\n" +
@@ -1650,7 +1717,17 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\fco2_humidity\x18\x0f \x01(\x02H\x0eR\vco2Humidity\x88\x01\x01\x120\n" +
 	"\x11form_formaldehyde\x18\x10 \x01(\x02H\x0fR\x10formFormaldehyde\x88\x01\x01\x12(\n" +
 	"\rform_humidity\x18\x11 \x01(\x02H\x10R\fformHumidity\x88\x01\x01\x12.\n" +
-	"\x10form_temperature\x18\x12 \x01(\x02H\x11R\x0fformTemperature\x88\x01\x01B\x10\n" +
+	"\x10form_temperature\x18\x12 \x01(\x02H\x11R\x0fformTemperature\x88\x01\x01\x12(\n" +
+	"\rpm40_standard\x18\x13 \x01(\rH\x12R\fpm40Standard\x88\x01\x01\x12*\n" +
+	"\x0eparticles_40um\x18\x14 \x01(\rH\x13R\rparticles40um\x88\x01\x01\x12*\n" +
+	"\x0epm_temperature\x18\x15 \x01(\x02H\x14R\rpmTemperature\x88\x01\x01\x12$\n" +
+	"\vpm_humidity\x18\x16 \x01(\x02H\x15R\n" +
+	"pmHumidity\x88\x01\x01\x12!\n" +
+	"\n" +
+	"pm_voc_idx\x18\x17 \x01(\x02H\x16R\bpmVocIdx\x88\x01\x01\x12!\n" +
+	"\n" +
+	"pm_nox_idx\x18\x18 \x01(\x02H\x17R\bpmNoxIdx\x88\x01\x01\x12(\n" +
+	"\rparticles_tps\x18\x19 \x01(\x02H\x18R\fparticlesTps\x88\x01\x01B\x10\n" +
 	"\x0e_pm10_standardB\x10\n" +
 	"\x0e_pm25_standardB\x11\n" +
 	"\x0f_pm100_standardB\x15\n" +
@@ -1668,7 +1745,14 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\r_co2_humidityB\x14\n" +
 	"\x12_form_formaldehydeB\x10\n" +
 	"\x0e_form_humidityB\x13\n" +
-	"\x11_form_temperature\"\x96\x04\n" +
+	"\x11_form_temperatureB\x10\n" +
+	"\x0e_pm40_standardB\x11\n" +
+	"\x0f_particles_40umB\x11\n" +
+	"\x0f_pm_temperatureB\x0e\n" +
+	"\f_pm_humidityB\r\n" +
+	"\v_pm_voc_idxB\r\n" +
+	"\v_pm_nox_idxB\x10\n" +
+	"\x0e_particles_tps\"\x96\x04\n" +
 	"\n" +
 	"LocalStats\x12%\n" +
 	"\x0euptime_seconds\x18\x01 \x01(\rR\ruptimeSeconds\x12/\n" +
@@ -1723,7 +1807,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"zeroOffset\x18\x01 \x01(\x05R\n" +
 	"zeroOffset\x12,\n" +
-	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xd5\x04\n" +
+	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xe0\x04\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -1778,7 +1862,8 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\aPCT2075\x10'\x12\v\n" +
 	"\aADS1X15\x10(\x12\x0f\n" +
 	"\vADS1X15_ALT\x10)\x12\t\n" +
-	"\x05SFA30\x10*Be\n" +
+	"\x05SFA30\x10*\x12\t\n" +
+	"\x05SEN5X\x10+Be\n" +
 	"\x13com.geeksville.meshB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (

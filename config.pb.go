@@ -893,6 +893,10 @@ const (
 	Config_LoRaConfig_KZ_433 Config_LoRaConfig_RegionCode = 23
 	// Kazakhstan 863MHz
 	Config_LoRaConfig_KZ_863 Config_LoRaConfig_RegionCode = 24
+	// Nepal 865MHz
+	Config_LoRaConfig_NP_865 Config_LoRaConfig_RegionCode = 25
+	// Brazil 902MHz
+	Config_LoRaConfig_BR_902 Config_LoRaConfig_RegionCode = 26
 )
 
 // Enum value maps for Config_LoRaConfig_RegionCode.
@@ -923,6 +927,8 @@ var (
 		22: "ANZ_433",
 		23: "KZ_433",
 		24: "KZ_863",
+		25: "NP_865",
+		26: "BR_902",
 	}
 	Config_LoRaConfig_RegionCode_value = map[string]int32{
 		"UNSET":   0,
@@ -950,6 +956,8 @@ var (
 		"ANZ_433": 22,
 		"KZ_433":  23,
 		"KZ_863":  24,
+		"NP_865":  25,
+		"BR_902":  26,
 	}
 )
 
@@ -1916,7 +1924,10 @@ type Config_DisplayConfig struct {
 	// Number of seconds the screen stays on after pressing the user button or receiving a message
 	// 0 for default of one minute MAXUINT for always on
 	ScreenOnSecs uint32 `protobuf:"varint,1,opt,name=screen_on_secs,json=screenOnSecs,proto3" json:"screen_on_secs,omitempty"`
+	// Deprecated in 2.7.4: Unused
 	// How the GPS coordinates are formatted on the OLED screen.
+	//
+	// Deprecated: Marked as deprecated in meshtastic/config.proto.
 	GpsFormat Config_DisplayConfig_GpsCoordinateFormat `protobuf:"varint,2,opt,name=gps_format,json=gpsFormat,proto3,enum=meshtastic.Config_DisplayConfig_GpsCoordinateFormat" json:"gps_format,omitempty"`
 	// Automatically toggles to the next page on the screen like a carousel, based the specified interval in seconds.
 	// Potentially useful for devices without user buttons.
@@ -1982,6 +1993,7 @@ func (x *Config_DisplayConfig) GetScreenOnSecs() uint32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in meshtastic/config.proto.
 func (x *Config_DisplayConfig) GetGpsFormat() Config_DisplayConfig_GpsCoordinateFormat {
 	if x != nil {
 		return x.GpsFormat
@@ -2569,7 +2581,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x9e3\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xba3\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2706,11 +2718,11 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x06STATIC\x10\x01\"4\n" +
 	"\rProtocolFlags\x12\x10\n" +
 	"\fNO_BROADCAST\x10\x00\x12\x11\n" +
-	"\rUDP_BROADCAST\x10\x01\x1a\xa5\t\n" +
+	"\rUDP_BROADCAST\x10\x01\x1a\xa9\t\n" +
 	"\rDisplayConfig\x12$\n" +
-	"\x0escreen_on_secs\x18\x01 \x01(\rR\fscreenOnSecs\x12S\n" +
+	"\x0escreen_on_secs\x18\x01 \x01(\rR\fscreenOnSecs\x12W\n" +
 	"\n" +
-	"gps_format\x18\x02 \x01(\x0e24.meshtastic.Config.DisplayConfig.GpsCoordinateFormatR\tgpsFormat\x129\n" +
+	"gps_format\x18\x02 \x01(\x0e24.meshtastic.Config.DisplayConfig.GpsCoordinateFormatB\x02\x18\x01R\tgpsFormat\x129\n" +
 	"\x19auto_screen_carousel_secs\x18\x03 \x01(\rR\x16autoScreenCarouselSecs\x12*\n" +
 	"\x11compass_north_top\x18\x04 \x01(\bR\x0fcompassNorthTop\x12\x1f\n" +
 	"\vflip_screen\x18\x05 \x01(\bR\n" +
@@ -2754,7 +2766,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x12DEGREES_0_INVERTED\x10\x04\x12\x17\n" +
 	"\x13DEGREES_90_INVERTED\x10\x05\x12\x18\n" +
 	"\x14DEGREES_180_INVERTED\x10\x06\x12\x18\n" +
-	"\x14DEGREES_270_INVERTED\x10\a\x1a\xb8\t\n" +
+	"\x14DEGREES_270_INVERTED\x10\a\x1a\xd0\t\n" +
 	"\n" +
 	"LoRaConfig\x12\x1d\n" +
 	"\n" +
@@ -2780,7 +2792,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x0fignore_incoming\x18g \x03(\rR\x0eignoreIncoming\x12\x1f\n" +
 	"\vignore_mqtt\x18h \x01(\bR\n" +
 	"ignoreMqtt\x12)\n" +
-	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\"\x96\x02\n" +
+	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\"\xae\x02\n" +
 	"\n" +
 	"RegionCode\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\x06\n" +
@@ -2821,7 +2833,11 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x06KZ_433\x10\x17\x12\n" +
 	"\n" +
-	"\x06KZ_863\x10\x18\"\xa9\x01\n" +
+	"\x06KZ_863\x10\x18\x12\n" +
+	"\n" +
+	"\x06NP_865\x10\x19\x12\n" +
+	"\n" +
+	"\x06BR_902\x10\x1a\"\xa9\x01\n" +
 	"\vModemPreset\x12\r\n" +
 	"\tLONG_FAST\x10\x00\x12\r\n" +
 	"\tLONG_SLOW\x10\x01\x12\x16\n" +
