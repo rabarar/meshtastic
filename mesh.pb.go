@@ -691,6 +691,76 @@ func (CriticalErrorCode) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{2}
 }
 
+// Enum to indicate to clients whether this firmware is a special firmware build, like an event.
+// The first 16 values are reserved for non-event special firmwares, like the Smart Citizen use case.
+type FirmwareEdition int32
+
+const (
+	// Vanilla firmware
+	FirmwareEdition_VANILLA FirmwareEdition = 0
+	// Firmware for use in the Smart Citizen environmental monitoring network
+	FirmwareEdition_SMART_CITIZEN FirmwareEdition = 1
+	// Open Sauce, the maker conference held yearly in CA
+	FirmwareEdition_OPEN_SAUCE FirmwareEdition = 16
+	// DEFCON, the yearly hacker conference
+	FirmwareEdition_DEFCON FirmwareEdition = 17
+	// Burning Man, the yearly hippie gathering in the desert
+	FirmwareEdition_BURNING_MAN FirmwareEdition = 18
+	// Hamvention, the Dayton amateur radio convention
+	FirmwareEdition_HAMVENTION FirmwareEdition = 19
+	// Placeholder for DIY and unofficial events
+	FirmwareEdition_DIY_EDITION FirmwareEdition = 127
+)
+
+// Enum value maps for FirmwareEdition.
+var (
+	FirmwareEdition_name = map[int32]string{
+		0:   "VANILLA",
+		1:   "SMART_CITIZEN",
+		16:  "OPEN_SAUCE",
+		17:  "DEFCON",
+		18:  "BURNING_MAN",
+		19:  "HAMVENTION",
+		127: "DIY_EDITION",
+	}
+	FirmwareEdition_value = map[string]int32{
+		"VANILLA":       0,
+		"SMART_CITIZEN": 1,
+		"OPEN_SAUCE":    16,
+		"DEFCON":        17,
+		"BURNING_MAN":   18,
+		"HAMVENTION":    19,
+		"DIY_EDITION":   127,
+	}
+)
+
+func (x FirmwareEdition) Enum() *FirmwareEdition {
+	p := new(FirmwareEdition)
+	*p = x
+	return p
+}
+
+func (x FirmwareEdition) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FirmwareEdition) Descriptor() protoreflect.EnumDescriptor {
+	return file_meshtastic_mesh_proto_enumTypes[3].Descriptor()
+}
+
+func (FirmwareEdition) Type() protoreflect.EnumType {
+	return &file_meshtastic_mesh_proto_enumTypes[3]
+}
+
+func (x FirmwareEdition) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FirmwareEdition.Descriptor instead.
+func (FirmwareEdition) EnumDescriptor() ([]byte, []int) {
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{3}
+}
+
 // Enum for modules excluded from a device's configuration.
 // Each value represents a ModuleConfigType that can be toggled as excluded
 // by setting its corresponding bit in the `excluded_modules` bitmask field.
@@ -782,11 +852,11 @@ func (x ExcludedModules) String() string {
 }
 
 func (ExcludedModules) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_mesh_proto_enumTypes[3].Descriptor()
+	return file_meshtastic_mesh_proto_enumTypes[4].Descriptor()
 }
 
 func (ExcludedModules) Type() protoreflect.EnumType {
-	return &file_meshtastic_mesh_proto_enumTypes[3]
+	return &file_meshtastic_mesh_proto_enumTypes[4]
 }
 
 func (x ExcludedModules) Number() protoreflect.EnumNumber {
@@ -795,7 +865,7 @@ func (x ExcludedModules) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ExcludedModules.Descriptor instead.
 func (ExcludedModules) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{3}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{4}
 }
 
 // How the location was acquired: manual, onboard GPS, external (EUD) GPS
@@ -839,11 +909,11 @@ func (x Position_LocSource) String() string {
 }
 
 func (Position_LocSource) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_mesh_proto_enumTypes[4].Descriptor()
+	return file_meshtastic_mesh_proto_enumTypes[5].Descriptor()
 }
 
 func (Position_LocSource) Type() protoreflect.EnumType {
-	return &file_meshtastic_mesh_proto_enumTypes[4]
+	return &file_meshtastic_mesh_proto_enumTypes[5]
 }
 
 func (x Position_LocSource) Number() protoreflect.EnumNumber {
@@ -901,11 +971,11 @@ func (x Position_AltSource) String() string {
 }
 
 func (Position_AltSource) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_mesh_proto_enumTypes[5].Descriptor()
+	return file_meshtastic_mesh_proto_enumTypes[6].Descriptor()
 }
 
 func (Position_AltSource) Type() protoreflect.EnumType {
-	return &file_meshtastic_mesh_proto_enumTypes[5]
+	return &file_meshtastic_mesh_proto_enumTypes[6]
 }
 
 func (x Position_AltSource) Number() protoreflect.EnumNumber {
@@ -1014,11 +1084,11 @@ func (x Routing_Error) String() string {
 }
 
 func (Routing_Error) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_mesh_proto_enumTypes[6].Descriptor()
+	return file_meshtastic_mesh_proto_enumTypes[7].Descriptor()
 }
 
 func (Routing_Error) Type() protoreflect.EnumType {
-	return &file_meshtastic_mesh_proto_enumTypes[6]
+	return &file_meshtastic_mesh_proto_enumTypes[7]
 }
 
 func (x Routing_Error) Number() protoreflect.EnumNumber {
@@ -1116,11 +1186,11 @@ func (x MeshPacket_Priority) String() string {
 }
 
 func (MeshPacket_Priority) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_mesh_proto_enumTypes[7].Descriptor()
+	return file_meshtastic_mesh_proto_enumTypes[8].Descriptor()
 }
 
 func (MeshPacket_Priority) Type() protoreflect.EnumType {
-	return &file_meshtastic_mesh_proto_enumTypes[7]
+	return &file_meshtastic_mesh_proto_enumTypes[8]
 }
 
 func (x MeshPacket_Priority) Number() protoreflect.EnumNumber {
@@ -1169,11 +1239,11 @@ func (x MeshPacket_Delayed) String() string {
 }
 
 func (MeshPacket_Delayed) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_mesh_proto_enumTypes[8].Descriptor()
+	return file_meshtastic_mesh_proto_enumTypes[9].Descriptor()
 }
 
 func (MeshPacket_Delayed) Type() protoreflect.EnumType {
-	return &file_meshtastic_mesh_proto_enumTypes[8]
+	return &file_meshtastic_mesh_proto_enumTypes[9]
 }
 
 func (x MeshPacket_Delayed) Number() protoreflect.EnumNumber {
@@ -1238,11 +1308,11 @@ func (x LogRecord_Level) String() string {
 }
 
 func (LogRecord_Level) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_mesh_proto_enumTypes[9].Descriptor()
+	return file_meshtastic_mesh_proto_enumTypes[10].Descriptor()
 }
 
 func (LogRecord_Level) Type() protoreflect.EnumType {
-	return &file_meshtastic_mesh_proto_enumTypes[9]
+	return &file_meshtastic_mesh_proto_enumTypes[10]
 }
 
 func (x LogRecord_Level) Number() protoreflect.EnumNumber {
@@ -2731,7 +2801,12 @@ type MyNodeInfo struct {
 	// Unique hardware identifier for this device
 	DeviceId []byte `protobuf:"bytes,12,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
 	// The PlatformIO environment used to build this firmware
-	PioEnv        string `protobuf:"bytes,13,opt,name=pio_env,json=pioEnv,proto3" json:"pio_env,omitempty"`
+	PioEnv string `protobuf:"bytes,13,opt,name=pio_env,json=pioEnv,proto3" json:"pio_env,omitempty"`
+	// The indicator for whether this device is running event firmware and which
+	FirmwareEdition FirmwareEdition `protobuf:"varint,14,opt,name=firmware_edition,json=firmwareEdition,proto3,enum=meshtastic.FirmwareEdition" json:"firmware_edition,omitempty"`
+	// The number of nodes in the nodedb.
+	// This is used by the phone to know how many NodeInfo packets to expect on want_config
+	NodedbCount   uint32 `protobuf:"varint,15,opt,name=nodedb_count,json=nodedbCount,proto3" json:"nodedb_count,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2799,6 +2874,20 @@ func (x *MyNodeInfo) GetPioEnv() string {
 		return x.PioEnv
 	}
 	return ""
+}
+
+func (x *MyNodeInfo) GetFirmwareEdition() FirmwareEdition {
+	if x != nil {
+		return x.FirmwareEdition
+	}
+	return FirmwareEdition_VANILLA
+}
+
+func (x *MyNodeInfo) GetNodedbCount() uint32 {
+	if x != nil {
+		return x.NodedbCount
+	}
+	return 0
 }
 
 // Debug output from the device.
@@ -4807,14 +4896,16 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"is_ignored\x18\v \x01(\bR\tisIgnored\x127\n" +
 	"\x18is_key_manually_verified\x18\f \x01(\bR\x15isKeyManuallyVerifiedB\f\n" +
 	"\n" +
-	"_hops_away\"\xad\x01\n" +
+	"_hops_away\"\x98\x02\n" +
 	"\n" +
 	"MyNodeInfo\x12\x1e\n" +
 	"\vmy_node_num\x18\x01 \x01(\rR\tmyNodeNum\x12!\n" +
 	"\freboot_count\x18\b \x01(\rR\vrebootCount\x12&\n" +
 	"\x0fmin_app_version\x18\v \x01(\rR\rminAppVersion\x12\x1b\n" +
 	"\tdevice_id\x18\f \x01(\fR\bdeviceId\x12\x17\n" +
-	"\apio_env\x18\r \x01(\tR\x06pioEnv\"\xde\x01\n" +
+	"\apio_env\x18\r \x01(\tR\x06pioEnv\x12F\n" +
+	"\x10firmware_edition\x18\x0e \x01(\x0e2\x1b.meshtastic.FirmwareEditionR\x0ffirmwareEdition\x12!\n" +
+	"\fnodedb_count\x18\x0f \x01(\rR\vnodedbCount\"\xde\x01\n" +
 	"\tLogRecord\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\x12\x12\n" +
 	"\x04time\x18\x02 \x01(\aR\x04time\x12\x16\n" +
@@ -5087,7 +5178,18 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x12\x11\n" +
 	"\rRADIO_SPI_BUG\x10\v\x12 \n" +
 	"\x1cFLASH_CORRUPTION_RECOVERABLE\x10\f\x12\"\n" +
-	"\x1eFLASH_CORRUPTION_UNRECOVERABLE\x10\r*\x80\x03\n" +
+	"\x1eFLASH_CORRUPTION_UNRECOVERABLE\x10\r*\x7f\n" +
+	"\x0fFirmwareEdition\x12\v\n" +
+	"\aVANILLA\x10\x00\x12\x11\n" +
+	"\rSMART_CITIZEN\x10\x01\x12\x0e\n" +
+	"\n" +
+	"OPEN_SAUCE\x10\x10\x12\n" +
+	"\n" +
+	"\x06DEFCON\x10\x11\x12\x0f\n" +
+	"\vBURNING_MAN\x10\x12\x12\x0e\n" +
+	"\n" +
+	"HAMVENTION\x10\x13\x12\x0f\n" +
+	"\vDIY_EDITION\x10\x7f*\x80\x03\n" +
 	"\x0fExcludedModules\x12\x11\n" +
 	"\rEXCLUDED_NONE\x10\x00\x12\x0f\n" +
 	"\vMQTT_CONFIG\x10\x01\x12\x11\n" +
@@ -5120,111 +5222,113 @@ func file_meshtastic_mesh_proto_rawDescGZIP() []byte {
 	return file_meshtastic_mesh_proto_rawDescData
 }
 
-var file_meshtastic_mesh_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
+var file_meshtastic_mesh_proto_enumTypes = make([]protoimpl.EnumInfo, 11)
 var file_meshtastic_mesh_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
 var file_meshtastic_mesh_proto_goTypes = []any{
 	(HardwareModel)(0),                   // 0: meshtastic.HardwareModel
 	(Constants)(0),                       // 1: meshtastic.Constants
 	(CriticalErrorCode)(0),               // 2: meshtastic.CriticalErrorCode
-	(ExcludedModules)(0),                 // 3: meshtastic.ExcludedModules
-	(Position_LocSource)(0),              // 4: meshtastic.Position.LocSource
-	(Position_AltSource)(0),              // 5: meshtastic.Position.AltSource
-	(Routing_Error)(0),                   // 6: meshtastic.Routing.Error
-	(MeshPacket_Priority)(0),             // 7: meshtastic.MeshPacket.Priority
-	(MeshPacket_Delayed)(0),              // 8: meshtastic.MeshPacket.Delayed
-	(LogRecord_Level)(0),                 // 9: meshtastic.LogRecord.Level
-	(*Position)(nil),                     // 10: meshtastic.Position
-	(*User)(nil),                         // 11: meshtastic.User
-	(*RouteDiscovery)(nil),               // 12: meshtastic.RouteDiscovery
-	(*Routing)(nil),                      // 13: meshtastic.Routing
-	(*Data)(nil),                         // 14: meshtastic.Data
-	(*KeyVerification)(nil),              // 15: meshtastic.KeyVerification
-	(*Waypoint)(nil),                     // 16: meshtastic.Waypoint
-	(*MqttClientProxyMessage)(nil),       // 17: meshtastic.MqttClientProxyMessage
-	(*MeshPacket)(nil),                   // 18: meshtastic.MeshPacket
-	(*NodeInfo)(nil),                     // 19: meshtastic.NodeInfo
-	(*MyNodeInfo)(nil),                   // 20: meshtastic.MyNodeInfo
-	(*LogRecord)(nil),                    // 21: meshtastic.LogRecord
-	(*QueueStatus)(nil),                  // 22: meshtastic.QueueStatus
-	(*FromRadio)(nil),                    // 23: meshtastic.FromRadio
-	(*ClientNotification)(nil),           // 24: meshtastic.ClientNotification
-	(*KeyVerificationNumberInform)(nil),  // 25: meshtastic.KeyVerificationNumberInform
-	(*KeyVerificationNumberRequest)(nil), // 26: meshtastic.KeyVerificationNumberRequest
-	(*KeyVerificationFinal)(nil),         // 27: meshtastic.KeyVerificationFinal
-	(*DuplicatedPublicKey)(nil),          // 28: meshtastic.DuplicatedPublicKey
-	(*LowEntropyKey)(nil),                // 29: meshtastic.LowEntropyKey
-	(*FileInfo)(nil),                     // 30: meshtastic.FileInfo
-	(*ToRadio)(nil),                      // 31: meshtastic.ToRadio
-	(*Compressed)(nil),                   // 32: meshtastic.Compressed
-	(*NeighborInfo)(nil),                 // 33: meshtastic.NeighborInfo
-	(*Neighbor)(nil),                     // 34: meshtastic.Neighbor
-	(*DeviceMetadata)(nil),               // 35: meshtastic.DeviceMetadata
-	(*Heartbeat)(nil),                    // 36: meshtastic.Heartbeat
-	(*NodeRemoteHardwarePin)(nil),        // 37: meshtastic.NodeRemoteHardwarePin
-	(*ChunkedPayload)(nil),               // 38: meshtastic.ChunkedPayload
-	(*ResendChunks)(nil),                 // 39: meshtastic.resend_chunks
-	(*ChunkedPayloadResponse)(nil),       // 40: meshtastic.ChunkedPayloadResponse
-	(Config_DeviceConfig_Role)(0),        // 41: meshtastic.Config.DeviceConfig.Role
-	(PortNum)(0),                         // 42: meshtastic.PortNum
-	(*DeviceMetrics)(nil),                // 43: meshtastic.DeviceMetrics
-	(*Config)(nil),                       // 44: meshtastic.Config
-	(*ModuleConfig)(nil),                 // 45: meshtastic.ModuleConfig
-	(*Channel)(nil),                      // 46: meshtastic.Channel
-	(*XModem)(nil),                       // 47: meshtastic.XModem
-	(*DeviceUIConfig)(nil),               // 48: meshtastic.DeviceUIConfig
-	(*RemoteHardwarePin)(nil),            // 49: meshtastic.RemoteHardwarePin
+	(FirmwareEdition)(0),                 // 3: meshtastic.FirmwareEdition
+	(ExcludedModules)(0),                 // 4: meshtastic.ExcludedModules
+	(Position_LocSource)(0),              // 5: meshtastic.Position.LocSource
+	(Position_AltSource)(0),              // 6: meshtastic.Position.AltSource
+	(Routing_Error)(0),                   // 7: meshtastic.Routing.Error
+	(MeshPacket_Priority)(0),             // 8: meshtastic.MeshPacket.Priority
+	(MeshPacket_Delayed)(0),              // 9: meshtastic.MeshPacket.Delayed
+	(LogRecord_Level)(0),                 // 10: meshtastic.LogRecord.Level
+	(*Position)(nil),                     // 11: meshtastic.Position
+	(*User)(nil),                         // 12: meshtastic.User
+	(*RouteDiscovery)(nil),               // 13: meshtastic.RouteDiscovery
+	(*Routing)(nil),                      // 14: meshtastic.Routing
+	(*Data)(nil),                         // 15: meshtastic.Data
+	(*KeyVerification)(nil),              // 16: meshtastic.KeyVerification
+	(*Waypoint)(nil),                     // 17: meshtastic.Waypoint
+	(*MqttClientProxyMessage)(nil),       // 18: meshtastic.MqttClientProxyMessage
+	(*MeshPacket)(nil),                   // 19: meshtastic.MeshPacket
+	(*NodeInfo)(nil),                     // 20: meshtastic.NodeInfo
+	(*MyNodeInfo)(nil),                   // 21: meshtastic.MyNodeInfo
+	(*LogRecord)(nil),                    // 22: meshtastic.LogRecord
+	(*QueueStatus)(nil),                  // 23: meshtastic.QueueStatus
+	(*FromRadio)(nil),                    // 24: meshtastic.FromRadio
+	(*ClientNotification)(nil),           // 25: meshtastic.ClientNotification
+	(*KeyVerificationNumberInform)(nil),  // 26: meshtastic.KeyVerificationNumberInform
+	(*KeyVerificationNumberRequest)(nil), // 27: meshtastic.KeyVerificationNumberRequest
+	(*KeyVerificationFinal)(nil),         // 28: meshtastic.KeyVerificationFinal
+	(*DuplicatedPublicKey)(nil),          // 29: meshtastic.DuplicatedPublicKey
+	(*LowEntropyKey)(nil),                // 30: meshtastic.LowEntropyKey
+	(*FileInfo)(nil),                     // 31: meshtastic.FileInfo
+	(*ToRadio)(nil),                      // 32: meshtastic.ToRadio
+	(*Compressed)(nil),                   // 33: meshtastic.Compressed
+	(*NeighborInfo)(nil),                 // 34: meshtastic.NeighborInfo
+	(*Neighbor)(nil),                     // 35: meshtastic.Neighbor
+	(*DeviceMetadata)(nil),               // 36: meshtastic.DeviceMetadata
+	(*Heartbeat)(nil),                    // 37: meshtastic.Heartbeat
+	(*NodeRemoteHardwarePin)(nil),        // 38: meshtastic.NodeRemoteHardwarePin
+	(*ChunkedPayload)(nil),               // 39: meshtastic.ChunkedPayload
+	(*ResendChunks)(nil),                 // 40: meshtastic.resend_chunks
+	(*ChunkedPayloadResponse)(nil),       // 41: meshtastic.ChunkedPayloadResponse
+	(Config_DeviceConfig_Role)(0),        // 42: meshtastic.Config.DeviceConfig.Role
+	(PortNum)(0),                         // 43: meshtastic.PortNum
+	(*DeviceMetrics)(nil),                // 44: meshtastic.DeviceMetrics
+	(*Config)(nil),                       // 45: meshtastic.Config
+	(*ModuleConfig)(nil),                 // 46: meshtastic.ModuleConfig
+	(*Channel)(nil),                      // 47: meshtastic.Channel
+	(*XModem)(nil),                       // 48: meshtastic.XModem
+	(*DeviceUIConfig)(nil),               // 49: meshtastic.DeviceUIConfig
+	(*RemoteHardwarePin)(nil),            // 50: meshtastic.RemoteHardwarePin
 }
 var file_meshtastic_mesh_proto_depIdxs = []int32{
-	4,  // 0: meshtastic.Position.location_source:type_name -> meshtastic.Position.LocSource
-	5,  // 1: meshtastic.Position.altitude_source:type_name -> meshtastic.Position.AltSource
+	5,  // 0: meshtastic.Position.location_source:type_name -> meshtastic.Position.LocSource
+	6,  // 1: meshtastic.Position.altitude_source:type_name -> meshtastic.Position.AltSource
 	0,  // 2: meshtastic.User.hw_model:type_name -> meshtastic.HardwareModel
-	41, // 3: meshtastic.User.role:type_name -> meshtastic.Config.DeviceConfig.Role
-	12, // 4: meshtastic.Routing.route_request:type_name -> meshtastic.RouteDiscovery
-	12, // 5: meshtastic.Routing.route_reply:type_name -> meshtastic.RouteDiscovery
-	6,  // 6: meshtastic.Routing.error_reason:type_name -> meshtastic.Routing.Error
-	42, // 7: meshtastic.Data.portnum:type_name -> meshtastic.PortNum
-	14, // 8: meshtastic.MeshPacket.decoded:type_name -> meshtastic.Data
-	7,  // 9: meshtastic.MeshPacket.priority:type_name -> meshtastic.MeshPacket.Priority
-	8,  // 10: meshtastic.MeshPacket.delayed:type_name -> meshtastic.MeshPacket.Delayed
-	11, // 11: meshtastic.NodeInfo.user:type_name -> meshtastic.User
-	10, // 12: meshtastic.NodeInfo.position:type_name -> meshtastic.Position
-	43, // 13: meshtastic.NodeInfo.device_metrics:type_name -> meshtastic.DeviceMetrics
-	9,  // 14: meshtastic.LogRecord.level:type_name -> meshtastic.LogRecord.Level
-	18, // 15: meshtastic.FromRadio.packet:type_name -> meshtastic.MeshPacket
-	20, // 16: meshtastic.FromRadio.my_info:type_name -> meshtastic.MyNodeInfo
-	19, // 17: meshtastic.FromRadio.node_info:type_name -> meshtastic.NodeInfo
-	44, // 18: meshtastic.FromRadio.config:type_name -> meshtastic.Config
-	21, // 19: meshtastic.FromRadio.log_record:type_name -> meshtastic.LogRecord
-	45, // 20: meshtastic.FromRadio.moduleConfig:type_name -> meshtastic.ModuleConfig
-	46, // 21: meshtastic.FromRadio.channel:type_name -> meshtastic.Channel
-	22, // 22: meshtastic.FromRadio.queueStatus:type_name -> meshtastic.QueueStatus
-	47, // 23: meshtastic.FromRadio.xmodemPacket:type_name -> meshtastic.XModem
-	35, // 24: meshtastic.FromRadio.metadata:type_name -> meshtastic.DeviceMetadata
-	17, // 25: meshtastic.FromRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
-	30, // 26: meshtastic.FromRadio.fileInfo:type_name -> meshtastic.FileInfo
-	24, // 27: meshtastic.FromRadio.clientNotification:type_name -> meshtastic.ClientNotification
-	48, // 28: meshtastic.FromRadio.deviceuiConfig:type_name -> meshtastic.DeviceUIConfig
-	9,  // 29: meshtastic.ClientNotification.level:type_name -> meshtastic.LogRecord.Level
-	25, // 30: meshtastic.ClientNotification.key_verification_number_inform:type_name -> meshtastic.KeyVerificationNumberInform
-	26, // 31: meshtastic.ClientNotification.key_verification_number_request:type_name -> meshtastic.KeyVerificationNumberRequest
-	27, // 32: meshtastic.ClientNotification.key_verification_final:type_name -> meshtastic.KeyVerificationFinal
-	28, // 33: meshtastic.ClientNotification.duplicated_public_key:type_name -> meshtastic.DuplicatedPublicKey
-	29, // 34: meshtastic.ClientNotification.low_entropy_key:type_name -> meshtastic.LowEntropyKey
-	18, // 35: meshtastic.ToRadio.packet:type_name -> meshtastic.MeshPacket
-	47, // 36: meshtastic.ToRadio.xmodemPacket:type_name -> meshtastic.XModem
-	17, // 37: meshtastic.ToRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
-	36, // 38: meshtastic.ToRadio.heartbeat:type_name -> meshtastic.Heartbeat
-	42, // 39: meshtastic.Compressed.portnum:type_name -> meshtastic.PortNum
-	34, // 40: meshtastic.NeighborInfo.neighbors:type_name -> meshtastic.Neighbor
-	41, // 41: meshtastic.DeviceMetadata.role:type_name -> meshtastic.Config.DeviceConfig.Role
-	0,  // 42: meshtastic.DeviceMetadata.hw_model:type_name -> meshtastic.HardwareModel
-	49, // 43: meshtastic.NodeRemoteHardwarePin.pin:type_name -> meshtastic.RemoteHardwarePin
-	39, // 44: meshtastic.ChunkedPayloadResponse.resend_chunks:type_name -> meshtastic.resend_chunks
-	45, // [45:45] is the sub-list for method output_type
-	45, // [45:45] is the sub-list for method input_type
-	45, // [45:45] is the sub-list for extension type_name
-	45, // [45:45] is the sub-list for extension extendee
-	0,  // [0:45] is the sub-list for field type_name
+	42, // 3: meshtastic.User.role:type_name -> meshtastic.Config.DeviceConfig.Role
+	13, // 4: meshtastic.Routing.route_request:type_name -> meshtastic.RouteDiscovery
+	13, // 5: meshtastic.Routing.route_reply:type_name -> meshtastic.RouteDiscovery
+	7,  // 6: meshtastic.Routing.error_reason:type_name -> meshtastic.Routing.Error
+	43, // 7: meshtastic.Data.portnum:type_name -> meshtastic.PortNum
+	15, // 8: meshtastic.MeshPacket.decoded:type_name -> meshtastic.Data
+	8,  // 9: meshtastic.MeshPacket.priority:type_name -> meshtastic.MeshPacket.Priority
+	9,  // 10: meshtastic.MeshPacket.delayed:type_name -> meshtastic.MeshPacket.Delayed
+	12, // 11: meshtastic.NodeInfo.user:type_name -> meshtastic.User
+	11, // 12: meshtastic.NodeInfo.position:type_name -> meshtastic.Position
+	44, // 13: meshtastic.NodeInfo.device_metrics:type_name -> meshtastic.DeviceMetrics
+	3,  // 14: meshtastic.MyNodeInfo.firmware_edition:type_name -> meshtastic.FirmwareEdition
+	10, // 15: meshtastic.LogRecord.level:type_name -> meshtastic.LogRecord.Level
+	19, // 16: meshtastic.FromRadio.packet:type_name -> meshtastic.MeshPacket
+	21, // 17: meshtastic.FromRadio.my_info:type_name -> meshtastic.MyNodeInfo
+	20, // 18: meshtastic.FromRadio.node_info:type_name -> meshtastic.NodeInfo
+	45, // 19: meshtastic.FromRadio.config:type_name -> meshtastic.Config
+	22, // 20: meshtastic.FromRadio.log_record:type_name -> meshtastic.LogRecord
+	46, // 21: meshtastic.FromRadio.moduleConfig:type_name -> meshtastic.ModuleConfig
+	47, // 22: meshtastic.FromRadio.channel:type_name -> meshtastic.Channel
+	23, // 23: meshtastic.FromRadio.queueStatus:type_name -> meshtastic.QueueStatus
+	48, // 24: meshtastic.FromRadio.xmodemPacket:type_name -> meshtastic.XModem
+	36, // 25: meshtastic.FromRadio.metadata:type_name -> meshtastic.DeviceMetadata
+	18, // 26: meshtastic.FromRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
+	31, // 27: meshtastic.FromRadio.fileInfo:type_name -> meshtastic.FileInfo
+	25, // 28: meshtastic.FromRadio.clientNotification:type_name -> meshtastic.ClientNotification
+	49, // 29: meshtastic.FromRadio.deviceuiConfig:type_name -> meshtastic.DeviceUIConfig
+	10, // 30: meshtastic.ClientNotification.level:type_name -> meshtastic.LogRecord.Level
+	26, // 31: meshtastic.ClientNotification.key_verification_number_inform:type_name -> meshtastic.KeyVerificationNumberInform
+	27, // 32: meshtastic.ClientNotification.key_verification_number_request:type_name -> meshtastic.KeyVerificationNumberRequest
+	28, // 33: meshtastic.ClientNotification.key_verification_final:type_name -> meshtastic.KeyVerificationFinal
+	29, // 34: meshtastic.ClientNotification.duplicated_public_key:type_name -> meshtastic.DuplicatedPublicKey
+	30, // 35: meshtastic.ClientNotification.low_entropy_key:type_name -> meshtastic.LowEntropyKey
+	19, // 36: meshtastic.ToRadio.packet:type_name -> meshtastic.MeshPacket
+	48, // 37: meshtastic.ToRadio.xmodemPacket:type_name -> meshtastic.XModem
+	18, // 38: meshtastic.ToRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
+	37, // 39: meshtastic.ToRadio.heartbeat:type_name -> meshtastic.Heartbeat
+	43, // 40: meshtastic.Compressed.portnum:type_name -> meshtastic.PortNum
+	35, // 41: meshtastic.NeighborInfo.neighbors:type_name -> meshtastic.Neighbor
+	42, // 42: meshtastic.DeviceMetadata.role:type_name -> meshtastic.Config.DeviceConfig.Role
+	0,  // 43: meshtastic.DeviceMetadata.hw_model:type_name -> meshtastic.HardwareModel
+	50, // 44: meshtastic.NodeRemoteHardwarePin.pin:type_name -> meshtastic.RemoteHardwarePin
+	40, // 45: meshtastic.ChunkedPayloadResponse.resend_chunks:type_name -> meshtastic.resend_chunks
+	46, // [46:46] is the sub-list for method output_type
+	46, // [46:46] is the sub-list for method input_type
+	46, // [46:46] is the sub-list for extension type_name
+	46, // [46:46] is the sub-list for extension extendee
+	0,  // [0:46] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_mesh_proto_init() }
@@ -5300,7 +5404,7 @@ func file_meshtastic_mesh_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_mesh_proto_rawDesc), len(file_meshtastic_mesh_proto_rawDesc)),
-			NumEnums:      10,
+			NumEnums:      11,
 			NumMessages:   31,
 			NumExtensions: 0,
 			NumServices:   0,
