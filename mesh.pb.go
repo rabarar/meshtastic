@@ -274,6 +274,9 @@ const (
 	HardwareModel_RAK3312 HardwareModel = 106
 	// Elecrow ThinkNode M5 https://www.elecrow.com/wiki/ThinkNode_M5_Meshtastic_LoRa_Signal_Transceiver_ESP32-S3.html
 	HardwareModel_THINKNODE_M5 HardwareModel = 107
+	// MeshSolar is an integrated power management and communication solution designed for outdoor low-power devices.
+	// https://heltec.org/project/meshsolar/
+	HardwareModel_HELTEC_MESH_SOLAR HardwareModel = 108
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -391,6 +394,7 @@ var (
 		105: "WISMESH_TAG",
 		106: "RAK3312",
 		107: "THINKNODE_M5",
+		108: "HELTEC_MESH_SOLAR",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -502,6 +506,7 @@ var (
 		"WISMESH_TAG":                  105,
 		"RAK3312":                      106,
 		"THINKNODE_M5":                 107,
+		"HELTEC_MESH_SOLAR":            108,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -5035,7 +5040,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\xa7\x10\n" +
+	"\x0fpayload_variant*\xbe\x10\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -5157,7 +5162,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x19GAT562_MESH_TRIAL_TRACKER\x10h\x12\x0f\n" +
 	"\vWISMESH_TAG\x10i\x12\v\n" +
 	"\aRAK3312\x10j\x12\x10\n" +
-	"\fTHINKNODE_M5\x10k\x12\x0f\n" +
+	"\fTHINKNODE_M5\x10k\x12\x15\n" +
+	"\x11HELTEC_MESH_SOLAR\x10l\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +

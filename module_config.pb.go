@@ -312,6 +312,9 @@ const (
 	// VE.Direct is a serial protocol used by Victron Energy products
 	// https://beta.ivc.no/wiki/index.php/Victron_VE_Direct_DIY_Cable
 	ModuleConfig_SerialConfig_VE_DIRECT ModuleConfig_SerialConfig_Serial_Mode = 7
+	// Used to configure and view some parameters of MeshSolar.
+	// https://heltec.org/project/meshsolar/
+	ModuleConfig_SerialConfig_MS_CONFIG ModuleConfig_SerialConfig_Serial_Mode = 8
 )
 
 // Enum value maps for ModuleConfig_SerialConfig_Serial_Mode.
@@ -325,6 +328,7 @@ var (
 		5: "CALTOPO",
 		6: "WS85",
 		7: "VE_DIRECT",
+		8: "MS_CONFIG",
 	}
 	ModuleConfig_SerialConfig_Serial_Mode_value = map[string]int32{
 		"DEFAULT":   0,
@@ -335,6 +339,7 @@ var (
 		"CALTOPO":   5,
 		"WS85":      6,
 		"VE_DIRECT": 7,
+		"MS_CONFIG": 8,
 	}
 )
 
@@ -2035,9 +2040,13 @@ type ModuleConfig_CannedMessageConfig struct {
 	// Enable the Up/Down/Select input device. Can be RAK rotary encoder or 3 buttons. Uses the a/b/press definitions from inputbroker.
 	Updown1Enabled bool `protobuf:"varint,8,opt,name=updown1_enabled,json=updown1Enabled,proto3" json:"updown1_enabled,omitempty"`
 	// Enable/disable CannedMessageModule.
+	//
+	// Deprecated: Marked as deprecated in meshtastic/module_config.proto.
 	Enabled bool `protobuf:"varint,9,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	// Input event origin accepted by the canned message module.
 	// Can be e.g. "rotEnc1", "upDownEnc1", "scanAndSelect", "cardkb", "serialkb", or keyword "_any"
+	//
+	// Deprecated: Marked as deprecated in meshtastic/module_config.proto.
 	AllowInputSource string `protobuf:"bytes,10,opt,name=allow_input_source,json=allowInputSource,proto3" json:"allow_input_source,omitempty"`
 	// CannedMessageModule also sends a bell character with the messages.
 	// ExternalNotificationModule can benefit from this feature.
@@ -2132,6 +2141,7 @@ func (x *ModuleConfig_CannedMessageConfig) GetUpdown1Enabled() bool {
 	return false
 }
 
+// Deprecated: Marked as deprecated in meshtastic/module_config.proto.
 func (x *ModuleConfig_CannedMessageConfig) GetEnabled() bool {
 	if x != nil {
 		return x.Enabled
@@ -2139,6 +2149,7 @@ func (x *ModuleConfig_CannedMessageConfig) GetEnabled() bool {
 	return false
 }
 
+// Deprecated: Marked as deprecated in meshtastic/module_config.proto.
 func (x *ModuleConfig_CannedMessageConfig) GetAllowInputSource() string {
 	if x != nil {
 		return x.AllowInputSource
@@ -2241,7 +2252,7 @@ var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\"\xb72\n" +
+	"meshtastic\"\xce2\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2330,7 +2341,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12<\n" +
 	"\x1apaxcounter_update_interval\x18\x02 \x01(\rR\x18paxcounterUpdateInterval\x12%\n" +
 	"\x0ewifi_threshold\x18\x03 \x01(\x05R\rwifiThreshold\x12#\n" +
-	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xc6\x05\n" +
+	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xd5\x05\n" +
 	"\fSerialConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x12\n" +
 	"\x04echo\x18\x02 \x01(\bR\x04echo\x12\x10\n" +
@@ -2360,7 +2371,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\vBAUD_230400\x10\f\x12\x0f\n" +
 	"\vBAUD_460800\x10\r\x12\x0f\n" +
 	"\vBAUD_576000\x10\x0e\x12\x0f\n" +
-	"\vBAUD_921600\x10\x0f\"n\n" +
+	"\vBAUD_921600\x10\x0f\"}\n" +
 	"\vSerial_Mode\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\n" +
 	"\n" +
@@ -2370,7 +2381,8 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x04NMEA\x10\x04\x12\v\n" +
 	"\aCALTOPO\x10\x05\x12\b\n" +
 	"\x04WS85\x10\x06\x12\r\n" +
-	"\tVE_DIRECT\x10\a\x1a\xac\x04\n" +
+	"\tVE_DIRECT\x10\a\x12\r\n" +
+	"\tMS_CONFIG\x10\b\x1a\xac\x04\n" +
 	"\x1aExternalNotificationConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x1b\n" +
 	"\toutput_ms\x18\x02 \x01(\rR\boutputMs\x12\x16\n" +
@@ -2415,7 +2427,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	" \x01(\bR\x12powerScreenEnabled\x12<\n" +
 	"\x1ahealth_measurement_enabled\x18\v \x01(\bR\x18healthMeasurementEnabled\x124\n" +
 	"\x16health_update_interval\x18\f \x01(\rR\x14healthUpdateInterval\x122\n" +
-	"\x15health_screen_enabled\x18\r \x01(\bR\x13healthScreenEnabled\x1a\x92\x06\n" +
+	"\x15health_screen_enabled\x18\r \x01(\bR\x13healthScreenEnabled\x1a\x9a\x06\n" +
 	"\x13CannedMessageConfig\x12'\n" +
 	"\x0frotary1_enabled\x18\x01 \x01(\bR\x0erotary1Enabled\x12*\n" +
 	"\x11inputbroker_pin_a\x18\x02 \x01(\rR\x0finputbrokerPinA\x12*\n" +
@@ -2424,10 +2436,10 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x14inputbroker_event_cw\x18\x05 \x01(\x0e2;.meshtastic.ModuleConfig.CannedMessageConfig.InputEventCharR\x12inputbrokerEventCw\x12o\n" +
 	"\x15inputbroker_event_ccw\x18\x06 \x01(\x0e2;.meshtastic.ModuleConfig.CannedMessageConfig.InputEventCharR\x13inputbrokerEventCcw\x12s\n" +
 	"\x17inputbroker_event_press\x18\a \x01(\x0e2;.meshtastic.ModuleConfig.CannedMessageConfig.InputEventCharR\x15inputbrokerEventPress\x12'\n" +
-	"\x0fupdown1_enabled\x18\b \x01(\bR\x0eupdown1Enabled\x12\x18\n" +
-	"\aenabled\x18\t \x01(\bR\aenabled\x12,\n" +
+	"\x0fupdown1_enabled\x18\b \x01(\bR\x0eupdown1Enabled\x12\x1c\n" +
+	"\aenabled\x18\t \x01(\bB\x02\x18\x01R\aenabled\x120\n" +
 	"\x12allow_input_source\x18\n" +
-	" \x01(\tR\x10allowInputSource\x12\x1b\n" +
+	" \x01(\tB\x02\x18\x01R\x10allowInputSource\x12\x1b\n" +
 	"\tsend_bell\x18\v \x01(\bR\bsendBell\"c\n" +
 	"\x0eInputEventChar\x12\b\n" +
 	"\x04NONE\x10\x00\x12\x06\n" +

@@ -1934,6 +1934,8 @@ type Config_DisplayConfig struct {
 	AutoScreenCarouselSecs uint32 `protobuf:"varint,3,opt,name=auto_screen_carousel_secs,json=autoScreenCarouselSecs,proto3" json:"auto_screen_carousel_secs,omitempty"`
 	// If this is set, the displayed compass will always point north. if unset, the old behaviour
 	// (top of display is heading direction) is used.
+	//
+	// Deprecated: Marked as deprecated in meshtastic/config.proto.
 	CompassNorthTop bool `protobuf:"varint,4,opt,name=compass_north_top,json=compassNorthTop,proto3" json:"compass_north_top,omitempty"`
 	// Flip screen vertically, for cases that mount the screen upside down
 	FlipScreen bool `protobuf:"varint,5,opt,name=flip_screen,json=flipScreen,proto3" json:"flip_screen,omitempty"`
@@ -2008,6 +2010,7 @@ func (x *Config_DisplayConfig) GetAutoScreenCarouselSecs() uint32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in meshtastic/config.proto.
 func (x *Config_DisplayConfig) GetCompassNorthTop() bool {
 	if x != nil {
 		return x.CompassNorthTop
@@ -2581,7 +2584,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xba3\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xbe3\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2718,13 +2721,13 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x06STATIC\x10\x01\"4\n" +
 	"\rProtocolFlags\x12\x10\n" +
 	"\fNO_BROADCAST\x10\x00\x12\x11\n" +
-	"\rUDP_BROADCAST\x10\x01\x1a\xa9\t\n" +
+	"\rUDP_BROADCAST\x10\x01\x1a\xad\t\n" +
 	"\rDisplayConfig\x12$\n" +
 	"\x0escreen_on_secs\x18\x01 \x01(\rR\fscreenOnSecs\x12W\n" +
 	"\n" +
 	"gps_format\x18\x02 \x01(\x0e24.meshtastic.Config.DisplayConfig.GpsCoordinateFormatB\x02\x18\x01R\tgpsFormat\x129\n" +
-	"\x19auto_screen_carousel_secs\x18\x03 \x01(\rR\x16autoScreenCarouselSecs\x12*\n" +
-	"\x11compass_north_top\x18\x04 \x01(\bR\x0fcompassNorthTop\x12\x1f\n" +
+	"\x19auto_screen_carousel_secs\x18\x03 \x01(\rR\x16autoScreenCarouselSecs\x12.\n" +
+	"\x11compass_north_top\x18\x04 \x01(\bB\x02\x18\x01R\x0fcompassNorthTop\x12\x1f\n" +
 	"\vflip_screen\x18\x05 \x01(\bR\n" +
 	"flipScreen\x12C\n" +
 	"\x05units\x18\x06 \x01(\x0e2-.meshtastic.Config.DisplayConfig.DisplayUnitsR\x05units\x12=\n" +
