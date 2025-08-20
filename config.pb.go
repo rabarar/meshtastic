@@ -661,10 +661,10 @@ const (
 	Config_DisplayConfig_OLED_SSD1306 Config_DisplayConfig_OledType = 1
 	// Default / Autodetect
 	Config_DisplayConfig_OLED_SH1106 Config_DisplayConfig_OledType = 2
-	// Can not be auto detected but set by proto. Used for 128x128 screens
-	Config_DisplayConfig_OLED_SH1107 Config_DisplayConfig_OledType = 3
 	// Can not be auto detected but set by proto. Used for 128x64 screens
-	Config_DisplayConfig_OLED_SH1107_128_64 Config_DisplayConfig_OledType = 4
+	Config_DisplayConfig_OLED_SH1107 Config_DisplayConfig_OledType = 3
+	// Can not be auto detected but set by proto. Used for 128x128 screens
+	Config_DisplayConfig_OLED_SH1107_128_128 Config_DisplayConfig_OledType = 4
 )
 
 // Enum value maps for Config_DisplayConfig_OledType.
@@ -674,14 +674,14 @@ var (
 		1: "OLED_SSD1306",
 		2: "OLED_SH1106",
 		3: "OLED_SH1107",
-		4: "OLED_SH1107_128_64",
+		4: "OLED_SH1107_128_128",
 	}
 	Config_DisplayConfig_OledType_value = map[string]int32{
-		"OLED_AUTO":          0,
-		"OLED_SSD1306":       1,
-		"OLED_SH1106":        2,
-		"OLED_SH1107":        3,
-		"OLED_SH1107_128_64": 4,
+		"OLED_AUTO":           0,
+		"OLED_SSD1306":        1,
+		"OLED_SH1106":         2,
+		"OLED_SH1107":         3,
+		"OLED_SH1107_128_128": 4,
 	}
 )
 
@@ -2584,7 +2584,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xbe3\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xbf3\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2721,7 +2721,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x06STATIC\x10\x01\"4\n" +
 	"\rProtocolFlags\x12\x10\n" +
 	"\fNO_BROADCAST\x10\x00\x12\x11\n" +
-	"\rUDP_BROADCAST\x10\x01\x1a\xad\t\n" +
+	"\rUDP_BROADCAST\x10\x01\x1a\xae\t\n" +
 	"\rDisplayConfig\x12$\n" +
 	"\x0escreen_on_secs\x18\x01 \x01(\rR\fscreenOnSecs\x12W\n" +
 	"\n" +
@@ -2748,13 +2748,13 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\fDisplayUnits\x12\n" +
 	"\n" +
 	"\x06METRIC\x10\x00\x12\f\n" +
-	"\bIMPERIAL\x10\x01\"e\n" +
+	"\bIMPERIAL\x10\x01\"f\n" +
 	"\bOledType\x12\r\n" +
 	"\tOLED_AUTO\x10\x00\x12\x10\n" +
 	"\fOLED_SSD1306\x10\x01\x12\x0f\n" +
 	"\vOLED_SH1106\x10\x02\x12\x0f\n" +
-	"\vOLED_SH1107\x10\x03\x12\x16\n" +
-	"\x12OLED_SH1107_128_64\x10\x04\"A\n" +
+	"\vOLED_SH1107\x10\x03\x12\x17\n" +
+	"\x13OLED_SH1107_128_128\x10\x04\"A\n" +
 	"\vDisplayMode\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\f\n" +
 	"\bTWOCOLOR\x10\x01\x12\f\n" +
