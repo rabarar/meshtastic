@@ -1804,7 +1804,10 @@ type ModuleConfig_RangeTestConfig struct {
 	Sender uint32 `protobuf:"varint,2,opt,name=sender,proto3" json:"sender,omitempty"`
 	// Bool value indicating that this node should save a RangeTest.csv file.
 	// ESP32 Only
-	Save          bool `protobuf:"varint,3,opt,name=save,proto3" json:"save,omitempty"`
+	Save bool `protobuf:"varint,3,opt,name=save,proto3" json:"save,omitempty"`
+	// Bool indicating that the node should cleanup / destroy it's RangeTest.csv file.
+	// ESP32 Only
+	ClearOnReboot bool `protobuf:"varint,4,opt,name=clear_on_reboot,json=clearOnReboot,proto3" json:"clear_on_reboot,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1856,6 +1859,13 @@ func (x *ModuleConfig_RangeTestConfig) GetSender() uint32 {
 func (x *ModuleConfig_RangeTestConfig) GetSave() bool {
 	if x != nil {
 		return x.Save
+	}
+	return false
+}
+
+func (x *ModuleConfig_RangeTestConfig) GetClearOnReboot() bool {
+	if x != nil {
+		return x.ClearOnReboot
 	}
 	return false
 }
@@ -2252,7 +2262,7 @@ var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\"\xce2\n" +
+	"meshtastic\"\xf62\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2408,11 +2418,12 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\arecords\x18\x03 \x01(\rR\arecords\x12,\n" +
 	"\x12history_return_max\x18\x04 \x01(\rR\x10historyReturnMax\x122\n" +
 	"\x15history_return_window\x18\x05 \x01(\rR\x13historyReturnWindow\x12\x1b\n" +
-	"\tis_server\x18\x06 \x01(\bR\bisServer\x1aW\n" +
+	"\tis_server\x18\x06 \x01(\bR\bisServer\x1a\x7f\n" +
 	"\x0fRangeTestConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x16\n" +
 	"\x06sender\x18\x02 \x01(\rR\x06sender\x12\x12\n" +
-	"\x04save\x18\x03 \x01(\bR\x04save\x1a\xff\x05\n" +
+	"\x04save\x18\x03 \x01(\bR\x04save\x12&\n" +
+	"\x0fclear_on_reboot\x18\x04 \x01(\bR\rclearOnReboot\x1a\xff\x05\n" +
 	"\x0fTelemetryConfig\x124\n" +
 	"\x16device_update_interval\x18\x01 \x01(\rR\x14deviceUpdateInterval\x12>\n" +
 	"\x1benvironment_update_interval\x18\x02 \x01(\rR\x19environmentUpdateInterval\x12F\n" +
