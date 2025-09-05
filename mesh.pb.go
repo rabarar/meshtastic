@@ -279,6 +279,8 @@ const (
 	HardwareModel_HELTEC_MESH_SOLAR HardwareModel = 108
 	// Lilygo T-Echo Lite
 	HardwareModel_T_ECHO_LITE HardwareModel = 109
+	// New Heltec LoRA32 with ESP32-S3 CPU
+	HardwareModel_HELTEC_V4 HardwareModel = 110
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -398,6 +400,7 @@ var (
 		107: "THINKNODE_M5",
 		108: "HELTEC_MESH_SOLAR",
 		109: "T_ECHO_LITE",
+		110: "HELTEC_V4",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -511,6 +514,7 @@ var (
 		"THINKNODE_M5":                 107,
 		"HELTEC_MESH_SOLAR":            108,
 		"T_ECHO_LITE":                  109,
+		"HELTEC_V4":                    110,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -5146,7 +5150,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\xcf\x10\n" +
+	"\x0fpayload_variant*\xde\x10\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -5270,7 +5274,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\aRAK3312\x10j\x12\x10\n" +
 	"\fTHINKNODE_M5\x10k\x12\x15\n" +
 	"\x11HELTEC_MESH_SOLAR\x10l\x12\x0f\n" +
-	"\vT_ECHO_LITE\x10m\x12\x0f\n" +
+	"\vT_ECHO_LITE\x10m\x12\r\n" +
+	"\tHELTEC_V4\x10n\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +
