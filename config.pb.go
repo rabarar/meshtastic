@@ -538,75 +538,47 @@ func (Config_NetworkConfig_ProtocolFlags) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_config_proto_rawDescGZIP(), []int{0, 3, 1}
 }
 
-// How the GPS coordinates are displayed on the OLED screen.
-type Config_DisplayConfig_GpsCoordinateFormat int32
+// Deprecated in 2.7.4: Unused
+type Config_DisplayConfig_DeprecatedGpsCoordinateFormat int32
 
 const (
-	// GPS coordinates are displayed in the normal decimal degrees format:
-	// DD.DDDDDD DDD.DDDDDD
-	Config_DisplayConfig_DEC Config_DisplayConfig_GpsCoordinateFormat = 0
-	// GPS coordinates are displayed in the degrees minutes seconds format:
-	// DD°MM'SS"C DDD°MM'SS"C, where C is the compass point representing the locations quadrant
-	Config_DisplayConfig_DMS Config_DisplayConfig_GpsCoordinateFormat = 1
-	// Universal Transverse Mercator format:
-	// ZZB EEEEEE NNNNNNN, where Z is zone, B is band, E is easting, N is northing
-	Config_DisplayConfig_UTM Config_DisplayConfig_GpsCoordinateFormat = 2
-	// Military Grid Reference System format:
-	// ZZB CD EEEEE NNNNN, where Z is zone, B is band, C is the east 100k square, D is the north 100k square,
-	// E is easting, N is northing
-	Config_DisplayConfig_MGRS Config_DisplayConfig_GpsCoordinateFormat = 3
-	// Open Location Code (aka Plus Codes).
-	Config_DisplayConfig_OLC Config_DisplayConfig_GpsCoordinateFormat = 4
-	// Ordnance Survey Grid Reference (the National Grid System of the UK).
-	// Format: AB EEEEE NNNNN, where A is the east 100k square, B is the north 100k square,
-	// E is the easting, N is the northing
-	Config_DisplayConfig_OSGR Config_DisplayConfig_GpsCoordinateFormat = 5
+	Config_DisplayConfig_UNUSED Config_DisplayConfig_DeprecatedGpsCoordinateFormat = 0
 )
 
-// Enum value maps for Config_DisplayConfig_GpsCoordinateFormat.
+// Enum value maps for Config_DisplayConfig_DeprecatedGpsCoordinateFormat.
 var (
-	Config_DisplayConfig_GpsCoordinateFormat_name = map[int32]string{
-		0: "DEC",
-		1: "DMS",
-		2: "UTM",
-		3: "MGRS",
-		4: "OLC",
-		5: "OSGR",
+	Config_DisplayConfig_DeprecatedGpsCoordinateFormat_name = map[int32]string{
+		0: "UNUSED",
 	}
-	Config_DisplayConfig_GpsCoordinateFormat_value = map[string]int32{
-		"DEC":  0,
-		"DMS":  1,
-		"UTM":  2,
-		"MGRS": 3,
-		"OLC":  4,
-		"OSGR": 5,
+	Config_DisplayConfig_DeprecatedGpsCoordinateFormat_value = map[string]int32{
+		"UNUSED": 0,
 	}
 )
 
-func (x Config_DisplayConfig_GpsCoordinateFormat) Enum() *Config_DisplayConfig_GpsCoordinateFormat {
-	p := new(Config_DisplayConfig_GpsCoordinateFormat)
+func (x Config_DisplayConfig_DeprecatedGpsCoordinateFormat) Enum() *Config_DisplayConfig_DeprecatedGpsCoordinateFormat {
+	p := new(Config_DisplayConfig_DeprecatedGpsCoordinateFormat)
 	*p = x
 	return p
 }
 
-func (x Config_DisplayConfig_GpsCoordinateFormat) String() string {
+func (x Config_DisplayConfig_DeprecatedGpsCoordinateFormat) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Config_DisplayConfig_GpsCoordinateFormat) Descriptor() protoreflect.EnumDescriptor {
+func (Config_DisplayConfig_DeprecatedGpsCoordinateFormat) Descriptor() protoreflect.EnumDescriptor {
 	return file_meshtastic_config_proto_enumTypes[7].Descriptor()
 }
 
-func (Config_DisplayConfig_GpsCoordinateFormat) Type() protoreflect.EnumType {
+func (Config_DisplayConfig_DeprecatedGpsCoordinateFormat) Type() protoreflect.EnumType {
 	return &file_meshtastic_config_proto_enumTypes[7]
 }
 
-func (x Config_DisplayConfig_GpsCoordinateFormat) Number() protoreflect.EnumNumber {
+func (x Config_DisplayConfig_DeprecatedGpsCoordinateFormat) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Config_DisplayConfig_GpsCoordinateFormat.Descriptor instead.
-func (Config_DisplayConfig_GpsCoordinateFormat) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use Config_DisplayConfig_DeprecatedGpsCoordinateFormat.Descriptor instead.
+func (Config_DisplayConfig_DeprecatedGpsCoordinateFormat) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_config_proto_rawDescGZIP(), []int{0, 4, 0}
 }
 
@@ -1936,7 +1908,7 @@ type Config_DisplayConfig struct {
 	// How the GPS coordinates are formatted on the OLED screen.
 	//
 	// Deprecated: Marked as deprecated in meshtastic/config.proto.
-	GpsFormat Config_DisplayConfig_GpsCoordinateFormat `protobuf:"varint,2,opt,name=gps_format,json=gpsFormat,proto3,enum=meshtastic.Config_DisplayConfig_GpsCoordinateFormat" json:"gps_format,omitempty"`
+	GpsFormat Config_DisplayConfig_DeprecatedGpsCoordinateFormat `protobuf:"varint,2,opt,name=gps_format,json=gpsFormat,proto3,enum=meshtastic.Config_DisplayConfig_DeprecatedGpsCoordinateFormat" json:"gps_format,omitempty"`
 	// Automatically toggles to the next page on the screen like a carousel, based the specified interval in seconds.
 	// Potentially useful for devices without user buttons.
 	AutoScreenCarouselSecs uint32 `protobuf:"varint,3,opt,name=auto_screen_carousel_secs,json=autoScreenCarouselSecs,proto3" json:"auto_screen_carousel_secs,omitempty"`
@@ -1961,9 +1933,12 @@ type Config_DisplayConfig struct {
 	CompassOrientation Config_DisplayConfig_CompassOrientation `protobuf:"varint,11,opt,name=compass_orientation,json=compassOrientation,proto3,enum=meshtastic.Config_DisplayConfig_CompassOrientation" json:"compass_orientation,omitempty"`
 	// If false (default), the device will display the time in 24-hour format on screen.
 	// If true, the device will display the time in 12-hour format on screen.
-	Use_12HClock  bool `protobuf:"varint,12,opt,name=use_12h_clock,json=use12hClock,proto3" json:"use_12h_clock,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Use_12HClock bool `protobuf:"varint,12,opt,name=use_12h_clock,json=use12hClock,proto3" json:"use_12h_clock,omitempty"`
+	// If false (default), the device will use short names for various display screens.
+	// If true, node names will show in long format
+	UseLongNodeName bool `protobuf:"varint,13,opt,name=use_long_node_name,json=useLongNodeName,proto3" json:"use_long_node_name,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Config_DisplayConfig) Reset() {
@@ -2004,11 +1979,11 @@ func (x *Config_DisplayConfig) GetScreenOnSecs() uint32 {
 }
 
 // Deprecated: Marked as deprecated in meshtastic/config.proto.
-func (x *Config_DisplayConfig) GetGpsFormat() Config_DisplayConfig_GpsCoordinateFormat {
+func (x *Config_DisplayConfig) GetGpsFormat() Config_DisplayConfig_DeprecatedGpsCoordinateFormat {
 	if x != nil {
 		return x.GpsFormat
 	}
-	return Config_DisplayConfig_DEC
+	return Config_DisplayConfig_UNUSED
 }
 
 func (x *Config_DisplayConfig) GetAutoScreenCarouselSecs() uint32 {
@@ -2078,6 +2053,13 @@ func (x *Config_DisplayConfig) GetCompassOrientation() Config_DisplayConfig_Comp
 func (x *Config_DisplayConfig) GetUse_12HClock() bool {
 	if x != nil {
 		return x.Use_12HClock
+	}
+	return false
+}
+
+func (x *Config_DisplayConfig) GetUseLongNodeName() bool {
+	if x != nil {
+		return x.UseLongNodeName
 	}
 	return false
 }
@@ -2592,7 +2574,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xd03\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xe53\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2730,11 +2712,11 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x06STATIC\x10\x01\"4\n" +
 	"\rProtocolFlags\x12\x10\n" +
 	"\fNO_BROADCAST\x10\x00\x12\x11\n" +
-	"\rUDP_BROADCAST\x10\x01\x1a\xae\t\n" +
+	"\rUDP_BROADCAST\x10\x01\x1a\xc3\t\n" +
 	"\rDisplayConfig\x12$\n" +
-	"\x0escreen_on_secs\x18\x01 \x01(\rR\fscreenOnSecs\x12W\n" +
+	"\x0escreen_on_secs\x18\x01 \x01(\rR\fscreenOnSecs\x12a\n" +
 	"\n" +
-	"gps_format\x18\x02 \x01(\x0e24.meshtastic.Config.DisplayConfig.GpsCoordinateFormatB\x02\x18\x01R\tgpsFormat\x129\n" +
+	"gps_format\x18\x02 \x01(\x0e2>.meshtastic.Config.DisplayConfig.DeprecatedGpsCoordinateFormatB\x02\x18\x01R\tgpsFormat\x129\n" +
 	"\x19auto_screen_carousel_secs\x18\x03 \x01(\rR\x16autoScreenCarouselSecs\x12.\n" +
 	"\x11compass_north_top\x18\x04 \x01(\bB\x02\x18\x01R\x0fcompassNorthTop\x12\x1f\n" +
 	"\vflip_screen\x18\x05 \x01(\bR\n" +
@@ -2746,14 +2728,11 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x15wake_on_tap_or_motion\x18\n" +
 	" \x01(\bR\x11wakeOnTapOrMotion\x12d\n" +
 	"\x13compass_orientation\x18\v \x01(\x0e23.meshtastic.Config.DisplayConfig.CompassOrientationR\x12compassOrientation\x12\"\n" +
-	"\ruse_12h_clock\x18\f \x01(\bR\vuse12hClock\"M\n" +
-	"\x13GpsCoordinateFormat\x12\a\n" +
-	"\x03DEC\x10\x00\x12\a\n" +
-	"\x03DMS\x10\x01\x12\a\n" +
-	"\x03UTM\x10\x02\x12\b\n" +
-	"\x04MGRS\x10\x03\x12\a\n" +
-	"\x03OLC\x10\x04\x12\b\n" +
-	"\x04OSGR\x10\x05\"(\n" +
+	"\ruse_12h_clock\x18\f \x01(\bR\vuse12hClock\x12+\n" +
+	"\x12use_long_node_name\x18\r \x01(\bR\x0fuseLongNodeName\"+\n" +
+	"\x1dDeprecatedGpsCoordinateFormat\x12\n" +
+	"\n" +
+	"\x06UNUSED\x10\x00\"(\n" +
 	"\fDisplayUnits\x12\n" +
 	"\n" +
 	"\x06METRIC\x10\x00\x12\f\n" +
@@ -2902,33 +2881,33 @@ func file_meshtastic_config_proto_rawDescGZIP() []byte {
 var file_meshtastic_config_proto_enumTypes = make([]protoimpl.EnumInfo, 15)
 var file_meshtastic_config_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_meshtastic_config_proto_goTypes = []any{
-	(Config_DeviceConfig_Role)(0),                 // 0: meshtastic.Config.DeviceConfig.Role
-	(Config_DeviceConfig_RebroadcastMode)(0),      // 1: meshtastic.Config.DeviceConfig.RebroadcastMode
-	(Config_DeviceConfig_BuzzerMode)(0),           // 2: meshtastic.Config.DeviceConfig.BuzzerMode
-	(Config_PositionConfig_PositionFlags)(0),      // 3: meshtastic.Config.PositionConfig.PositionFlags
-	(Config_PositionConfig_GpsMode)(0),            // 4: meshtastic.Config.PositionConfig.GpsMode
-	(Config_NetworkConfig_AddressMode)(0),         // 5: meshtastic.Config.NetworkConfig.AddressMode
-	(Config_NetworkConfig_ProtocolFlags)(0),       // 6: meshtastic.Config.NetworkConfig.ProtocolFlags
-	(Config_DisplayConfig_GpsCoordinateFormat)(0), // 7: meshtastic.Config.DisplayConfig.GpsCoordinateFormat
-	(Config_DisplayConfig_DisplayUnits)(0),        // 8: meshtastic.Config.DisplayConfig.DisplayUnits
-	(Config_DisplayConfig_OledType)(0),            // 9: meshtastic.Config.DisplayConfig.OledType
-	(Config_DisplayConfig_DisplayMode)(0),         // 10: meshtastic.Config.DisplayConfig.DisplayMode
-	(Config_DisplayConfig_CompassOrientation)(0),  // 11: meshtastic.Config.DisplayConfig.CompassOrientation
-	(Config_LoRaConfig_RegionCode)(0),             // 12: meshtastic.Config.LoRaConfig.RegionCode
-	(Config_LoRaConfig_ModemPreset)(0),            // 13: meshtastic.Config.LoRaConfig.ModemPreset
-	(Config_BluetoothConfig_PairingMode)(0),       // 14: meshtastic.Config.BluetoothConfig.PairingMode
-	(*Config)(nil),                                // 15: meshtastic.Config
-	(*Config_DeviceConfig)(nil),                   // 16: meshtastic.Config.DeviceConfig
-	(*Config_PositionConfig)(nil),                 // 17: meshtastic.Config.PositionConfig
-	(*Config_PowerConfig)(nil),                    // 18: meshtastic.Config.PowerConfig
-	(*Config_NetworkConfig)(nil),                  // 19: meshtastic.Config.NetworkConfig
-	(*Config_DisplayConfig)(nil),                  // 20: meshtastic.Config.DisplayConfig
-	(*Config_LoRaConfig)(nil),                     // 21: meshtastic.Config.LoRaConfig
-	(*Config_BluetoothConfig)(nil),                // 22: meshtastic.Config.BluetoothConfig
-	(*Config_SecurityConfig)(nil),                 // 23: meshtastic.Config.SecurityConfig
-	(*Config_SessionkeyConfig)(nil),               // 24: meshtastic.Config.SessionkeyConfig
-	(*Config_NetworkConfig_IpV4Config)(nil),       // 25: meshtastic.Config.NetworkConfig.IpV4Config
-	(*DeviceUIConfig)(nil),                        // 26: meshtastic.DeviceUIConfig
+	(Config_DeviceConfig_Role)(0),                           // 0: meshtastic.Config.DeviceConfig.Role
+	(Config_DeviceConfig_RebroadcastMode)(0),                // 1: meshtastic.Config.DeviceConfig.RebroadcastMode
+	(Config_DeviceConfig_BuzzerMode)(0),                     // 2: meshtastic.Config.DeviceConfig.BuzzerMode
+	(Config_PositionConfig_PositionFlags)(0),                // 3: meshtastic.Config.PositionConfig.PositionFlags
+	(Config_PositionConfig_GpsMode)(0),                      // 4: meshtastic.Config.PositionConfig.GpsMode
+	(Config_NetworkConfig_AddressMode)(0),                   // 5: meshtastic.Config.NetworkConfig.AddressMode
+	(Config_NetworkConfig_ProtocolFlags)(0),                 // 6: meshtastic.Config.NetworkConfig.ProtocolFlags
+	(Config_DisplayConfig_DeprecatedGpsCoordinateFormat)(0), // 7: meshtastic.Config.DisplayConfig.DeprecatedGpsCoordinateFormat
+	(Config_DisplayConfig_DisplayUnits)(0),                  // 8: meshtastic.Config.DisplayConfig.DisplayUnits
+	(Config_DisplayConfig_OledType)(0),                      // 9: meshtastic.Config.DisplayConfig.OledType
+	(Config_DisplayConfig_DisplayMode)(0),                   // 10: meshtastic.Config.DisplayConfig.DisplayMode
+	(Config_DisplayConfig_CompassOrientation)(0),            // 11: meshtastic.Config.DisplayConfig.CompassOrientation
+	(Config_LoRaConfig_RegionCode)(0),                       // 12: meshtastic.Config.LoRaConfig.RegionCode
+	(Config_LoRaConfig_ModemPreset)(0),                      // 13: meshtastic.Config.LoRaConfig.ModemPreset
+	(Config_BluetoothConfig_PairingMode)(0),                 // 14: meshtastic.Config.BluetoothConfig.PairingMode
+	(*Config)(nil),                                          // 15: meshtastic.Config
+	(*Config_DeviceConfig)(nil),                             // 16: meshtastic.Config.DeviceConfig
+	(*Config_PositionConfig)(nil),                           // 17: meshtastic.Config.PositionConfig
+	(*Config_PowerConfig)(nil),                              // 18: meshtastic.Config.PowerConfig
+	(*Config_NetworkConfig)(nil),                            // 19: meshtastic.Config.NetworkConfig
+	(*Config_DisplayConfig)(nil),                            // 20: meshtastic.Config.DisplayConfig
+	(*Config_LoRaConfig)(nil),                               // 21: meshtastic.Config.LoRaConfig
+	(*Config_BluetoothConfig)(nil),                          // 22: meshtastic.Config.BluetoothConfig
+	(*Config_SecurityConfig)(nil),                           // 23: meshtastic.Config.SecurityConfig
+	(*Config_SessionkeyConfig)(nil),                         // 24: meshtastic.Config.SessionkeyConfig
+	(*Config_NetworkConfig_IpV4Config)(nil),                 // 25: meshtastic.Config.NetworkConfig.IpV4Config
+	(*DeviceUIConfig)(nil),                                  // 26: meshtastic.DeviceUIConfig
 }
 var file_meshtastic_config_proto_depIdxs = []int32{
 	16, // 0: meshtastic.Config.device:type_name -> meshtastic.Config.DeviceConfig
@@ -2947,7 +2926,7 @@ var file_meshtastic_config_proto_depIdxs = []int32{
 	4,  // 13: meshtastic.Config.PositionConfig.gps_mode:type_name -> meshtastic.Config.PositionConfig.GpsMode
 	5,  // 14: meshtastic.Config.NetworkConfig.address_mode:type_name -> meshtastic.Config.NetworkConfig.AddressMode
 	25, // 15: meshtastic.Config.NetworkConfig.ipv4_config:type_name -> meshtastic.Config.NetworkConfig.IpV4Config
-	7,  // 16: meshtastic.Config.DisplayConfig.gps_format:type_name -> meshtastic.Config.DisplayConfig.GpsCoordinateFormat
+	7,  // 16: meshtastic.Config.DisplayConfig.gps_format:type_name -> meshtastic.Config.DisplayConfig.DeprecatedGpsCoordinateFormat
 	8,  // 17: meshtastic.Config.DisplayConfig.units:type_name -> meshtastic.Config.DisplayConfig.DisplayUnits
 	9,  // 18: meshtastic.Config.DisplayConfig.oled:type_name -> meshtastic.Config.DisplayConfig.OledType
 	10, // 19: meshtastic.Config.DisplayConfig.displaymode:type_name -> meshtastic.Config.DisplayConfig.DisplayMode

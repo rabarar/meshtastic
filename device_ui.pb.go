@@ -250,6 +250,83 @@ func (Language) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_device_ui_proto_rawDescGZIP(), []int{2}
 }
 
+// How the GPS coordinates are displayed on the OLED screen.
+type DeviceUIConfig_GpsCoordinateFormat int32
+
+const (
+	// GPS coordinates are displayed in the normal decimal degrees format:
+	// DD.DDDDDD DDD.DDDDDD
+	DeviceUIConfig_DEC DeviceUIConfig_GpsCoordinateFormat = 0
+	// GPS coordinates are displayed in the degrees minutes seconds format:
+	// DD°MM'SS"C DDD°MM'SS"C, where C is the compass point representing the locations quadrant
+	DeviceUIConfig_DMS DeviceUIConfig_GpsCoordinateFormat = 1
+	// Universal Transverse Mercator format:
+	// ZZB EEEEEE NNNNNNN, where Z is zone, B is band, E is easting, N is northing
+	DeviceUIConfig_UTM DeviceUIConfig_GpsCoordinateFormat = 2
+	// Military Grid Reference System format:
+	// ZZB CD EEEEE NNNNN, where Z is zone, B is band, C is the east 100k square, D is the north 100k square,
+	// E is easting, N is northing
+	DeviceUIConfig_MGRS DeviceUIConfig_GpsCoordinateFormat = 3
+	// Open Location Code (aka Plus Codes).
+	DeviceUIConfig_OLC DeviceUIConfig_GpsCoordinateFormat = 4
+	// Ordnance Survey Grid Reference (the National Grid System of the UK).
+	// Format: AB EEEEE NNNNN, where A is the east 100k square, B is the north 100k square,
+	// E is the easting, N is the northing
+	DeviceUIConfig_OSGR DeviceUIConfig_GpsCoordinateFormat = 5
+	// Maidenhead Locator System
+	// Described here: https://en.wikipedia.org/wiki/Maidenhead_Locator_System
+	DeviceUIConfig_MLS DeviceUIConfig_GpsCoordinateFormat = 6
+)
+
+// Enum value maps for DeviceUIConfig_GpsCoordinateFormat.
+var (
+	DeviceUIConfig_GpsCoordinateFormat_name = map[int32]string{
+		0: "DEC",
+		1: "DMS",
+		2: "UTM",
+		3: "MGRS",
+		4: "OLC",
+		5: "OSGR",
+		6: "MLS",
+	}
+	DeviceUIConfig_GpsCoordinateFormat_value = map[string]int32{
+		"DEC":  0,
+		"DMS":  1,
+		"UTM":  2,
+		"MGRS": 3,
+		"OLC":  4,
+		"OSGR": 5,
+		"MLS":  6,
+	}
+)
+
+func (x DeviceUIConfig_GpsCoordinateFormat) Enum() *DeviceUIConfig_GpsCoordinateFormat {
+	p := new(DeviceUIConfig_GpsCoordinateFormat)
+	*p = x
+	return p
+}
+
+func (x DeviceUIConfig_GpsCoordinateFormat) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DeviceUIConfig_GpsCoordinateFormat) Descriptor() protoreflect.EnumDescriptor {
+	return file_meshtastic_device_ui_proto_enumTypes[3].Descriptor()
+}
+
+func (DeviceUIConfig_GpsCoordinateFormat) Type() protoreflect.EnumType {
+	return &file_meshtastic_device_ui_proto_enumTypes[3]
+}
+
+func (x DeviceUIConfig_GpsCoordinateFormat) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DeviceUIConfig_GpsCoordinateFormat.Descriptor instead.
+func (DeviceUIConfig_GpsCoordinateFormat) EnumDescriptor() ([]byte, []int) {
+	return file_meshtastic_device_ui_proto_rawDescGZIP(), []int{0, 0}
+}
+
 type DeviceUIConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// A version integer used to invalidate saved files when we make incompatible changes.
@@ -286,8 +363,10 @@ type DeviceUIConfig struct {
 	// Clockface analog style
 	// true for analog clockface, false for digital clockface
 	IsClockfaceAnalog bool `protobuf:"varint,18,opt,name=is_clockface_analog,json=isClockfaceAnalog,proto3" json:"is_clockface_analog,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// How the GPS coordinates are formatted on the OLED screen.
+	GpsFormat     DeviceUIConfig_GpsCoordinateFormat `protobuf:"varint,19,opt,name=gps_format,json=gpsFormat,proto3,enum=meshtastic.DeviceUIConfig_GpsCoordinateFormat" json:"gps_format,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeviceUIConfig) Reset() {
@@ -444,6 +523,13 @@ func (x *DeviceUIConfig) GetIsClockfaceAnalog() bool {
 		return x.IsClockfaceAnalog
 	}
 	return false
+}
+
+func (x *DeviceUIConfig) GetGpsFormat() DeviceUIConfig_GpsCoordinateFormat {
+	if x != nil {
+		return x.GpsFormat
+	}
+	return DeviceUIConfig_DEC
 }
 
 type NodeFilter struct {
@@ -757,7 +843,7 @@ var File_meshtastic_device_ui_proto protoreflect.FileDescriptor
 const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"\n" +
 	"\x1ameshtastic/device_ui.proto\x12\n" +
-	"meshtastic\"\x90\x06\n" +
+	"meshtastic\"\xb7\a\n" +
 	"\x0eDeviceUIConfig\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\rR\aversion\x12+\n" +
 	"\x11screen_brightness\x18\x02 \x01(\rR\x10screenBrightness\x12%\n" +
@@ -780,7 +866,17 @@ const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"\bmap_data\x18\x0f \x01(\v2\x0f.meshtastic.MapR\amapData\x12:\n" +
 	"\fcompass_mode\x18\x10 \x01(\x0e2\x17.meshtastic.CompassModeR\vcompassMode\x12(\n" +
 	"\x10screen_rgb_color\x18\x11 \x01(\rR\x0escreenRgbColor\x12.\n" +
-	"\x13is_clockface_analog\x18\x12 \x01(\bR\x11isClockfaceAnalog\"\x83\x02\n" +
+	"\x13is_clockface_analog\x18\x12 \x01(\bR\x11isClockfaceAnalog\x12M\n" +
+	"\n" +
+	"gps_format\x18\x13 \x01(\x0e2..meshtastic.DeviceUIConfig.GpsCoordinateFormatR\tgpsFormat\"V\n" +
+	"\x13GpsCoordinateFormat\x12\a\n" +
+	"\x03DEC\x10\x00\x12\a\n" +
+	"\x03DMS\x10\x01\x12\a\n" +
+	"\x03UTM\x10\x02\x12\b\n" +
+	"\x04MGRS\x10\x03\x12\a\n" +
+	"\x03OLC\x10\x04\x12\b\n" +
+	"\x04OSGR\x10\x05\x12\a\n" +
+	"\x03MLS\x10\x06\"\x83\x02\n" +
 	"\n" +
 	"NodeFilter\x12%\n" +
 	"\x0eunknown_switch\x18\x01 \x01(\bR\runknownSwitch\x12%\n" +
@@ -857,31 +953,33 @@ func file_meshtastic_device_ui_proto_rawDescGZIP() []byte {
 	return file_meshtastic_device_ui_proto_rawDescData
 }
 
-var file_meshtastic_device_ui_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_meshtastic_device_ui_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
 var file_meshtastic_device_ui_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_meshtastic_device_ui_proto_goTypes = []any{
-	(CompassMode)(0),       // 0: meshtastic.CompassMode
-	(Theme)(0),             // 1: meshtastic.Theme
-	(Language)(0),          // 2: meshtastic.Language
-	(*DeviceUIConfig)(nil), // 3: meshtastic.DeviceUIConfig
-	(*NodeFilter)(nil),     // 4: meshtastic.NodeFilter
-	(*NodeHighlight)(nil),  // 5: meshtastic.NodeHighlight
-	(*GeoPoint)(nil),       // 6: meshtastic.GeoPoint
-	(*Map)(nil),            // 7: meshtastic.Map
+	(CompassMode)(0),                        // 0: meshtastic.CompassMode
+	(Theme)(0),                              // 1: meshtastic.Theme
+	(Language)(0),                           // 2: meshtastic.Language
+	(DeviceUIConfig_GpsCoordinateFormat)(0), // 3: meshtastic.DeviceUIConfig.GpsCoordinateFormat
+	(*DeviceUIConfig)(nil),                  // 4: meshtastic.DeviceUIConfig
+	(*NodeFilter)(nil),                      // 5: meshtastic.NodeFilter
+	(*NodeHighlight)(nil),                   // 6: meshtastic.NodeHighlight
+	(*GeoPoint)(nil),                        // 7: meshtastic.GeoPoint
+	(*Map)(nil),                             // 8: meshtastic.Map
 }
 var file_meshtastic_device_ui_proto_depIdxs = []int32{
 	1, // 0: meshtastic.DeviceUIConfig.theme:type_name -> meshtastic.Theme
 	2, // 1: meshtastic.DeviceUIConfig.language:type_name -> meshtastic.Language
-	4, // 2: meshtastic.DeviceUIConfig.node_filter:type_name -> meshtastic.NodeFilter
-	5, // 3: meshtastic.DeviceUIConfig.node_highlight:type_name -> meshtastic.NodeHighlight
-	7, // 4: meshtastic.DeviceUIConfig.map_data:type_name -> meshtastic.Map
+	5, // 2: meshtastic.DeviceUIConfig.node_filter:type_name -> meshtastic.NodeFilter
+	6, // 3: meshtastic.DeviceUIConfig.node_highlight:type_name -> meshtastic.NodeHighlight
+	8, // 4: meshtastic.DeviceUIConfig.map_data:type_name -> meshtastic.Map
 	0, // 5: meshtastic.DeviceUIConfig.compass_mode:type_name -> meshtastic.CompassMode
-	6, // 6: meshtastic.Map.home:type_name -> meshtastic.GeoPoint
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	3, // 6: meshtastic.DeviceUIConfig.gps_format:type_name -> meshtastic.DeviceUIConfig.GpsCoordinateFormat
+	7, // 7: meshtastic.Map.home:type_name -> meshtastic.GeoPoint
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_device_ui_proto_init() }
@@ -894,7 +992,7 @@ func file_meshtastic_device_ui_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_device_ui_proto_rawDesc), len(file_meshtastic_device_ui_proto_rawDesc)),
-			NumEnums:      3,
+			NumEnums:      4,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,

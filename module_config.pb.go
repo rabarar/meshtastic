@@ -1905,8 +1905,11 @@ type ModuleConfig_TelemetryConfig struct {
 	HealthUpdateInterval uint32 `protobuf:"varint,12,opt,name=health_update_interval,json=healthUpdateInterval,proto3" json:"health_update_interval,omitempty"`
 	// Enable/Disable the health telemetry module on-device display
 	HealthScreenEnabled bool `protobuf:"varint,13,opt,name=health_screen_enabled,json=healthScreenEnabled,proto3" json:"health_screen_enabled,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Enable/Disable the device telemetry module to send metrics to the mesh
+	// Note: We will still send telemtry to the connected phone / client every minute over the API
+	DeviceTelemetryEnabled bool `protobuf:"varint,14,opt,name=device_telemetry_enabled,json=deviceTelemetryEnabled,proto3" json:"device_telemetry_enabled,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *ModuleConfig_TelemetryConfig) Reset() {
@@ -2026,6 +2029,13 @@ func (x *ModuleConfig_TelemetryConfig) GetHealthUpdateInterval() uint32 {
 func (x *ModuleConfig_TelemetryConfig) GetHealthScreenEnabled() bool {
 	if x != nil {
 		return x.HealthScreenEnabled
+	}
+	return false
+}
+
+func (x *ModuleConfig_TelemetryConfig) GetDeviceTelemetryEnabled() bool {
+	if x != nil {
+		return x.DeviceTelemetryEnabled
 	}
 	return false
 }
@@ -2262,7 +2272,7 @@ var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\"\xf62\n" +
+	"meshtastic\"\xb03\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2423,7 +2433,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x16\n" +
 	"\x06sender\x18\x02 \x01(\rR\x06sender\x12\x12\n" +
 	"\x04save\x18\x03 \x01(\bR\x04save\x12&\n" +
-	"\x0fclear_on_reboot\x18\x04 \x01(\bR\rclearOnReboot\x1a\xff\x05\n" +
+	"\x0fclear_on_reboot\x18\x04 \x01(\bR\rclearOnReboot\x1a\xb9\x06\n" +
 	"\x0fTelemetryConfig\x124\n" +
 	"\x16device_update_interval\x18\x01 \x01(\rR\x14deviceUpdateInterval\x12>\n" +
 	"\x1benvironment_update_interval\x18\x02 \x01(\rR\x19environmentUpdateInterval\x12F\n" +
@@ -2438,7 +2448,8 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	" \x01(\bR\x12powerScreenEnabled\x12<\n" +
 	"\x1ahealth_measurement_enabled\x18\v \x01(\bR\x18healthMeasurementEnabled\x124\n" +
 	"\x16health_update_interval\x18\f \x01(\rR\x14healthUpdateInterval\x122\n" +
-	"\x15health_screen_enabled\x18\r \x01(\bR\x13healthScreenEnabled\x1a\x9a\x06\n" +
+	"\x15health_screen_enabled\x18\r \x01(\bR\x13healthScreenEnabled\x128\n" +
+	"\x18device_telemetry_enabled\x18\x0e \x01(\bR\x16deviceTelemetryEnabled\x1a\x9a\x06\n" +
 	"\x13CannedMessageConfig\x12'\n" +
 	"\x0frotary1_enabled\x18\x01 \x01(\bR\x0erotary1Enabled\x12*\n" +
 	"\x11inputbroker_pin_a\x18\x02 \x01(\rR\x0finputbrokerPinA\x12*\n" +
