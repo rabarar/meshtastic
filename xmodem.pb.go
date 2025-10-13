@@ -172,8 +172,8 @@ const file_meshtastic_xmodem_proto_rawDesc = "" +
 	"\x03ACK\x10\x06\x12\a\n" +
 	"\x03NAK\x10\x15\x12\a\n" +
 	"\x03CAN\x10\x18\x12\t\n" +
-	"\x05CTRLZ\x10\x1aBb\n" +
-	"\x13com.geeksville.meshB\fXmodemProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\x05CTRLZ\x10\x1aBc\n" +
+	"\x14org.meshtastic.protoB\fXmodemProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_xmodem_proto_rawDescOnce sync.Once

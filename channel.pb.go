@@ -142,10 +142,8 @@ type ChannelSettings struct {
 	DownlinkEnabled bool `protobuf:"varint,6,opt,name=downlink_enabled,json=downlinkEnabled,proto3" json:"downlink_enabled,omitempty"`
 	// Per-channel module settings.
 	ModuleSettings *ModuleSettings `protobuf:"bytes,7,opt,name=module_settings,json=moduleSettings,proto3" json:"module_settings,omitempty"`
-	// Whether or not we should receive notifactions / alerts through this channel
-	Mute          bool `protobuf:"varint,8,opt,name=mute,proto3" json:"mute,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ChannelSettings) Reset() {
@@ -228,21 +226,14 @@ func (x *ChannelSettings) GetModuleSettings() *ModuleSettings {
 	return nil
 }
 
-func (x *ChannelSettings) GetMute() bool {
-	if x != nil {
-		return x.Mute
-	}
-	return false
-}
-
 // This message is specifically for modules to store per-channel configuration data.
 type ModuleSettings struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Bits of precision for the location sent in position packets.
 	PositionPrecision uint32 `protobuf:"varint,1,opt,name=position_precision,json=positionPrecision,proto3" json:"position_precision,omitempty"`
-	// Controls whether or not the phone / clients should mute the current channel
+	// Controls whether or not the client / device should mute the current channel
 	// Useful for noisy public channels you don't necessarily want to disable
-	IsClientMuted bool `protobuf:"varint,2,opt,name=is_client_muted,json=isClientMuted,proto3" json:"is_client_muted,omitempty"`
+	IsMuted       bool `protobuf:"varint,2,opt,name=is_muted,json=isMuted,proto3" json:"is_muted,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -284,9 +275,9 @@ func (x *ModuleSettings) GetPositionPrecision() uint32 {
 	return 0
 }
 
-func (x *ModuleSettings) GetIsClientMuted() bool {
+func (x *ModuleSettings) GetIsMuted() bool {
 	if x != nil {
-		return x.IsClientMuted
+		return x.IsMuted
 	}
 	return false
 }
@@ -362,7 +353,7 @@ var File_meshtastic_channel_proto protoreflect.FileDescriptor
 const file_meshtastic_channel_proto_rawDesc = "" +
 	"\n" +
 	"\x18meshtastic/channel.proto\x12\n" +
-	"meshtastic\"\x97\x02\n" +
+	"meshtastic\"\x83\x02\n" +
 	"\x0fChannelSettings\x12#\n" +
 	"\vchannel_num\x18\x01 \x01(\rB\x02\x18\x01R\n" +
 	"channelNum\x12\x10\n" +
@@ -371,11 +362,10 @@ const file_meshtastic_channel_proto_rawDesc = "" +
 	"\x02id\x18\x04 \x01(\aR\x02id\x12%\n" +
 	"\x0euplink_enabled\x18\x05 \x01(\bR\ruplinkEnabled\x12)\n" +
 	"\x10downlink_enabled\x18\x06 \x01(\bR\x0fdownlinkEnabled\x12C\n" +
-	"\x0fmodule_settings\x18\a \x01(\v2\x1a.meshtastic.ModuleSettingsR\x0emoduleSettings\x12\x12\n" +
-	"\x04mute\x18\b \x01(\bR\x04mute\"g\n" +
+	"\x0fmodule_settings\x18\a \x01(\v2\x1a.meshtastic.ModuleSettingsR\x0emoduleSettings\"Z\n" +
 	"\x0eModuleSettings\x12-\n" +
-	"\x12position_precision\x18\x01 \x01(\rR\x11positionPrecision\x12&\n" +
-	"\x0fis_client_muted\x18\x02 \x01(\bR\risClientMuted\"\xb8\x01\n" +
+	"\x12position_precision\x18\x01 \x01(\rR\x11positionPrecision\x12\x19\n" +
+	"\bis_muted\x18\x02 \x01(\bR\aisMuted\"\xb8\x01\n" +
 	"\aChannel\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\x05R\x05index\x127\n" +
 	"\bsettings\x18\x02 \x01(\v2\x1b.meshtastic.ChannelSettingsR\bsettings\x12,\n" +
@@ -383,8 +373,8 @@ const file_meshtastic_channel_proto_rawDesc = "" +
 	"\x04Role\x12\f\n" +
 	"\bDISABLED\x10\x00\x12\v\n" +
 	"\aPRIMARY\x10\x01\x12\r\n" +
-	"\tSECONDARY\x10\x02Bc\n" +
-	"\x13com.geeksville.meshB\rChannelProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\tSECONDARY\x10\x02Bd\n" +
+	"\x14org.meshtastic.protoB\rChannelProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_channel_proto_rawDescOnce sync.Once

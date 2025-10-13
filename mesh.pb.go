@@ -5344,8 +5344,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x16DETECTIONSENSOR_CONFIG\x10\x80\x10\x12\x16\n" +
 	"\x11PAXCOUNTER_CONFIG\x10\x80 \x12\x15\n" +
 	"\x10BLUETOOTH_CONFIG\x10\x80@\x12\x14\n" +
-	"\x0eNETWORK_CONFIG\x10\x80\x80\x01B`\n" +
-	"\x13com.geeksville.meshB\n" +
+	"\x0eNETWORK_CONFIG\x10\x80\x80\x01Ba\n" +
+	"\x14org.meshtastic.protoB\n" +
 	"MeshProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (

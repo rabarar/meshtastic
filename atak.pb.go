@@ -720,8 +720,8 @@ const file_meshtastic_atak_proto_rawDesc = "" +
 	"\x05Medic\x10\x05\x12\x13\n" +
 	"\x0fForwardObserver\x10\x06\x12\a\n" +
 	"\x03RTO\x10\a\x12\x06\n" +
-	"\x02K9\x10\bB`\n" +
-	"\x13com.geeksville.meshB\n" +
+	"\x02K9\x10\bBa\n" +
+	"\x14org.meshtastic.protoB\n" +
 	"ATAKProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (

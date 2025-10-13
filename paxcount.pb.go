@@ -94,8 +94,8 @@ const file_meshtastic_paxcount_proto_rawDesc = "" +
 	"\bPaxcount\x12\x12\n" +
 	"\x04wifi\x18\x01 \x01(\rR\x04wifi\x12\x10\n" +
 	"\x03ble\x18\x02 \x01(\rR\x03ble\x12\x16\n" +
-	"\x06uptime\x18\x03 \x01(\rR\x06uptimeBd\n" +
-	"\x13com.geeksville.meshB\x0ePaxcountProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\x06uptime\x18\x03 \x01(\rR\x06uptimeBe\n" +
+	"\x14org.meshtastic.protoB\x0ePaxcountProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_paxcount_proto_rawDescOnce sync.Once

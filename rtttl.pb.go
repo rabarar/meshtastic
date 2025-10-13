@@ -74,8 +74,8 @@ const file_meshtastic_rtttl_proto_rawDesc = "" +
 	"\x16meshtastic/rtttl.proto\x12\n" +
 	"meshtastic\")\n" +
 	"\vRTTTLConfig\x12\x1a\n" +
-	"\bringtone\x18\x01 \x01(\tR\bringtoneBg\n" +
-	"\x13com.geeksville.meshB\x11RTTTLConfigProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\bringtone\x18\x01 \x01(\tR\bringtoneBh\n" +
+	"\x14org.meshtastic.protoB\x11RTTTLConfigProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_rtttl_proto_rawDescOnce sync.Once

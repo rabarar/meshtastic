@@ -90,8 +90,8 @@ const file_meshtastic_apponly_proto_rawDesc = "" +
 	"ChannelSet\x127\n" +
 	"\bsettings\x18\x01 \x03(\v2\x1b.meshtastic.ChannelSettingsR\bsettings\x12>\n" +
 	"\vlora_config\x18\x02 \x01(\v2\x1d.meshtastic.Config.LoRaConfigR\n" +
-	"loraConfigBc\n" +
-	"\x13com.geeksville.meshB\rAppOnlyProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"loraConfigBd\n" +
+	"\x14org.meshtastic.protoB\rAppOnlyProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_apponly_proto_rawDescOnce sync.Once

@@ -360,8 +360,8 @@ const file_meshtastic_powermon_proto_rawDesc = "" +
 	"\aWIFI_ON\x10a\x12\v\n" +
 	"\aGPS_OFF\x10p\x12\n" +
 	"\n" +
-	"\x06GPS_ON\x10qBd\n" +
-	"\x13com.geeksville.meshB\x0ePowerMonProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\x06GPS_ON\x10qBe\n" +
+	"\x14org.meshtastic.protoB\x0ePowerMonProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_powermon_proto_rawDescOnce sync.Once

@@ -429,8 +429,8 @@ const file_meshtastic_connection_status_proto_rawDesc = "" +
 	"\fis_connected\x18\x03 \x01(\bR\visConnected\"O\n" +
 	"\x16SerialConnectionStatus\x12\x12\n" +
 	"\x04baud\x18\x01 \x01(\rR\x04baud\x12!\n" +
-	"\fis_connected\x18\x02 \x01(\bR\visConnectedBf\n" +
-	"\x13com.geeksville.meshB\x10ConnStatusProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\fis_connected\x18\x02 \x01(\bR\visConnectedBg\n" +
+	"\x14org.meshtastic.protoB\x10ConnStatusProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_connection_status_proto_rawDescOnce sync.Once

@@ -300,8 +300,8 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\vCAYENNE_APP\x10M\x12\x10\n" +
 	"\vPRIVATE_APP\x10\x80\x02\x12\x13\n" +
 	"\x0eATAK_FORWARDER\x10\x81\x02\x12\b\n" +
-	"\x03MAX\x10\xff\x03B^\n" +
-	"\x13com.geeksville.meshB\bPortnumsZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\x03MAX\x10\xff\x03B_\n" +
+	"\x14org.meshtastic.protoB\bPortnumsZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_portnums_proto_rawDescOnce sync.Once

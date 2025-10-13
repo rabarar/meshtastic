@@ -74,8 +74,8 @@ const file_meshtastic_cannedmessages_proto_rawDesc = "" +
 	"\x1fmeshtastic/cannedmessages.proto\x12\n" +
 	"meshtastic\"7\n" +
 	"\x19CannedMessageModuleConfig\x12\x1a\n" +
-	"\bmessages\x18\x01 \x01(\tR\bmessagesBo\n" +
-	"\x13com.geeksville.meshB\x19CannedMessageConfigProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\bmessages\x18\x01 \x01(\tR\bmessagesBp\n" +
+	"\x14org.meshtastic.protoB\x19CannedMessageConfigProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_cannedmessages_proto_rawDescOnce sync.Once

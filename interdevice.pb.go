@@ -306,8 +306,8 @@ const file_meshtastic_interdevice_proto_rawDesc = "" +
 	"AHT20_TEMP\x10\xb3\x01\x12\x13\n" +
 	"\x0eAHT20_HUMIDITY\x10\xb4\x01\x12\x0f\n" +
 	"\n" +
-	"TVOC_INDEX\x10\xb5\x01Bg\n" +
-	"\x13com.geeksville.meshB\x11InterdeviceProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"TVOC_INDEX\x10\xb5\x01Bh\n" +
+	"\x14org.meshtastic.protoB\x11InterdeviceProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_interdevice_proto_rawDescOnce sync.Once

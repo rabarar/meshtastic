@@ -156,8 +156,8 @@ const file_meshtastic_clientonly_proto_rawDesc = "" +
 	"\x0e_module_configB\x11\n" +
 	"\x0f_fixed_positionB\v\n" +
 	"\t_ringtoneB\x12\n" +
-	"\x10_canned_messagesBf\n" +
-	"\x13com.geeksville.meshB\x10ClientOnlyProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\x10_canned_messagesBg\n" +
+	"\x14org.meshtastic.protoB\x10ClientOnlyProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_clientonly_proto_rawDescOnce sync.Once

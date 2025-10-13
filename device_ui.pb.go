@@ -944,8 +944,8 @@ const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"\n" +
 	"\x06DANISH\x10\x13\x12\x16\n" +
 	"\x12SIMPLIFIED_CHINESE\x10\x1e\x12\x17\n" +
-	"\x13TRADITIONAL_CHINESE\x10\x1fBd\n" +
-	"\x13com.geeksville.meshB\x0eDeviceUIProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\x13TRADITIONAL_CHINESE\x10\x1fBe\n" +
+	"\x14org.meshtastic.protoB\x0eDeviceUIProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_device_ui_proto_rawDescOnce sync.Once

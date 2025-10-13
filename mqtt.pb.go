@@ -283,8 +283,8 @@ const file_meshtastic_mqtt_proto_rawDesc = "" +
 	"\baltitude\x18\v \x01(\x05R\baltitude\x12-\n" +
 	"\x12position_precision\x18\f \x01(\rR\x11positionPrecision\x123\n" +
 	"\x16num_online_local_nodes\x18\r \x01(\rR\x13numOnlineLocalNodes\x129\n" +
-	"\x19has_opted_report_location\x18\x0e \x01(\bR\x16hasOptedReportLocationB`\n" +
-	"\x13com.geeksville.meshB\n" +
+	"\x19has_opted_report_location\x18\x0e \x01(\bR\x16hasOptedReportLocationBa\n" +
+	"\x14org.meshtastic.protoB\n" +
 	"MQTTProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (

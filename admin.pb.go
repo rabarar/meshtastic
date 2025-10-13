@@ -1762,8 +1762,8 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x17PROVIDE_SECURITY_NUMBER\x10\x01\x12\r\n" +
 	"\tDO_VERIFY\x10\x02\x12\x11\n" +
 	"\rDO_NOT_VERIFY\x10\x03B\x12\n" +
-	"\x10_security_numberBa\n" +
-	"\x13com.geeksville.meshB\vAdminProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\x10_security_numberBb\n" +
+	"\x14org.meshtastic.protoB\vAdminProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_admin_proto_rawDescOnce sync.Once

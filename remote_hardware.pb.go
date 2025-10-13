@@ -179,8 +179,8 @@ const file_meshtastic_remote_hardware_proto_rawDesc = "" +
 	"\rGPIOS_CHANGED\x10\x03\x12\x0e\n" +
 	"\n" +
 	"READ_GPIOS\x10\x04\x12\x14\n" +
-	"\x10READ_GPIOS_REPLY\x10\x05Bd\n" +
-	"\x13com.geeksville.meshB\x0eRemoteHardwareZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
+	"\x10READ_GPIOS_REPLY\x10\x05Be\n" +
+	"\x14org.meshtastic.protoB\x0eRemoteHardwareZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
 	file_meshtastic_remote_hardware_proto_rawDescOnce sync.Once
