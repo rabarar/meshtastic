@@ -115,6 +115,8 @@ const (
 	TelemetrySensorType_SEN5X TelemetrySensorType = 43
 	// TSL2561 light sensor
 	TelemetrySensorType_TSL2561 TelemetrySensorType = 44
+	// BH1750 light sensor
+	TelemetrySensorType_BH1750 TelemetrySensorType = 45
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -165,6 +167,7 @@ var (
 		42: "SFA30",
 		43: "SEN5X",
 		44: "TSL2561",
+		45: "BH1750",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -212,6 +215,7 @@ var (
 		"SFA30":         42,
 		"SEN5X":         43,
 		"TSL2561":       44,
+		"BH1750":        45,
 	}
 )
 
@@ -1821,7 +1825,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"zeroOffset\x18\x01 \x01(\x05R\n" +
 	"zeroOffset\x12,\n" +
-	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xed\x04\n" +
+	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xf9\x04\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -1878,7 +1882,9 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\vADS1X15_ALT\x10)\x12\t\n" +
 	"\x05SFA30\x10*\x12\t\n" +
 	"\x05SEN5X\x10+\x12\v\n" +
-	"\aTSL2561\x10,Bf\n" +
+	"\aTSL2561\x10,\x12\n" +
+	"\n" +
+	"\x06BH1750\x10-Bf\n" +
 	"\x14org.meshtastic.protoB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
