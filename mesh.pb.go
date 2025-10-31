@@ -291,6 +291,10 @@ const (
 	HardwareModel_T_WATCH_ULTRA HardwareModel = 114
 	// Elecrow ThinkNode M3
 	HardwareModel_THINKNODE_M3 HardwareModel = 115
+	// RAK WISMESH_TAP_V2 with ESP32-S3 CPU
+	HardwareModel_WISMESH_TAP_V2 HardwareModel = 116
+	// RAK3401
+	HardwareModel_RAK3401 HardwareModel = 117
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -416,6 +420,8 @@ var (
 		113: "HELTEC_WIRELESS_TRACKER_V2",
 		114: "T_WATCH_ULTRA",
 		115: "THINKNODE_M3",
+		116: "WISMESH_TAP_V2",
+		117: "RAK3401",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -535,6 +541,8 @@ var (
 		"HELTEC_WIRELESS_TRACKER_V2":   113,
 		"T_WATCH_ULTRA":                114,
 		"THINKNODE_M3":                 115,
+		"WISMESH_TAP_V2":               116,
+		"RAK3401":                      117,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -5170,7 +5178,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\xc1\x11\n" +
+	"\x0fpayload_variant*\xe2\x11\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -5300,7 +5308,9 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x15M5STACK_CARDPUTER_ADV\x10p\x12\x1e\n" +
 	"\x1aHELTEC_WIRELESS_TRACKER_V2\x10q\x12\x11\n" +
 	"\rT_WATCH_ULTRA\x10r\x12\x10\n" +
-	"\fTHINKNODE_M3\x10s\x12\x0f\n" +
+	"\fTHINKNODE_M3\x10s\x12\x12\n" +
+	"\x0eWISMESH_TAP_V2\x10t\x12\v\n" +
+	"\aRAK3401\x10u\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +
