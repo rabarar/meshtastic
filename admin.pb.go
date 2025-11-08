@@ -894,13 +894,13 @@ func (x *AdminMessage) GetFactoryResetConfig() int32 {
 	return 0
 }
 
-func (x *AdminMessage) GetNodedbReset() int32 {
+func (x *AdminMessage) GetNodedbReset() bool {
 	if x != nil {
 		if x, ok := x.PayloadVariant.(*AdminMessage_NodedbReset); ok {
 			return x.NodedbReset
 		}
 	}
-	return 0
+	return false
 }
 
 type isAdminMessage_PayloadVariant interface {
@@ -1185,7 +1185,8 @@ type AdminMessage_FactoryResetConfig struct {
 
 type AdminMessage_NodedbReset struct {
 	// Tell the node to reset the nodedb.
-	NodedbReset int32 `protobuf:"varint,100,opt,name=nodedb_reset,json=nodedbReset,proto3,oneof"`
+	// When true, favorites are preserved through reset.
+	NodedbReset bool `protobuf:"varint,100,opt,name=nodedb_reset,json=nodedbReset,proto3,oneof"`
 }
 
 func (*AdminMessage_GetChannelRequest) isAdminMessage_PayloadVariant() {}
@@ -1700,7 +1701,7 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x0ereboot_seconds\x18a \x01(\x05H\x00R\rrebootSeconds\x12+\n" +
 	"\x10shutdown_seconds\x18b \x01(\x05H\x00R\x0fshutdownSeconds\x122\n" +
 	"\x14factory_reset_config\x18c \x01(\x05H\x00R\x12factoryResetConfig\x12#\n" +
-	"\fnodedb_reset\x18d \x01(\x05H\x00R\vnodedbReset\x1av\n" +
+	"\fnodedb_reset\x18d \x01(\bH\x00R\vnodedbReset\x1av\n" +
 	"\n" +
 	"InputEvent\x12\x1d\n" +
 	"\n" +
