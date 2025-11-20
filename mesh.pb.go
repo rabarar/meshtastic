@@ -295,6 +295,8 @@ const (
 	HardwareModel_WISMESH_TAP_V2 HardwareModel = 116
 	// RAK3401
 	HardwareModel_RAK3401 HardwareModel = 117
+	// RAK6421 Hat+
+	HardwareModel_RAK6421 HardwareModel = 118
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -422,6 +424,7 @@ var (
 		115: "THINKNODE_M3",
 		116: "WISMESH_TAP_V2",
 		117: "RAK3401",
+		118: "RAK6421",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -543,6 +546,7 @@ var (
 		"THINKNODE_M3":                 115,
 		"WISMESH_TAP_V2":               116,
 		"RAK3401":                      117,
+		"RAK6421":                      118,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -2453,6 +2457,10 @@ type MeshPacket struct {
 	// See [crypto](/docs/overview/encryption) for details.
 	From uint32 `protobuf:"fixed32,1,opt,name=from,proto3" json:"from,omitempty"`
 	// The (immediate) destination for this packet
+	// If the value is 4,294,967,295 (maximum value of an unsigned 32bit integer), this indicates that the packet was
+	// not destined for a specific node, but for a channel as indicated by the value of `channel` below.
+	// If the value is another, this indicates that the packet was destined for a specific
+	// node (i.e. a kind of "Direct Message" to this node) and not broadcast on a channel.
 	To uint32 `protobuf:"fixed32,2,opt,name=to,proto3" json:"to,omitempty"`
 	// (Usually) If set, this indicates the index in the secondary_channels table that this packet was sent/received on.
 	// If unset, packet was on the primary channel.
@@ -5178,7 +5186,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\xe2\x11\n" +
+	"\x0fpayload_variant*\xef\x11\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -5310,7 +5318,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\rT_WATCH_ULTRA\x10r\x12\x10\n" +
 	"\fTHINKNODE_M3\x10s\x12\x12\n" +
 	"\x0eWISMESH_TAP_V2\x10t\x12\v\n" +
-	"\aRAK3401\x10u\x12\x0f\n" +
+	"\aRAK3401\x10u\x12\v\n" +
+	"\aRAK6421\x10v\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +
