@@ -244,8 +244,8 @@ const (
 	HardwareModel_T_ETH_ELITE HardwareModel = 91
 	// Heltec HRI-3621 industrial probe
 	HardwareModel_HELTEC_SENSOR_HUB HardwareModel = 92
-	// Reserved Fried Chicken ID for future use
-	HardwareModel_RESERVED_FRIED_CHICKEN HardwareModel = 93
+	// Muzi Works Muzi-Base device
+	HardwareModel_MUZI_BASE HardwareModel = 93
 	// Heltec Magnetic Power Bank with Meshtastic compatible
 	HardwareModel_HELTEC_MESH_POCKET HardwareModel = 94
 	// Seeed Solar Node
@@ -403,7 +403,7 @@ var (
 		90:  "THINKNODE_M2",
 		91:  "T_ETH_ELITE",
 		92:  "HELTEC_SENSOR_HUB",
-		93:  "RESERVED_FRIED_CHICKEN",
+		93:  "MUZI_BASE",
 		94:  "HELTEC_MESH_POCKET",
 		95:  "SEEED_SOLAR_NODE",
 		96:  "NOMADSTAR_METEOR_PRO",
@@ -527,7 +527,7 @@ var (
 		"THINKNODE_M2":                 90,
 		"T_ETH_ELITE":                  91,
 		"HELTEC_SENSOR_HUB":            92,
-		"RESERVED_FRIED_CHICKEN":       93,
+		"MUZI_BASE":                    93,
 		"HELTEC_MESH_POCKET":           94,
 		"SEEED_SOLAR_NODE":             95,
 		"NOMADSTAR_METEOR_PRO":         96,
@@ -5194,7 +5194,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\x93\x12\n" +
+	"\x0fpayload_variant*\x86\x12\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -5300,8 +5300,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\fTHINKNODE_M1\x10Y\x12\x10\n" +
 	"\fTHINKNODE_M2\x10Z\x12\x0f\n" +
 	"\vT_ETH_ELITE\x10[\x12\x15\n" +
-	"\x11HELTEC_SENSOR_HUB\x10\\\x12\x1a\n" +
-	"\x16RESERVED_FRIED_CHICKEN\x10]\x12\x16\n" +
+	"\x11HELTEC_SENSOR_HUB\x10\\\x12\r\n" +
+	"\tMUZI_BASE\x10]\x12\x16\n" +
 	"\x12HELTEC_MESH_POCKET\x10^\x12\x14\n" +
 	"\x10SEEED_SOLAR_NODE\x10_\x12\x18\n" +
 	"\x14NOMADSTAR_METEOR_PRO\x10`\x12\r\n" +
