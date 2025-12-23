@@ -4,6 +4,8 @@
 // 	protoc        (unknown)
 // source: meshtastic/atak.proto
 
+// trunk-ignore(buf-lint/PACKAGE_DIRECTORY_MATCH)
+
 package meshtastic
 
 import (
