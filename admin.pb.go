@@ -414,7 +414,6 @@ type AdminMessage struct {
 	//	*AdminMessage_CommitEditSettings
 	//	*AdminMessage_AddContact
 	//	*AdminMessage_KeyVerification
-	//	*AdminMessage_RebootOtaMode
 	//	*AdminMessage_FactoryResetDevice
 	//	*AdminMessage_RebootOtaSeconds
 	//	*AdminMessage_ExitSimulator
@@ -422,6 +421,7 @@ type AdminMessage struct {
 	//	*AdminMessage_ShutdownSeconds
 	//	*AdminMessage_FactoryResetConfig
 	//	*AdminMessage_NodedbReset
+	//	*AdminMessage_OtaRequest
 	PayloadVariant isAdminMessage_PayloadVariant `protobuf_oneof:"payload_variant"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -894,15 +894,6 @@ func (x *AdminMessage) GetKeyVerification() *KeyVerificationAdmin {
 	return nil
 }
 
-func (x *AdminMessage) GetRebootOtaMode() OTAMode {
-	if x != nil {
-		if x, ok := x.PayloadVariant.(*AdminMessage_RebootOtaMode); ok {
-			return x.RebootOtaMode
-		}
-	}
-	return OTAMode_NO_REBOOT_OTA
-}
-
 func (x *AdminMessage) GetFactoryResetDevice() int32 {
 	if x != nil {
 		if x, ok := x.PayloadVariant.(*AdminMessage_FactoryResetDevice); ok {
@@ -965,6 +956,15 @@ func (x *AdminMessage) GetNodedbReset() bool {
 		}
 	}
 	return false
+}
+
+func (x *AdminMessage) GetOtaRequest() *AdminMessage_OTAEvent {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*AdminMessage_OtaRequest); ok {
+			return x.OtaRequest
+		}
+	}
+	return nil
 }
 
 type isAdminMessage_PayloadVariant interface {
@@ -1215,11 +1215,6 @@ type AdminMessage_KeyVerification struct {
 	KeyVerification *KeyVerificationAdmin `protobuf:"bytes,67,opt,name=key_verification,json=keyVerification,proto3,oneof"`
 }
 
-type AdminMessage_RebootOtaMode struct {
-	// Tell the node to reboot into OTA mode for firmware update via BLE or WiFi (ESP32 only for now)
-	RebootOtaMode OTAMode `protobuf:"varint,68,opt,name=reboot_ota_mode,json=rebootOtaMode,proto3,enum=meshtastic.OTAMode,oneof"`
-}
-
 type AdminMessage_FactoryResetDevice struct {
 	// Tell the node to factory reset config everything; all device state and configuration will be returned to factory defaults and BLE bonds will be cleared.
 	FactoryResetDevice int32 `protobuf:"varint,94,opt,name=factory_reset_device,json=factoryResetDevice,proto3,oneof"`
@@ -1259,6 +1254,11 @@ type AdminMessage_NodedbReset struct {
 	// Tell the node to reset the nodedb.
 	// When true, favorites are preserved through reset.
 	NodedbReset bool `protobuf:"varint,100,opt,name=nodedb_reset,json=nodedbReset,proto3,oneof"`
+}
+
+type AdminMessage_OtaRequest struct {
+	// Tell the node to reset into the OTA Loader
+	OtaRequest *AdminMessage_OTAEvent `protobuf:"bytes,102,opt,name=ota_request,json=otaRequest,proto3,oneof"`
 }
 
 func (*AdminMessage_GetChannelRequest) isAdminMessage_PayloadVariant() {}
@@ -1355,8 +1355,6 @@ func (*AdminMessage_AddContact) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_KeyVerification) isAdminMessage_PayloadVariant() {}
 
-func (*AdminMessage_RebootOtaMode) isAdminMessage_PayloadVariant() {}
-
 func (*AdminMessage_FactoryResetDevice) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_RebootOtaSeconds) isAdminMessage_PayloadVariant() {}
@@ -1370,6 +1368,8 @@ func (*AdminMessage_ShutdownSeconds) isAdminMessage_PayloadVariant() {}
 func (*AdminMessage_FactoryResetConfig) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_NodedbReset) isAdminMessage_PayloadVariant() {}
+
+func (*AdminMessage_OtaRequest) isAdminMessage_PayloadVariant() {}
 
 // Parameters for setting up Meshtastic for ameteur radio usage
 type HamParameters struct {
@@ -1709,12 +1709,69 @@ func (x *AdminMessage_InputEvent) GetTouchY() uint32 {
 	return 0
 }
 
+// User is requesting an over the air update.
+// Node will reboot into the OTA loader
+type AdminMessage_OTAEvent struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Tell the node to reboot into OTA mode for firmware update via BLE or WiFi (ESP32 only for now)
+	RebootOtaMode OTAMode `protobuf:"varint,1,opt,name=reboot_ota_mode,json=rebootOtaMode,proto3,enum=meshtastic.OTAMode" json:"reboot_ota_mode,omitempty"`
+	// A 32 byte hash of the OTA firmware.
+	// Used to verify the integrity of the firmware before applying an update.
+	OtaHash       []byte `protobuf:"bytes,2,opt,name=ota_hash,json=otaHash,proto3" json:"ota_hash,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminMessage_OTAEvent) Reset() {
+	*x = AdminMessage_OTAEvent{}
+	mi := &file_meshtastic_admin_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminMessage_OTAEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminMessage_OTAEvent) ProtoMessage() {}
+
+func (x *AdminMessage_OTAEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_admin_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminMessage_OTAEvent.ProtoReflect.Descriptor instead.
+func (*AdminMessage_OTAEvent) Descriptor() ([]byte, []int) {
+	return file_meshtastic_admin_proto_rawDescGZIP(), []int{0, 1}
+}
+
+func (x *AdminMessage_OTAEvent) GetRebootOtaMode() OTAMode {
+	if x != nil {
+		return x.RebootOtaMode
+	}
+	return OTAMode_NO_REBOOT_OTA
+}
+
+func (x *AdminMessage_OTAEvent) GetOtaHash() []byte {
+	if x != nil {
+		return x.OtaHash
+	}
+	return nil
+}
+
 var File_meshtastic_admin_proto protoreflect.FileDescriptor
 
 const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"\x16meshtastic/admin.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\x96\"\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\x81#\n" +
 	"\fAdminMessage\x12'\n" +
 	"\x0fsession_passkey\x18e \x01(\fR\x0esessionPasskey\x120\n" +
 	"\x13get_channel_request\x18\x01 \x01(\rH\x00R\x11getChannelRequest\x12G\n" +
@@ -1768,22 +1825,26 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x14commit_edit_settings\x18A \x01(\bH\x00R\x12commitEditSettings\x12<\n" +
 	"\vadd_contact\x18B \x01(\v2\x19.meshtastic.SharedContactH\x00R\n" +
 	"addContact\x12M\n" +
-	"\x10key_verification\x18C \x01(\v2 .meshtastic.KeyVerificationAdminH\x00R\x0fkeyVerification\x12=\n" +
-	"\x0freboot_ota_mode\x18D \x01(\x0e2\x13.meshtastic.OTAModeH\x00R\rrebootOtaMode\x122\n" +
+	"\x10key_verification\x18C \x01(\v2 .meshtastic.KeyVerificationAdminH\x00R\x0fkeyVerification\x122\n" +
 	"\x14factory_reset_device\x18^ \x01(\x05H\x00R\x12factoryResetDevice\x122\n" +
 	"\x12reboot_ota_seconds\x18_ \x01(\x05B\x02\x18\x01H\x00R\x10rebootOtaSeconds\x12'\n" +
 	"\x0eexit_simulator\x18` \x01(\bH\x00R\rexitSimulator\x12'\n" +
 	"\x0ereboot_seconds\x18a \x01(\x05H\x00R\rrebootSeconds\x12+\n" +
 	"\x10shutdown_seconds\x18b \x01(\x05H\x00R\x0fshutdownSeconds\x122\n" +
 	"\x14factory_reset_config\x18c \x01(\x05H\x00R\x12factoryResetConfig\x12#\n" +
-	"\fnodedb_reset\x18d \x01(\bH\x00R\vnodedbReset\x1av\n" +
+	"\fnodedb_reset\x18d \x01(\bH\x00R\vnodedbReset\x12D\n" +
+	"\vota_request\x18f \x01(\v2!.meshtastic.AdminMessage.OTAEventH\x00R\n" +
+	"otaRequest\x1av\n" +
 	"\n" +
 	"InputEvent\x12\x1d\n" +
 	"\n" +
 	"event_code\x18\x01 \x01(\rR\teventCode\x12\x17\n" +
 	"\akb_char\x18\x02 \x01(\rR\x06kbChar\x12\x17\n" +
 	"\atouch_x\x18\x03 \x01(\rR\x06touchX\x12\x17\n" +
-	"\atouch_y\x18\x04 \x01(\rR\x06touchY\"\xd6\x01\n" +
+	"\atouch_y\x18\x04 \x01(\rR\x06touchY\x1ab\n" +
+	"\bOTAEvent\x12;\n" +
+	"\x0freboot_ota_mode\x18\x01 \x01(\x0e2\x13.meshtastic.OTAModeR\rrebootOtaMode\x12\x19\n" +
+	"\bota_hash\x18\x02 \x01(\fR\aotaHash\"\xd6\x01\n" +
 	"\n" +
 	"ConfigType\x12\x11\n" +
 	"\rDEVICE_CONFIG\x10\x00\x12\x13\n" +
@@ -1858,7 +1919,7 @@ func file_meshtastic_admin_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_meshtastic_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_meshtastic_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_meshtastic_admin_proto_goTypes = []any{
 	(OTAMode)(0),                           // 0: meshtastic.OTAMode
 	(AdminMessage_ConfigType)(0),           // 1: meshtastic.AdminMessage.ConfigType
@@ -1871,49 +1932,51 @@ var file_meshtastic_admin_proto_goTypes = []any{
 	(*SharedContact)(nil),                  // 8: meshtastic.SharedContact
 	(*KeyVerificationAdmin)(nil),           // 9: meshtastic.KeyVerificationAdmin
 	(*AdminMessage_InputEvent)(nil),        // 10: meshtastic.AdminMessage.InputEvent
-	(*Channel)(nil),                        // 11: meshtastic.Channel
-	(*User)(nil),                           // 12: meshtastic.User
-	(*Config)(nil),                         // 13: meshtastic.Config
-	(*ModuleConfig)(nil),                   // 14: meshtastic.ModuleConfig
-	(*DeviceMetadata)(nil),                 // 15: meshtastic.DeviceMetadata
-	(*DeviceConnectionStatus)(nil),         // 16: meshtastic.DeviceConnectionStatus
-	(*Position)(nil),                       // 17: meshtastic.Position
-	(*DeviceUIConfig)(nil),                 // 18: meshtastic.DeviceUIConfig
-	(*NodeRemoteHardwarePin)(nil),          // 19: meshtastic.NodeRemoteHardwarePin
+	(*AdminMessage_OTAEvent)(nil),          // 11: meshtastic.AdminMessage.OTAEvent
+	(*Channel)(nil),                        // 12: meshtastic.Channel
+	(*User)(nil),                           // 13: meshtastic.User
+	(*Config)(nil),                         // 14: meshtastic.Config
+	(*ModuleConfig)(nil),                   // 15: meshtastic.ModuleConfig
+	(*DeviceMetadata)(nil),                 // 16: meshtastic.DeviceMetadata
+	(*DeviceConnectionStatus)(nil),         // 17: meshtastic.DeviceConnectionStatus
+	(*Position)(nil),                       // 18: meshtastic.Position
+	(*DeviceUIConfig)(nil),                 // 19: meshtastic.DeviceUIConfig
+	(*NodeRemoteHardwarePin)(nil),          // 20: meshtastic.NodeRemoteHardwarePin
 }
 var file_meshtastic_admin_proto_depIdxs = []int32{
-	11, // 0: meshtastic.AdminMessage.get_channel_response:type_name -> meshtastic.Channel
-	12, // 1: meshtastic.AdminMessage.get_owner_response:type_name -> meshtastic.User
+	12, // 0: meshtastic.AdminMessage.get_channel_response:type_name -> meshtastic.Channel
+	13, // 1: meshtastic.AdminMessage.get_owner_response:type_name -> meshtastic.User
 	1,  // 2: meshtastic.AdminMessage.get_config_request:type_name -> meshtastic.AdminMessage.ConfigType
-	13, // 3: meshtastic.AdminMessage.get_config_response:type_name -> meshtastic.Config
+	14, // 3: meshtastic.AdminMessage.get_config_response:type_name -> meshtastic.Config
 	2,  // 4: meshtastic.AdminMessage.get_module_config_request:type_name -> meshtastic.AdminMessage.ModuleConfigType
-	14, // 5: meshtastic.AdminMessage.get_module_config_response:type_name -> meshtastic.ModuleConfig
-	15, // 6: meshtastic.AdminMessage.get_device_metadata_response:type_name -> meshtastic.DeviceMetadata
-	16, // 7: meshtastic.AdminMessage.get_device_connection_status_response:type_name -> meshtastic.DeviceConnectionStatus
+	15, // 5: meshtastic.AdminMessage.get_module_config_response:type_name -> meshtastic.ModuleConfig
+	16, // 6: meshtastic.AdminMessage.get_device_metadata_response:type_name -> meshtastic.DeviceMetadata
+	17, // 7: meshtastic.AdminMessage.get_device_connection_status_response:type_name -> meshtastic.DeviceConnectionStatus
 	6,  // 8: meshtastic.AdminMessage.set_ham_mode:type_name -> meshtastic.HamParameters
 	7,  // 9: meshtastic.AdminMessage.get_node_remote_hardware_pins_response:type_name -> meshtastic.NodeRemoteHardwarePinsResponse
 	3,  // 10: meshtastic.AdminMessage.backup_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
 	3,  // 11: meshtastic.AdminMessage.restore_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
 	3,  // 12: meshtastic.AdminMessage.remove_backup_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
 	10, // 13: meshtastic.AdminMessage.send_input_event:type_name -> meshtastic.AdminMessage.InputEvent
-	12, // 14: meshtastic.AdminMessage.set_owner:type_name -> meshtastic.User
-	11, // 15: meshtastic.AdminMessage.set_channel:type_name -> meshtastic.Channel
-	13, // 16: meshtastic.AdminMessage.set_config:type_name -> meshtastic.Config
-	14, // 17: meshtastic.AdminMessage.set_module_config:type_name -> meshtastic.ModuleConfig
-	17, // 18: meshtastic.AdminMessage.set_fixed_position:type_name -> meshtastic.Position
-	18, // 19: meshtastic.AdminMessage.get_ui_config_response:type_name -> meshtastic.DeviceUIConfig
-	18, // 20: meshtastic.AdminMessage.store_ui_config:type_name -> meshtastic.DeviceUIConfig
+	13, // 14: meshtastic.AdminMessage.set_owner:type_name -> meshtastic.User
+	12, // 15: meshtastic.AdminMessage.set_channel:type_name -> meshtastic.Channel
+	14, // 16: meshtastic.AdminMessage.set_config:type_name -> meshtastic.Config
+	15, // 17: meshtastic.AdminMessage.set_module_config:type_name -> meshtastic.ModuleConfig
+	18, // 18: meshtastic.AdminMessage.set_fixed_position:type_name -> meshtastic.Position
+	19, // 19: meshtastic.AdminMessage.get_ui_config_response:type_name -> meshtastic.DeviceUIConfig
+	19, // 20: meshtastic.AdminMessage.store_ui_config:type_name -> meshtastic.DeviceUIConfig
 	8,  // 21: meshtastic.AdminMessage.add_contact:type_name -> meshtastic.SharedContact
 	9,  // 22: meshtastic.AdminMessage.key_verification:type_name -> meshtastic.KeyVerificationAdmin
-	0,  // 23: meshtastic.AdminMessage.reboot_ota_mode:type_name -> meshtastic.OTAMode
-	19, // 24: meshtastic.NodeRemoteHardwarePinsResponse.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
-	12, // 25: meshtastic.SharedContact.user:type_name -> meshtastic.User
+	11, // 23: meshtastic.AdminMessage.ota_request:type_name -> meshtastic.AdminMessage.OTAEvent
+	20, // 24: meshtastic.NodeRemoteHardwarePinsResponse.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
+	13, // 25: meshtastic.SharedContact.user:type_name -> meshtastic.User
 	4,  // 26: meshtastic.KeyVerificationAdmin.message_type:type_name -> meshtastic.KeyVerificationAdmin.MessageType
-	27, // [27:27] is the sub-list for method output_type
-	27, // [27:27] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	0,  // 27: meshtastic.AdminMessage.OTAEvent.reboot_ota_mode:type_name -> meshtastic.OTAMode
+	28, // [28:28] is the sub-list for method output_type
+	28, // [28:28] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_admin_proto_init() }
@@ -1975,7 +2038,6 @@ func file_meshtastic_admin_proto_init() {
 		(*AdminMessage_CommitEditSettings)(nil),
 		(*AdminMessage_AddContact)(nil),
 		(*AdminMessage_KeyVerification)(nil),
-		(*AdminMessage_RebootOtaMode)(nil),
 		(*AdminMessage_FactoryResetDevice)(nil),
 		(*AdminMessage_RebootOtaSeconds)(nil),
 		(*AdminMessage_ExitSimulator)(nil),
@@ -1983,6 +2045,7 @@ func file_meshtastic_admin_proto_init() {
 		(*AdminMessage_ShutdownSeconds)(nil),
 		(*AdminMessage_FactoryResetConfig)(nil),
 		(*AdminMessage_NodedbReset)(nil),
+		(*AdminMessage_OtaRequest)(nil),
 	}
 	file_meshtastic_admin_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
@@ -1991,7 +2054,7 @@ func file_meshtastic_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_admin_proto_rawDesc), len(file_meshtastic_admin_proto_rawDesc)),
 			NumEnums:      5,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

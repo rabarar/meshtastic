@@ -98,8 +98,8 @@ const (
 	// Less common/prototype boards listed here (needs one more byte over the air)
 	// ---------------------------------------------------------------------------
 	HardwareModel_LORA_RELAY_V1 HardwareModel = 32
-	// TODO: REPLACE
-	HardwareModel_NRF52840DK HardwareModel = 33
+	// T-Echo Plus device from LilyGo
+	HardwareModel_T_ECHO_PLUS HardwareModel = 33
 	// TODO: REPLACE
 	HardwareModel_PPR HardwareModel = 34
 	// TODO: REPLACE
@@ -343,7 +343,7 @@ var (
 		30:  "RP2040_LORA",
 		31:  "STATION_G2",
 		32:  "LORA_RELAY_V1",
-		33:  "NRF52840DK",
+		33:  "T_ECHO_PLUS",
 		34:  "PPR",
 		35:  "GENIEBLOCKS",
 		36:  "NRF52_UNKNOWN",
@@ -467,7 +467,7 @@ var (
 		"RP2040_LORA":                  30,
 		"STATION_G2":                   31,
 		"LORA_RELAY_V1":                32,
-		"NRF52840DK":                   33,
+		"T_ECHO_PLUS":                  33,
 		"PPR":                          34,
 		"GENIEBLOCKS":                  35,
 		"NRF52_UNKNOWN":                36,
@@ -2326,8 +2326,10 @@ type StoreForwardPlusPlus struct {
 	EncapsulatedFrom uint32 `protobuf:"varint,8,opt,name=encapsulated_from,json=encapsulatedFrom,proto3" json:"encapsulated_from,omitempty"`
 	// The receive time of the message in question
 	EncapsulatedRxtime uint32 `protobuf:"varint,9,opt,name=encapsulated_rxtime,json=encapsulatedRxtime,proto3" json:"encapsulated_rxtime,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Used in a LINK_REQUEST to specify the message X spots back from head
+	ChainCount    uint32 `protobuf:"varint,10,opt,name=chain_count,json=chainCount,proto3" json:"chain_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *StoreForwardPlusPlus) Reset() {
@@ -2419,6 +2421,13 @@ func (x *StoreForwardPlusPlus) GetEncapsulatedFrom() uint32 {
 func (x *StoreForwardPlusPlus) GetEncapsulatedRxtime() uint32 {
 	if x != nil {
 		return x.EncapsulatedRxtime
+	}
+	return 0
+}
+
+func (x *StoreForwardPlusPlus) GetChainCount() uint32 {
+	if x != nil {
+		return x.ChainCount
 	}
 	return 0
 }
@@ -5146,7 +5155,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x0fKeyVerification\x12\x14\n" +
 	"\x05nonce\x18\x01 \x01(\x04R\x05nonce\x12\x14\n" +
 	"\x05hash1\x18\x02 \x01(\fR\x05hash1\x12\x14\n" +
-	"\x05hash2\x18\x03 \x01(\fR\x05hash2\"\xb9\x04\n" +
+	"\x05hash2\x18\x03 \x01(\fR\x05hash2\"\xda\x04\n" +
 	"\x14StoreForwardPlusPlus\x12^\n" +
 	"\x11sfpp_message_type\x18\x01 \x01(\x0e22.meshtastic.StoreForwardPlusPlus.SFPP_message_typeR\x0fsfppMessageType\x12!\n" +
 	"\fmessage_hash\x18\x02 \x01(\fR\vmessageHash\x12\x1f\n" +
@@ -5157,7 +5166,10 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x0fencapsulated_id\x18\x06 \x01(\rR\x0eencapsulatedId\x12'\n" +
 	"\x0fencapsulated_to\x18\a \x01(\rR\x0eencapsulatedTo\x12+\n" +
 	"\x11encapsulated_from\x18\b \x01(\rR\x10encapsulatedFrom\x12/\n" +
-	"\x13encapsulated_rxtime\x18\t \x01(\rR\x12encapsulatedRxtime\"\x95\x01\n" +
+	"\x13encapsulated_rxtime\x18\t \x01(\rR\x12encapsulatedRxtime\x12\x1f\n" +
+	"\vchain_count\x18\n" +
+	" \x01(\rR\n" +
+	"chainCount\"\x95\x01\n" +
 	"\x11SFPP_message_type\x12\x12\n" +
 	"\x0eCANON_ANNOUNCE\x10\x00\x12\x0f\n" +
 	"\vCHAIN_QUERY\x10\x01\x12\x10\n" +
@@ -5395,7 +5407,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\x86\x12\n" +
+	"\x0fpayload_variant*\x87\x12\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -5435,9 +5447,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\vRP2040_LORA\x10\x1e\x12\x0e\n" +
 	"\n" +
 	"STATION_G2\x10\x1f\x12\x11\n" +
-	"\rLORA_RELAY_V1\x10 \x12\x0e\n" +
-	"\n" +
-	"NRF52840DK\x10!\x12\a\n" +
+	"\rLORA_RELAY_V1\x10 \x12\x0f\n" +
+	"\vT_ECHO_PLUS\x10!\x12\a\n" +
 	"\x03PPR\x10\"\x12\x0f\n" +
 	"\vGENIEBLOCKS\x10#\x12\x11\n" +
 	"\rNRF52_UNKNOWN\x10$\x12\r\n" +
