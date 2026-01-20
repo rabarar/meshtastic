@@ -301,6 +301,12 @@ const (
 	HardwareModel_THINKNODE_M4 HardwareModel = 119
 	// Elecrow ThinkNode M6
 	HardwareModel_THINKNODE_M6 HardwareModel = 120
+	// Elecrow Meshstick 1262
+	HardwareModel_MESHSTICK_1262 HardwareModel = 121
+	// LilyGo T-Beam 1W
+	HardwareModel_TBEAM_1_WATT HardwareModel = 122
+	// LilyGo T5 S3 ePaper Pro (V1 and V2)
+	HardwareModel_T5_S3_EPAPER_PRO HardwareModel = 123
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -431,6 +437,9 @@ var (
 		118: "RAK6421",
 		119: "THINKNODE_M4",
 		120: "THINKNODE_M6",
+		121: "MESHSTICK_1262",
+		122: "TBEAM_1_WATT",
+		123: "T5_S3_EPAPER_PRO",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -555,6 +564,9 @@ var (
 		"RAK6421":                      118,
 		"THINKNODE_M4":                 119,
 		"THINKNODE_M6":                 120,
+		"MESHSTICK_1262":               121,
+		"TBEAM_1_WATT":                 122,
+		"T5_S3_EPAPER_PRO":             123,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -1082,6 +1094,9 @@ const (
 	// Airtime fairness rate limit exceeded for a packet
 	// This typically enforced per portnum and is used to prevent a single node from monopolizing airtime
 	Routing_RATE_LIMIT_EXCEEDED Routing_Error = 38
+	// PKI encryption failed, due to no public key for the remote node
+	// This is different from PKI_UNKNOWN_PUBKEY which indicates a failure upon receiving a packet
+	Routing_PKI_SEND_FAIL_PUBLIC_KEY Routing_Error = 39
 )
 
 // Enum value maps for Routing_Error.
@@ -1104,6 +1119,7 @@ var (
 		36: "ADMIN_BAD_SESSION_KEY",
 		37: "ADMIN_PUBLIC_KEY_UNAUTHORIZED",
 		38: "RATE_LIMIT_EXCEEDED",
+		39: "PKI_SEND_FAIL_PUBLIC_KEY",
 	}
 	Routing_Error_value = map[string]int32{
 		"NONE":                          0,
@@ -1123,6 +1139,7 @@ var (
 		"ADMIN_BAD_SESSION_KEY":         36,
 		"ADMIN_PUBLIC_KEY_UNAUTHORIZED": 37,
 		"RATE_LIMIT_EXCEEDED":           38,
+		"PKI_SEND_FAIL_PUBLIC_KEY":      39,
 	}
 )
 
@@ -1317,7 +1334,7 @@ func (x MeshPacket_Priority) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MeshPacket_Priority.Descriptor instead.
 func (MeshPacket_Priority) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{9, 0}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{10, 0}
 }
 
 // Identify if this is a delayed packet
@@ -1370,7 +1387,7 @@ func (x MeshPacket_Delayed) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MeshPacket_Delayed.Descriptor instead.
 func (MeshPacket_Delayed) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{9, 1}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{10, 1}
 }
 
 // Enum to identify which transport mechanism this packet arrived over
@@ -1443,7 +1460,7 @@ func (x MeshPacket_TransportMechanism) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MeshPacket_TransportMechanism.Descriptor instead.
 func (MeshPacket_TransportMechanism) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{9, 2}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{10, 2}
 }
 
 // Log levels, chosen to match python logging conventions.
@@ -1512,7 +1529,7 @@ func (x LogRecord_Level) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use LogRecord_Level.Descriptor instead.
 func (LogRecord_Level) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{12, 0}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{13, 0}
 }
 
 // A GPS Position
@@ -2542,6 +2559,51 @@ func (x *Waypoint) GetIcon() uint32 {
 	return 0
 }
 
+// Message for node status
+type StatusMessage struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StatusMessage) Reset() {
+	*x = StatusMessage{}
+	mi := &file_meshtastic_mesh_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StatusMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StatusMessage) ProtoMessage() {}
+
+func (x *StatusMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_mesh_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StatusMessage.ProtoReflect.Descriptor instead.
+func (*StatusMessage) Descriptor() ([]byte, []int) {
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *StatusMessage) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
 // This message will be proxied over the PhoneAPI for the client to deliver to the MQTT server
 type MqttClientProxyMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -2562,7 +2624,7 @@ type MqttClientProxyMessage struct {
 
 func (x *MqttClientProxyMessage) Reset() {
 	*x = MqttClientProxyMessage{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[8]
+	mi := &file_meshtastic_mesh_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2574,7 +2636,7 @@ func (x *MqttClientProxyMessage) String() string {
 func (*MqttClientProxyMessage) ProtoMessage() {}
 
 func (x *MqttClientProxyMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[8]
+	mi := &file_meshtastic_mesh_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2587,7 +2649,7 @@ func (x *MqttClientProxyMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MqttClientProxyMessage.ProtoReflect.Descriptor instead.
 func (*MqttClientProxyMessage) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{8}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *MqttClientProxyMessage) GetTopic() string {
@@ -2744,7 +2806,7 @@ type MeshPacket struct {
 
 func (x *MeshPacket) Reset() {
 	*x = MeshPacket{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[9]
+	mi := &file_meshtastic_mesh_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2756,7 +2818,7 @@ func (x *MeshPacket) String() string {
 func (*MeshPacket) ProtoMessage() {}
 
 func (x *MeshPacket) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[9]
+	mi := &file_meshtastic_mesh_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2769,7 +2831,7 @@ func (x *MeshPacket) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MeshPacket.ProtoReflect.Descriptor instead.
 func (*MeshPacket) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{9}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *MeshPacket) GetFrom() uint32 {
@@ -2997,13 +3059,16 @@ type NodeInfo struct {
 	// Persists between NodeDB internal clean ups
 	// LSB 0 of the bitfield
 	IsKeyManuallyVerified bool `protobuf:"varint,12,opt,name=is_key_manually_verified,json=isKeyManuallyVerified,proto3" json:"is_key_manually_verified,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// True if node has been muted
+	// Persistes between NodeDB internal clean ups
+	IsMuted       bool `protobuf:"varint,13,opt,name=is_muted,json=isMuted,proto3" json:"is_muted,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *NodeInfo) Reset() {
 	*x = NodeInfo{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[10]
+	mi := &file_meshtastic_mesh_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3015,7 +3080,7 @@ func (x *NodeInfo) String() string {
 func (*NodeInfo) ProtoMessage() {}
 
 func (x *NodeInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[10]
+	mi := &file_meshtastic_mesh_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3028,7 +3093,7 @@ func (x *NodeInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeInfo.ProtoReflect.Descriptor instead.
 func (*NodeInfo) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{10}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *NodeInfo) GetNum() uint32 {
@@ -3115,6 +3180,13 @@ func (x *NodeInfo) GetIsKeyManuallyVerified() bool {
 	return false
 }
 
+func (x *NodeInfo) GetIsMuted() bool {
+	if x != nil {
+		return x.IsMuted
+	}
+	return false
+}
+
 // Unique local debugging info for this node
 // Note: we don't include position or the user info, because that will come in the
 // Sent to the phone in response to WantNodes.
@@ -3144,7 +3216,7 @@ type MyNodeInfo struct {
 
 func (x *MyNodeInfo) Reset() {
 	*x = MyNodeInfo{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[11]
+	mi := &file_meshtastic_mesh_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3156,7 +3228,7 @@ func (x *MyNodeInfo) String() string {
 func (*MyNodeInfo) ProtoMessage() {}
 
 func (x *MyNodeInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[11]
+	mi := &file_meshtastic_mesh_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3169,7 +3241,7 @@ func (x *MyNodeInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MyNodeInfo.ProtoReflect.Descriptor instead.
 func (*MyNodeInfo) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{11}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *MyNodeInfo) GetMyNodeNum() uint32 {
@@ -3242,7 +3314,7 @@ type LogRecord struct {
 
 func (x *LogRecord) Reset() {
 	*x = LogRecord{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[12]
+	mi := &file_meshtastic_mesh_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3254,7 +3326,7 @@ func (x *LogRecord) String() string {
 func (*LogRecord) ProtoMessage() {}
 
 func (x *LogRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[12]
+	mi := &file_meshtastic_mesh_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3267,7 +3339,7 @@ func (x *LogRecord) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogRecord.ProtoReflect.Descriptor instead.
 func (*LogRecord) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{12}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *LogRecord) GetMessage() string {
@@ -3314,7 +3386,7 @@ type QueueStatus struct {
 
 func (x *QueueStatus) Reset() {
 	*x = QueueStatus{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[13]
+	mi := &file_meshtastic_mesh_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3326,7 +3398,7 @@ func (x *QueueStatus) String() string {
 func (*QueueStatus) ProtoMessage() {}
 
 func (x *QueueStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[13]
+	mi := &file_meshtastic_mesh_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3339,7 +3411,7 @@ func (x *QueueStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QueueStatus.ProtoReflect.Descriptor instead.
 func (*QueueStatus) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{13}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *QueueStatus) GetRes() int32 {
@@ -3406,7 +3478,7 @@ type FromRadio struct {
 
 func (x *FromRadio) Reset() {
 	*x = FromRadio{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[14]
+	mi := &file_meshtastic_mesh_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3418,7 +3490,7 @@ func (x *FromRadio) String() string {
 func (*FromRadio) ProtoMessage() {}
 
 func (x *FromRadio) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[14]
+	mi := &file_meshtastic_mesh_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3431,7 +3503,7 @@ func (x *FromRadio) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FromRadio.ProtoReflect.Descriptor instead.
 func (*FromRadio) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{14}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *FromRadio) GetId() uint32 {
@@ -3744,7 +3816,7 @@ type ClientNotification struct {
 
 func (x *ClientNotification) Reset() {
 	*x = ClientNotification{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[15]
+	mi := &file_meshtastic_mesh_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3756,7 +3828,7 @@ func (x *ClientNotification) String() string {
 func (*ClientNotification) ProtoMessage() {}
 
 func (x *ClientNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[15]
+	mi := &file_meshtastic_mesh_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3769,7 +3841,7 @@ func (x *ClientNotification) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientNotification.ProtoReflect.Descriptor instead.
 func (*ClientNotification) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{15}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ClientNotification) GetReplyId() uint32 {
@@ -3897,7 +3969,7 @@ type KeyVerificationNumberInform struct {
 
 func (x *KeyVerificationNumberInform) Reset() {
 	*x = KeyVerificationNumberInform{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[16]
+	mi := &file_meshtastic_mesh_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3909,7 +3981,7 @@ func (x *KeyVerificationNumberInform) String() string {
 func (*KeyVerificationNumberInform) ProtoMessage() {}
 
 func (x *KeyVerificationNumberInform) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[16]
+	mi := &file_meshtastic_mesh_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3922,7 +3994,7 @@ func (x *KeyVerificationNumberInform) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use KeyVerificationNumberInform.ProtoReflect.Descriptor instead.
 func (*KeyVerificationNumberInform) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{16}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *KeyVerificationNumberInform) GetNonce() uint64 {
@@ -3956,7 +4028,7 @@ type KeyVerificationNumberRequest struct {
 
 func (x *KeyVerificationNumberRequest) Reset() {
 	*x = KeyVerificationNumberRequest{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[17]
+	mi := &file_meshtastic_mesh_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3968,7 +4040,7 @@ func (x *KeyVerificationNumberRequest) String() string {
 func (*KeyVerificationNumberRequest) ProtoMessage() {}
 
 func (x *KeyVerificationNumberRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[17]
+	mi := &file_meshtastic_mesh_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3981,7 +4053,7 @@ func (x *KeyVerificationNumberRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use KeyVerificationNumberRequest.ProtoReflect.Descriptor instead.
 func (*KeyVerificationNumberRequest) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{17}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *KeyVerificationNumberRequest) GetNonce() uint64 {
@@ -4010,7 +4082,7 @@ type KeyVerificationFinal struct {
 
 func (x *KeyVerificationFinal) Reset() {
 	*x = KeyVerificationFinal{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[18]
+	mi := &file_meshtastic_mesh_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4022,7 +4094,7 @@ func (x *KeyVerificationFinal) String() string {
 func (*KeyVerificationFinal) ProtoMessage() {}
 
 func (x *KeyVerificationFinal) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[18]
+	mi := &file_meshtastic_mesh_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4035,7 +4107,7 @@ func (x *KeyVerificationFinal) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use KeyVerificationFinal.ProtoReflect.Descriptor instead.
 func (*KeyVerificationFinal) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{18}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *KeyVerificationFinal) GetNonce() uint64 {
@@ -4074,7 +4146,7 @@ type DuplicatedPublicKey struct {
 
 func (x *DuplicatedPublicKey) Reset() {
 	*x = DuplicatedPublicKey{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[19]
+	mi := &file_meshtastic_mesh_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4086,7 +4158,7 @@ func (x *DuplicatedPublicKey) String() string {
 func (*DuplicatedPublicKey) ProtoMessage() {}
 
 func (x *DuplicatedPublicKey) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[19]
+	mi := &file_meshtastic_mesh_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4099,7 +4171,7 @@ func (x *DuplicatedPublicKey) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DuplicatedPublicKey.ProtoReflect.Descriptor instead.
 func (*DuplicatedPublicKey) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{19}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{20}
 }
 
 type LowEntropyKey struct {
@@ -4110,7 +4182,7 @@ type LowEntropyKey struct {
 
 func (x *LowEntropyKey) Reset() {
 	*x = LowEntropyKey{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[20]
+	mi := &file_meshtastic_mesh_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4122,7 +4194,7 @@ func (x *LowEntropyKey) String() string {
 func (*LowEntropyKey) ProtoMessage() {}
 
 func (x *LowEntropyKey) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[20]
+	mi := &file_meshtastic_mesh_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4135,7 +4207,7 @@ func (x *LowEntropyKey) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LowEntropyKey.ProtoReflect.Descriptor instead.
 func (*LowEntropyKey) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{20}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{21}
 }
 
 // Individual File info for the device
@@ -4151,7 +4223,7 @@ type FileInfo struct {
 
 func (x *FileInfo) Reset() {
 	*x = FileInfo{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[21]
+	mi := &file_meshtastic_mesh_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4163,7 +4235,7 @@ func (x *FileInfo) String() string {
 func (*FileInfo) ProtoMessage() {}
 
 func (x *FileInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[21]
+	mi := &file_meshtastic_mesh_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4176,7 +4248,7 @@ func (x *FileInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileInfo.ProtoReflect.Descriptor instead.
 func (*FileInfo) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{21}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *FileInfo) GetFileName() string {
@@ -4214,7 +4286,7 @@ type ToRadio struct {
 
 func (x *ToRadio) Reset() {
 	*x = ToRadio{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[22]
+	mi := &file_meshtastic_mesh_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4226,7 +4298,7 @@ func (x *ToRadio) String() string {
 func (*ToRadio) ProtoMessage() {}
 
 func (x *ToRadio) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[22]
+	mi := &file_meshtastic_mesh_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4239,7 +4311,7 @@ func (x *ToRadio) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToRadio.ProtoReflect.Descriptor instead.
 func (*ToRadio) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{22}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ToRadio) GetPayloadVariant() isToRadio_PayloadVariant {
@@ -4370,7 +4442,7 @@ type Compressed struct {
 
 func (x *Compressed) Reset() {
 	*x = Compressed{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[23]
+	mi := &file_meshtastic_mesh_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4382,7 +4454,7 @@ func (x *Compressed) String() string {
 func (*Compressed) ProtoMessage() {}
 
 func (x *Compressed) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[23]
+	mi := &file_meshtastic_mesh_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4395,7 +4467,7 @@ func (x *Compressed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Compressed.ProtoReflect.Descriptor instead.
 func (*Compressed) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{23}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *Compressed) GetPortnum() PortNum {
@@ -4429,7 +4501,7 @@ type NeighborInfo struct {
 
 func (x *NeighborInfo) Reset() {
 	*x = NeighborInfo{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[24]
+	mi := &file_meshtastic_mesh_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4441,7 +4513,7 @@ func (x *NeighborInfo) String() string {
 func (*NeighborInfo) ProtoMessage() {}
 
 func (x *NeighborInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[24]
+	mi := &file_meshtastic_mesh_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4454,7 +4526,7 @@ func (x *NeighborInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NeighborInfo.ProtoReflect.Descriptor instead.
 func (*NeighborInfo) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{24}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *NeighborInfo) GetNodeId() uint32 {
@@ -4504,7 +4576,7 @@ type Neighbor struct {
 
 func (x *Neighbor) Reset() {
 	*x = Neighbor{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[25]
+	mi := &file_meshtastic_mesh_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4516,7 +4588,7 @@ func (x *Neighbor) String() string {
 func (*Neighbor) ProtoMessage() {}
 
 func (x *Neighbor) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[25]
+	mi := &file_meshtastic_mesh_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4529,7 +4601,7 @@ func (x *Neighbor) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Neighbor.ProtoReflect.Descriptor instead.
 func (*Neighbor) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{25}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *Neighbor) GetNodeId() uint32 {
@@ -4594,7 +4666,7 @@ type DeviceMetadata struct {
 
 func (x *DeviceMetadata) Reset() {
 	*x = DeviceMetadata{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[26]
+	mi := &file_meshtastic_mesh_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4606,7 +4678,7 @@ func (x *DeviceMetadata) String() string {
 func (*DeviceMetadata) ProtoMessage() {}
 
 func (x *DeviceMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[26]
+	mi := &file_meshtastic_mesh_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4619,7 +4691,7 @@ func (x *DeviceMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeviceMetadata.ProtoReflect.Descriptor instead.
 func (*DeviceMetadata) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{26}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *DeviceMetadata) GetFirmwareVersion() string {
@@ -4718,7 +4790,7 @@ type Heartbeat struct {
 
 func (x *Heartbeat) Reset() {
 	*x = Heartbeat{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[27]
+	mi := &file_meshtastic_mesh_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4730,7 +4802,7 @@ func (x *Heartbeat) String() string {
 func (*Heartbeat) ProtoMessage() {}
 
 func (x *Heartbeat) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[27]
+	mi := &file_meshtastic_mesh_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4743,7 +4815,7 @@ func (x *Heartbeat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Heartbeat.ProtoReflect.Descriptor instead.
 func (*Heartbeat) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{27}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *Heartbeat) GetNonce() uint32 {
@@ -4766,7 +4838,7 @@ type NodeRemoteHardwarePin struct {
 
 func (x *NodeRemoteHardwarePin) Reset() {
 	*x = NodeRemoteHardwarePin{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[28]
+	mi := &file_meshtastic_mesh_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4778,7 +4850,7 @@ func (x *NodeRemoteHardwarePin) String() string {
 func (*NodeRemoteHardwarePin) ProtoMessage() {}
 
 func (x *NodeRemoteHardwarePin) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[28]
+	mi := &file_meshtastic_mesh_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4791,7 +4863,7 @@ func (x *NodeRemoteHardwarePin) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeRemoteHardwarePin.ProtoReflect.Descriptor instead.
 func (*NodeRemoteHardwarePin) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{28}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *NodeRemoteHardwarePin) GetNodeNum() uint32 {
@@ -4824,7 +4896,7 @@ type ChunkedPayload struct {
 
 func (x *ChunkedPayload) Reset() {
 	*x = ChunkedPayload{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[29]
+	mi := &file_meshtastic_mesh_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4836,7 +4908,7 @@ func (x *ChunkedPayload) String() string {
 func (*ChunkedPayload) ProtoMessage() {}
 
 func (x *ChunkedPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[29]
+	mi := &file_meshtastic_mesh_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4849,7 +4921,7 @@ func (x *ChunkedPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChunkedPayload.ProtoReflect.Descriptor instead.
 func (*ChunkedPayload) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{29}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *ChunkedPayload) GetPayloadId() uint32 {
@@ -4890,7 +4962,7 @@ type ResendChunks struct {
 
 func (x *ResendChunks) Reset() {
 	*x = ResendChunks{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[30]
+	mi := &file_meshtastic_mesh_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4902,7 +4974,7 @@ func (x *ResendChunks) String() string {
 func (*ResendChunks) ProtoMessage() {}
 
 func (x *ResendChunks) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[30]
+	mi := &file_meshtastic_mesh_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4915,7 +4987,7 @@ func (x *ResendChunks) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResendChunks.ProtoReflect.Descriptor instead.
 func (*ResendChunks) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{30}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ResendChunks) GetChunks() []uint32 {
@@ -4942,7 +5014,7 @@ type ChunkedPayloadResponse struct {
 
 func (x *ChunkedPayloadResponse) Reset() {
 	*x = ChunkedPayloadResponse{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[31]
+	mi := &file_meshtastic_mesh_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4954,7 +5026,7 @@ func (x *ChunkedPayloadResponse) String() string {
 func (*ChunkedPayloadResponse) ProtoMessage() {}
 
 func (x *ChunkedPayloadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[31]
+	mi := &file_meshtastic_mesh_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4967,7 +5039,7 @@ func (x *ChunkedPayloadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChunkedPayloadResponse.ProtoReflect.Descriptor instead.
 func (*ChunkedPayloadResponse) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{31}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *ChunkedPayloadResponse) GetPayloadId() uint32 {
@@ -5113,12 +5185,12 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"snrTowards\x12\x1d\n" +
 	"\n" +
 	"route_back\x18\x03 \x03(\aR\trouteBack\x12\x19\n" +
-	"\bsnr_back\x18\x04 \x03(\x05R\asnrBack\"\xa2\x04\n" +
+	"\bsnr_back\x18\x04 \x03(\x05R\asnrBack\"\xc0\x04\n" +
 	"\aRouting\x12A\n" +
 	"\rroute_request\x18\x01 \x01(\v2\x1a.meshtastic.RouteDiscoveryH\x00R\frouteRequest\x12=\n" +
 	"\vroute_reply\x18\x02 \x01(\v2\x1a.meshtastic.RouteDiscoveryH\x00R\n" +
 	"routeReply\x12>\n" +
-	"\ferror_reason\x18\x03 \x01(\x0e2\x19.meshtastic.Routing.ErrorH\x00R\verrorReason\"\xc9\x02\n" +
+	"\ferror_reason\x18\x03 \x01(\x0e2\x19.meshtastic.Routing.ErrorH\x00R\verrorReason\"\xe7\x02\n" +
 	"\x05Error\x12\b\n" +
 	"\x04NONE\x10\x00\x12\f\n" +
 	"\bNO_ROUTE\x10\x01\x12\v\n" +
@@ -5138,7 +5210,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x12PKI_UNKNOWN_PUBKEY\x10#\x12\x19\n" +
 	"\x15ADMIN_BAD_SESSION_KEY\x10$\x12!\n" +
 	"\x1dADMIN_PUBLIC_KEY_UNAUTHORIZED\x10%\x12\x17\n" +
-	"\x13RATE_LIMIT_EXCEEDED\x10&B\t\n" +
+	"\x13RATE_LIMIT_EXCEEDED\x10&\x12\x1c\n" +
+	"\x18PKI_SEND_FAIL_PUBLIC_KEY\x10'B\t\n" +
 	"\avariant\"\x9e\x02\n" +
 	"\x04Data\x12-\n" +
 	"\aportnum\x18\x01 \x01(\x0e2\x13.meshtastic.PortNumR\aportnum\x12\x18\n" +
@@ -5189,7 +5262,9 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\vdescription\x18\a \x01(\tR\vdescription\x12\x12\n" +
 	"\x04icon\x18\b \x01(\aR\x04iconB\r\n" +
 	"\v_latitude_iB\x0e\n" +
-	"\f_longitude_i\"\x89\x01\n" +
+	"\f_longitude_i\"'\n" +
+	"\rStatusMessage\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\x89\x01\n" +
 	"\x16MqttClientProxyMessage\x12\x14\n" +
 	"\x05topic\x18\x01 \x01(\tR\x05topic\x12\x14\n" +
 	"\x04data\x18\x02 \x01(\fH\x00R\x04data\x12\x14\n" +
@@ -5248,7 +5323,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x0eTRANSPORT_MQTT\x10\x05\x12\x1b\n" +
 	"\x17TRANSPORT_MULTICAST_UDP\x10\x06\x12\x11\n" +
 	"\rTRANSPORT_API\x10\aB\x11\n" +
-	"\x0fpayload_variant\"\xc5\x03\n" +
+	"\x0fpayload_variant\"\xe0\x03\n" +
 	"\bNodeInfo\x12\x10\n" +
 	"\x03num\x18\x01 \x01(\rR\x03num\x12$\n" +
 	"\x04user\x18\x02 \x01(\v2\x10.meshtastic.UserR\x04user\x120\n" +
@@ -5265,7 +5340,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"isFavorite\x12\x1d\n" +
 	"\n" +
 	"is_ignored\x18\v \x01(\bR\tisIgnored\x127\n" +
-	"\x18is_key_manually_verified\x18\f \x01(\bR\x15isKeyManuallyVerifiedB\f\n" +
+	"\x18is_key_manually_verified\x18\f \x01(\bR\x15isKeyManuallyVerified\x12\x19\n" +
+	"\bis_muted\x18\r \x01(\bR\aisMutedB\f\n" +
 	"\n" +
 	"_hops_away\"\x98\x02\n" +
 	"\n" +
@@ -5407,7 +5483,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\x87\x12\n" +
+	"\x0fpayload_variant*\xc3\x12\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -5541,7 +5617,10 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\aRAK3401\x10u\x12\v\n" +
 	"\aRAK6421\x10v\x12\x10\n" +
 	"\fTHINKNODE_M4\x10w\x12\x10\n" +
-	"\fTHINKNODE_M6\x10x\x12\x0f\n" +
+	"\fTHINKNODE_M6\x10x\x12\x12\n" +
+	"\x0eMESHSTICK_1262\x10y\x12\x10\n" +
+	"\fTBEAM_1_WATT\x10z\x12\x14\n" +
+	"\x10T5_S3_EPAPER_PRO\x10{\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +
@@ -5607,7 +5686,7 @@ func file_meshtastic_mesh_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_mesh_proto_enumTypes = make([]protoimpl.EnumInfo, 13)
-var file_meshtastic_mesh_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
+var file_meshtastic_mesh_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
 var file_meshtastic_mesh_proto_goTypes = []any{
 	(HardwareModel)(0),                        // 0: meshtastic.HardwareModel
 	(Constants)(0),                            // 1: meshtastic.Constants
@@ -5630,49 +5709,50 @@ var file_meshtastic_mesh_proto_goTypes = []any{
 	(*KeyVerification)(nil),                   // 18: meshtastic.KeyVerification
 	(*StoreForwardPlusPlus)(nil),              // 19: meshtastic.StoreForwardPlusPlus
 	(*Waypoint)(nil),                          // 20: meshtastic.Waypoint
-	(*MqttClientProxyMessage)(nil),            // 21: meshtastic.MqttClientProxyMessage
-	(*MeshPacket)(nil),                        // 22: meshtastic.MeshPacket
-	(*NodeInfo)(nil),                          // 23: meshtastic.NodeInfo
-	(*MyNodeInfo)(nil),                        // 24: meshtastic.MyNodeInfo
-	(*LogRecord)(nil),                         // 25: meshtastic.LogRecord
-	(*QueueStatus)(nil),                       // 26: meshtastic.QueueStatus
-	(*FromRadio)(nil),                         // 27: meshtastic.FromRadio
-	(*ClientNotification)(nil),                // 28: meshtastic.ClientNotification
-	(*KeyVerificationNumberInform)(nil),       // 29: meshtastic.KeyVerificationNumberInform
-	(*KeyVerificationNumberRequest)(nil),      // 30: meshtastic.KeyVerificationNumberRequest
-	(*KeyVerificationFinal)(nil),              // 31: meshtastic.KeyVerificationFinal
-	(*DuplicatedPublicKey)(nil),               // 32: meshtastic.DuplicatedPublicKey
-	(*LowEntropyKey)(nil),                     // 33: meshtastic.LowEntropyKey
-	(*FileInfo)(nil),                          // 34: meshtastic.FileInfo
-	(*ToRadio)(nil),                           // 35: meshtastic.ToRadio
-	(*Compressed)(nil),                        // 36: meshtastic.Compressed
-	(*NeighborInfo)(nil),                      // 37: meshtastic.NeighborInfo
-	(*Neighbor)(nil),                          // 38: meshtastic.Neighbor
-	(*DeviceMetadata)(nil),                    // 39: meshtastic.DeviceMetadata
-	(*Heartbeat)(nil),                         // 40: meshtastic.Heartbeat
-	(*NodeRemoteHardwarePin)(nil),             // 41: meshtastic.NodeRemoteHardwarePin
-	(*ChunkedPayload)(nil),                    // 42: meshtastic.ChunkedPayload
-	(*ResendChunks)(nil),                      // 43: meshtastic.resend_chunks
-	(*ChunkedPayloadResponse)(nil),            // 44: meshtastic.ChunkedPayloadResponse
-	(Config_DeviceConfig_Role)(0),             // 45: meshtastic.Config.DeviceConfig.Role
-	(PortNum)(0),                              // 46: meshtastic.PortNum
-	(*DeviceMetrics)(nil),                     // 47: meshtastic.DeviceMetrics
-	(*Config)(nil),                            // 48: meshtastic.Config
-	(*ModuleConfig)(nil),                      // 49: meshtastic.ModuleConfig
-	(*Channel)(nil),                           // 50: meshtastic.Channel
-	(*XModem)(nil),                            // 51: meshtastic.XModem
-	(*DeviceUIConfig)(nil),                    // 52: meshtastic.DeviceUIConfig
-	(*RemoteHardwarePin)(nil),                 // 53: meshtastic.RemoteHardwarePin
+	(*StatusMessage)(nil),                     // 21: meshtastic.StatusMessage
+	(*MqttClientProxyMessage)(nil),            // 22: meshtastic.MqttClientProxyMessage
+	(*MeshPacket)(nil),                        // 23: meshtastic.MeshPacket
+	(*NodeInfo)(nil),                          // 24: meshtastic.NodeInfo
+	(*MyNodeInfo)(nil),                        // 25: meshtastic.MyNodeInfo
+	(*LogRecord)(nil),                         // 26: meshtastic.LogRecord
+	(*QueueStatus)(nil),                       // 27: meshtastic.QueueStatus
+	(*FromRadio)(nil),                         // 28: meshtastic.FromRadio
+	(*ClientNotification)(nil),                // 29: meshtastic.ClientNotification
+	(*KeyVerificationNumberInform)(nil),       // 30: meshtastic.KeyVerificationNumberInform
+	(*KeyVerificationNumberRequest)(nil),      // 31: meshtastic.KeyVerificationNumberRequest
+	(*KeyVerificationFinal)(nil),              // 32: meshtastic.KeyVerificationFinal
+	(*DuplicatedPublicKey)(nil),               // 33: meshtastic.DuplicatedPublicKey
+	(*LowEntropyKey)(nil),                     // 34: meshtastic.LowEntropyKey
+	(*FileInfo)(nil),                          // 35: meshtastic.FileInfo
+	(*ToRadio)(nil),                           // 36: meshtastic.ToRadio
+	(*Compressed)(nil),                        // 37: meshtastic.Compressed
+	(*NeighborInfo)(nil),                      // 38: meshtastic.NeighborInfo
+	(*Neighbor)(nil),                          // 39: meshtastic.Neighbor
+	(*DeviceMetadata)(nil),                    // 40: meshtastic.DeviceMetadata
+	(*Heartbeat)(nil),                         // 41: meshtastic.Heartbeat
+	(*NodeRemoteHardwarePin)(nil),             // 42: meshtastic.NodeRemoteHardwarePin
+	(*ChunkedPayload)(nil),                    // 43: meshtastic.ChunkedPayload
+	(*ResendChunks)(nil),                      // 44: meshtastic.resend_chunks
+	(*ChunkedPayloadResponse)(nil),            // 45: meshtastic.ChunkedPayloadResponse
+	(Config_DeviceConfig_Role)(0),             // 46: meshtastic.Config.DeviceConfig.Role
+	(PortNum)(0),                              // 47: meshtastic.PortNum
+	(*DeviceMetrics)(nil),                     // 48: meshtastic.DeviceMetrics
+	(*Config)(nil),                            // 49: meshtastic.Config
+	(*ModuleConfig)(nil),                      // 50: meshtastic.ModuleConfig
+	(*Channel)(nil),                           // 51: meshtastic.Channel
+	(*XModem)(nil),                            // 52: meshtastic.XModem
+	(*DeviceUIConfig)(nil),                    // 53: meshtastic.DeviceUIConfig
+	(*RemoteHardwarePin)(nil),                 // 54: meshtastic.RemoteHardwarePin
 }
 var file_meshtastic_mesh_proto_depIdxs = []int32{
 	5,  // 0: meshtastic.Position.location_source:type_name -> meshtastic.Position.LocSource
 	6,  // 1: meshtastic.Position.altitude_source:type_name -> meshtastic.Position.AltSource
 	0,  // 2: meshtastic.User.hw_model:type_name -> meshtastic.HardwareModel
-	45, // 3: meshtastic.User.role:type_name -> meshtastic.Config.DeviceConfig.Role
+	46, // 3: meshtastic.User.role:type_name -> meshtastic.Config.DeviceConfig.Role
 	15, // 4: meshtastic.Routing.route_request:type_name -> meshtastic.RouteDiscovery
 	15, // 5: meshtastic.Routing.route_reply:type_name -> meshtastic.RouteDiscovery
 	7,  // 6: meshtastic.Routing.error_reason:type_name -> meshtastic.Routing.Error
-	46, // 7: meshtastic.Data.portnum:type_name -> meshtastic.PortNum
+	47, // 7: meshtastic.Data.portnum:type_name -> meshtastic.PortNum
 	8,  // 8: meshtastic.StoreForwardPlusPlus.sfpp_message_type:type_name -> meshtastic.StoreForwardPlusPlus.SFPP_message_type
 	17, // 9: meshtastic.MeshPacket.decoded:type_name -> meshtastic.Data
 	9,  // 10: meshtastic.MeshPacket.priority:type_name -> meshtastic.MeshPacket.Priority
@@ -5680,39 +5760,39 @@ var file_meshtastic_mesh_proto_depIdxs = []int32{
 	11, // 12: meshtastic.MeshPacket.transport_mechanism:type_name -> meshtastic.MeshPacket.TransportMechanism
 	14, // 13: meshtastic.NodeInfo.user:type_name -> meshtastic.User
 	13, // 14: meshtastic.NodeInfo.position:type_name -> meshtastic.Position
-	47, // 15: meshtastic.NodeInfo.device_metrics:type_name -> meshtastic.DeviceMetrics
+	48, // 15: meshtastic.NodeInfo.device_metrics:type_name -> meshtastic.DeviceMetrics
 	3,  // 16: meshtastic.MyNodeInfo.firmware_edition:type_name -> meshtastic.FirmwareEdition
 	12, // 17: meshtastic.LogRecord.level:type_name -> meshtastic.LogRecord.Level
-	22, // 18: meshtastic.FromRadio.packet:type_name -> meshtastic.MeshPacket
-	24, // 19: meshtastic.FromRadio.my_info:type_name -> meshtastic.MyNodeInfo
-	23, // 20: meshtastic.FromRadio.node_info:type_name -> meshtastic.NodeInfo
-	48, // 21: meshtastic.FromRadio.config:type_name -> meshtastic.Config
-	25, // 22: meshtastic.FromRadio.log_record:type_name -> meshtastic.LogRecord
-	49, // 23: meshtastic.FromRadio.moduleConfig:type_name -> meshtastic.ModuleConfig
-	50, // 24: meshtastic.FromRadio.channel:type_name -> meshtastic.Channel
-	26, // 25: meshtastic.FromRadio.queueStatus:type_name -> meshtastic.QueueStatus
-	51, // 26: meshtastic.FromRadio.xmodemPacket:type_name -> meshtastic.XModem
-	39, // 27: meshtastic.FromRadio.metadata:type_name -> meshtastic.DeviceMetadata
-	21, // 28: meshtastic.FromRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
-	34, // 29: meshtastic.FromRadio.fileInfo:type_name -> meshtastic.FileInfo
-	28, // 30: meshtastic.FromRadio.clientNotification:type_name -> meshtastic.ClientNotification
-	52, // 31: meshtastic.FromRadio.deviceuiConfig:type_name -> meshtastic.DeviceUIConfig
+	23, // 18: meshtastic.FromRadio.packet:type_name -> meshtastic.MeshPacket
+	25, // 19: meshtastic.FromRadio.my_info:type_name -> meshtastic.MyNodeInfo
+	24, // 20: meshtastic.FromRadio.node_info:type_name -> meshtastic.NodeInfo
+	49, // 21: meshtastic.FromRadio.config:type_name -> meshtastic.Config
+	26, // 22: meshtastic.FromRadio.log_record:type_name -> meshtastic.LogRecord
+	50, // 23: meshtastic.FromRadio.moduleConfig:type_name -> meshtastic.ModuleConfig
+	51, // 24: meshtastic.FromRadio.channel:type_name -> meshtastic.Channel
+	27, // 25: meshtastic.FromRadio.queueStatus:type_name -> meshtastic.QueueStatus
+	52, // 26: meshtastic.FromRadio.xmodemPacket:type_name -> meshtastic.XModem
+	40, // 27: meshtastic.FromRadio.metadata:type_name -> meshtastic.DeviceMetadata
+	22, // 28: meshtastic.FromRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
+	35, // 29: meshtastic.FromRadio.fileInfo:type_name -> meshtastic.FileInfo
+	29, // 30: meshtastic.FromRadio.clientNotification:type_name -> meshtastic.ClientNotification
+	53, // 31: meshtastic.FromRadio.deviceuiConfig:type_name -> meshtastic.DeviceUIConfig
 	12, // 32: meshtastic.ClientNotification.level:type_name -> meshtastic.LogRecord.Level
-	29, // 33: meshtastic.ClientNotification.key_verification_number_inform:type_name -> meshtastic.KeyVerificationNumberInform
-	30, // 34: meshtastic.ClientNotification.key_verification_number_request:type_name -> meshtastic.KeyVerificationNumberRequest
-	31, // 35: meshtastic.ClientNotification.key_verification_final:type_name -> meshtastic.KeyVerificationFinal
-	32, // 36: meshtastic.ClientNotification.duplicated_public_key:type_name -> meshtastic.DuplicatedPublicKey
-	33, // 37: meshtastic.ClientNotification.low_entropy_key:type_name -> meshtastic.LowEntropyKey
-	22, // 38: meshtastic.ToRadio.packet:type_name -> meshtastic.MeshPacket
-	51, // 39: meshtastic.ToRadio.xmodemPacket:type_name -> meshtastic.XModem
-	21, // 40: meshtastic.ToRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
-	40, // 41: meshtastic.ToRadio.heartbeat:type_name -> meshtastic.Heartbeat
-	46, // 42: meshtastic.Compressed.portnum:type_name -> meshtastic.PortNum
-	38, // 43: meshtastic.NeighborInfo.neighbors:type_name -> meshtastic.Neighbor
-	45, // 44: meshtastic.DeviceMetadata.role:type_name -> meshtastic.Config.DeviceConfig.Role
+	30, // 33: meshtastic.ClientNotification.key_verification_number_inform:type_name -> meshtastic.KeyVerificationNumberInform
+	31, // 34: meshtastic.ClientNotification.key_verification_number_request:type_name -> meshtastic.KeyVerificationNumberRequest
+	32, // 35: meshtastic.ClientNotification.key_verification_final:type_name -> meshtastic.KeyVerificationFinal
+	33, // 36: meshtastic.ClientNotification.duplicated_public_key:type_name -> meshtastic.DuplicatedPublicKey
+	34, // 37: meshtastic.ClientNotification.low_entropy_key:type_name -> meshtastic.LowEntropyKey
+	23, // 38: meshtastic.ToRadio.packet:type_name -> meshtastic.MeshPacket
+	52, // 39: meshtastic.ToRadio.xmodemPacket:type_name -> meshtastic.XModem
+	22, // 40: meshtastic.ToRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
+	41, // 41: meshtastic.ToRadio.heartbeat:type_name -> meshtastic.Heartbeat
+	47, // 42: meshtastic.Compressed.portnum:type_name -> meshtastic.PortNum
+	39, // 43: meshtastic.NeighborInfo.neighbors:type_name -> meshtastic.Neighbor
+	46, // 44: meshtastic.DeviceMetadata.role:type_name -> meshtastic.Config.DeviceConfig.Role
 	0,  // 45: meshtastic.DeviceMetadata.hw_model:type_name -> meshtastic.HardwareModel
-	53, // 46: meshtastic.NodeRemoteHardwarePin.pin:type_name -> meshtastic.RemoteHardwarePin
-	43, // 47: meshtastic.ChunkedPayloadResponse.resend_chunks:type_name -> meshtastic.resend_chunks
+	54, // 46: meshtastic.NodeRemoteHardwarePin.pin:type_name -> meshtastic.RemoteHardwarePin
+	44, // 47: meshtastic.ChunkedPayloadResponse.resend_chunks:type_name -> meshtastic.resend_chunks
 	48, // [48:48] is the sub-list for method output_type
 	48, // [48:48] is the sub-list for method input_type
 	48, // [48:48] is the sub-list for extension type_name
@@ -5741,16 +5821,16 @@ func file_meshtastic_mesh_proto_init() {
 	}
 	file_meshtastic_mesh_proto_msgTypes[4].OneofWrappers = []any{}
 	file_meshtastic_mesh_proto_msgTypes[7].OneofWrappers = []any{}
-	file_meshtastic_mesh_proto_msgTypes[8].OneofWrappers = []any{
+	file_meshtastic_mesh_proto_msgTypes[9].OneofWrappers = []any{
 		(*MqttClientProxyMessage_Data)(nil),
 		(*MqttClientProxyMessage_Text)(nil),
 	}
-	file_meshtastic_mesh_proto_msgTypes[9].OneofWrappers = []any{
+	file_meshtastic_mesh_proto_msgTypes[10].OneofWrappers = []any{
 		(*MeshPacket_Decoded)(nil),
 		(*MeshPacket_Encrypted)(nil),
 	}
-	file_meshtastic_mesh_proto_msgTypes[10].OneofWrappers = []any{}
-	file_meshtastic_mesh_proto_msgTypes[14].OneofWrappers = []any{
+	file_meshtastic_mesh_proto_msgTypes[11].OneofWrappers = []any{}
+	file_meshtastic_mesh_proto_msgTypes[15].OneofWrappers = []any{
 		(*FromRadio_Packet)(nil),
 		(*FromRadio_MyInfo)(nil),
 		(*FromRadio_NodeInfo)(nil),
@@ -5768,14 +5848,14 @@ func file_meshtastic_mesh_proto_init() {
 		(*FromRadio_ClientNotification)(nil),
 		(*FromRadio_DeviceuiConfig)(nil),
 	}
-	file_meshtastic_mesh_proto_msgTypes[15].OneofWrappers = []any{
+	file_meshtastic_mesh_proto_msgTypes[16].OneofWrappers = []any{
 		(*ClientNotification_KeyVerificationNumberInform)(nil),
 		(*ClientNotification_KeyVerificationNumberRequest)(nil),
 		(*ClientNotification_KeyVerificationFinal)(nil),
 		(*ClientNotification_DuplicatedPublicKey)(nil),
 		(*ClientNotification_LowEntropyKey)(nil),
 	}
-	file_meshtastic_mesh_proto_msgTypes[22].OneofWrappers = []any{
+	file_meshtastic_mesh_proto_msgTypes[23].OneofWrappers = []any{
 		(*ToRadio_Packet)(nil),
 		(*ToRadio_WantConfigId)(nil),
 		(*ToRadio_Disconnect)(nil),
@@ -5783,7 +5863,7 @@ func file_meshtastic_mesh_proto_init() {
 		(*ToRadio_MqttClientProxyMessage)(nil),
 		(*ToRadio_Heartbeat)(nil),
 	}
-	file_meshtastic_mesh_proto_msgTypes[31].OneofWrappers = []any{
+	file_meshtastic_mesh_proto_msgTypes[32].OneofWrappers = []any{
 		(*ChunkedPayloadResponse_RequestTransfer)(nil),
 		(*ChunkedPayloadResponse_AcceptTransfer)(nil),
 		(*ChunkedPayloadResponse_ResendChunks)(nil),
@@ -5794,7 +5874,7 @@ func file_meshtastic_mesh_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_mesh_proto_rawDesc), len(file_meshtastic_mesh_proto_rawDesc)),
 			NumEnums:      13,
-			NumMessages:   32,
+			NumMessages:   33,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

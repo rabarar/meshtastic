@@ -91,7 +91,7 @@ const (
 	//	but should not be given priority over other routers in order to avoid unnecessaraily
 	//	consuming hops.
 	Config_DeviceConfig_ROUTER_LATE Config_DeviceConfig_Role = 11
-	// Description: Treats packets from or to favorited nodes as ROUTER, and all other packets as CLIENT.
+	// Description: Treats packets from or to favorited nodes as ROUTER_LATE, and all other packets as CLIENT.
 	// Technical Details: Used for stronger attic/roof nodes to distribute messages more widely
 	//
 	//	from weaker, indoor, or less-well-positioned nodes. Recommended for users with multiple nodes

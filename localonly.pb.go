@@ -168,6 +168,8 @@ type LocalModuleConfig struct {
 	DetectionSensor *ModuleConfig_DetectionSensorConfig `protobuf:"bytes,13,opt,name=detection_sensor,json=detectionSensor,proto3" json:"detection_sensor,omitempty"`
 	// Paxcounter Config
 	Paxcounter *ModuleConfig_PaxcounterConfig `protobuf:"bytes,14,opt,name=paxcounter,proto3" json:"paxcounter,omitempty"`
+	// StatusMessage Config
+	Statusmessage *ModuleConfig_StatusMessageConfig `protobuf:"bytes,15,opt,name=statusmessage,proto3" json:"statusmessage,omitempty"`
 	// A version integer used to invalidate old save files when we make
 	// incompatible changes This integer is set at build time and is private to
 	// NodeDB.cpp in the device code.
@@ -297,6 +299,13 @@ func (x *LocalModuleConfig) GetPaxcounter() *ModuleConfig_PaxcounterConfig {
 	return nil
 }
 
+func (x *LocalModuleConfig) GetStatusmessage() *ModuleConfig_StatusMessageConfig {
+	if x != nil {
+		return x.Statusmessage
+	}
+	return nil
+}
+
 func (x *LocalModuleConfig) GetVersion() uint32 {
 	if x != nil {
 		return x.Version
@@ -319,7 +328,7 @@ const file_meshtastic_localonly_proto_rawDesc = "" +
 	"\x04lora\x18\x06 \x01(\v2\x1d.meshtastic.Config.LoRaConfigR\x04lora\x12@\n" +
 	"\tbluetooth\x18\a \x01(\v2\".meshtastic.Config.BluetoothConfigR\tbluetooth\x12\x18\n" +
 	"\aversion\x18\b \x01(\rR\aversion\x12=\n" +
-	"\bsecurity\x18\t \x01(\v2!.meshtastic.Config.SecurityConfigR\bsecurity\"\xae\b\n" +
+	"\bsecurity\x18\t \x01(\v2!.meshtastic.Config.SecurityConfigR\bsecurity\"\x82\t\n" +
 	"\x11LocalModuleConfig\x127\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigR\x04mqtt\x12=\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigR\x06serial\x12h\n" +
@@ -337,7 +346,8 @@ const file_meshtastic_localonly_proto_rawDesc = "" +
 	"\x10detection_sensor\x18\r \x01(\v2..meshtastic.ModuleConfig.DetectionSensorConfigR\x0fdetectionSensor\x12I\n" +
 	"\n" +
 	"paxcounter\x18\x0e \x01(\v2).meshtastic.ModuleConfig.PaxcounterConfigR\n" +
-	"paxcounter\x12\x18\n" +
+	"paxcounter\x12R\n" +
+	"\rstatusmessage\x18\x0f \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigR\rstatusmessage\x12\x18\n" +
 	"\aversion\x18\b \x01(\rR\aversionBf\n" +
 	"\x14org.meshtastic.protoB\x0fLocalOnlyProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
@@ -378,6 +388,7 @@ var file_meshtastic_localonly_proto_goTypes = []any{
 	(*ModuleConfig_AmbientLightingConfig)(nil),      // 20: meshtastic.ModuleConfig.AmbientLightingConfig
 	(*ModuleConfig_DetectionSensorConfig)(nil),      // 21: meshtastic.ModuleConfig.DetectionSensorConfig
 	(*ModuleConfig_PaxcounterConfig)(nil),           // 22: meshtastic.ModuleConfig.PaxcounterConfig
+	(*ModuleConfig_StatusMessageConfig)(nil),        // 23: meshtastic.ModuleConfig.StatusMessageConfig
 }
 var file_meshtastic_localonly_proto_depIdxs = []int32{
 	2,  // 0: meshtastic.LocalConfig.device:type_name -> meshtastic.Config.DeviceConfig
@@ -401,11 +412,12 @@ var file_meshtastic_localonly_proto_depIdxs = []int32{
 	20, // 18: meshtastic.LocalModuleConfig.ambient_lighting:type_name -> meshtastic.ModuleConfig.AmbientLightingConfig
 	21, // 19: meshtastic.LocalModuleConfig.detection_sensor:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig
 	22, // 20: meshtastic.LocalModuleConfig.paxcounter:type_name -> meshtastic.ModuleConfig.PaxcounterConfig
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	23, // 21: meshtastic.LocalModuleConfig.statusmessage:type_name -> meshtastic.ModuleConfig.StatusMessageConfig
+	22, // [22:22] is the sub-list for method output_type
+	22, // [22:22] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_localonly_proto_init() }

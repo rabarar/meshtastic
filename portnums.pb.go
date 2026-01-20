@@ -104,6 +104,11 @@ const (
 	// This module is specifically for Native Linux nodes, and provides a Git-style
 	// chain of messages.
 	PortNum_STORE_FORWARD_PLUSPLUS_APP PortNum = 35
+	// Node Status module
+	// ENCODING: protobuf
+	// This module allows setting an extra string of status for a node.
+	// Broadcasts on change and on a timer, possibly once a day.
+	PortNum_NODE_STATUS_APP PortNum = 36
 	// Provides a hardware serial interface to send and receive from the Meshtastic network.
 	// Connect to the RX/TX pins of a device with 38400 8N1. Packets received from the Meshtastic
 	// network is forwarded to the RX pin while sending a packet to TX will go out to the Mesh network.
@@ -186,6 +191,7 @@ var (
 		33:  "IP_TUNNEL_APP",
 		34:  "PAXCOUNTER_APP",
 		35:  "STORE_FORWARD_PLUSPLUS_APP",
+		36:  "NODE_STATUS_APP",
 		64:  "SERIAL_APP",
 		65:  "STORE_FORWARD_APP",
 		66:  "RANGE_TEST_APP",
@@ -221,6 +227,7 @@ var (
 		"IP_TUNNEL_APP":               33,
 		"PAXCOUNTER_APP":              34,
 		"STORE_FORWARD_PLUSPLUS_APP":  35,
+		"NODE_STATUS_APP":             36,
 		"SERIAL_APP":                  64,
 		"STORE_FORWARD_APP":           65,
 		"RANGE_TEST_APP":              66,
@@ -272,7 +279,7 @@ var File_meshtastic_portnums_proto protoreflect.FileDescriptor
 const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\n" +
 	"\x19meshtastic/portnums.proto\x12\n" +
-	"meshtastic*\x96\x05\n" +
+	"meshtastic*\xab\x05\n" +
 	"\aPortNum\x12\x0f\n" +
 	"\vUNKNOWN_APP\x10\x00\x12\x14\n" +
 	"\x10TEXT_MESSAGE_APP\x10\x01\x12\x17\n" +
@@ -291,7 +298,8 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\tREPLY_APP\x10 \x12\x11\n" +
 	"\rIP_TUNNEL_APP\x10!\x12\x12\n" +
 	"\x0ePAXCOUNTER_APP\x10\"\x12\x1e\n" +
-	"\x1aSTORE_FORWARD_PLUSPLUS_APP\x10#\x12\x0e\n" +
+	"\x1aSTORE_FORWARD_PLUSPLUS_APP\x10#\x12\x13\n" +
+	"\x0fNODE_STATUS_APP\x10$\x12\x0e\n" +
 	"\n" +
 	"SERIAL_APP\x10@\x12\x15\n" +
 	"\x11STORE_FORWARD_APP\x10A\x12\x12\n" +

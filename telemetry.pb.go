@@ -1040,7 +1040,9 @@ type LocalStats struct {
 	// Number of bytes free in the heap
 	HeapFreeBytes uint32 `protobuf:"varint,13,opt,name=heap_free_bytes,json=heapFreeBytes,proto3" json:"heap_free_bytes,omitempty"`
 	// Number of packets that were dropped because the transmit queue was full.
-	NumTxDropped  uint32 `protobuf:"varint,14,opt,name=num_tx_dropped,json=numTxDropped,proto3" json:"num_tx_dropped,omitempty"`
+	NumTxDropped uint32 `protobuf:"varint,14,opt,name=num_tx_dropped,json=numTxDropped,proto3" json:"num_tx_dropped,omitempty"`
+	// Noise floor value measured in dBm
+	NoiseFloor    int32 `protobuf:"varint,15,opt,name=noise_floor,json=noiseFloor,proto3" json:"noise_floor,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1169,6 +1171,13 @@ func (x *LocalStats) GetHeapFreeBytes() uint32 {
 func (x *LocalStats) GetNumTxDropped() uint32 {
 	if x != nil {
 		return x.NumTxDropped
+	}
+	return 0
+}
+
+func (x *LocalStats) GetNoiseFloor() int32 {
+	if x != nil {
+		return x.NoiseFloor
 	}
 	return 0
 }
@@ -1769,7 +1778,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\f_pm_humidityB\r\n" +
 	"\v_pm_voc_idxB\r\n" +
 	"\v_pm_nox_idxB\x10\n" +
-	"\x0e_particles_tps\"\xbc\x04\n" +
+	"\x0e_particles_tps\"\xdd\x04\n" +
 	"\n" +
 	"LocalStats\x12%\n" +
 	"\x0euptime_seconds\x18\x01 \x01(\rR\ruptimeSeconds\x12/\n" +
@@ -1787,7 +1796,9 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x15num_tx_relay_canceled\x18\v \x01(\rR\x12numTxRelayCanceled\x12(\n" +
 	"\x10heap_total_bytes\x18\f \x01(\rR\x0eheapTotalBytes\x12&\n" +
 	"\x0fheap_free_bytes\x18\r \x01(\rR\rheapFreeBytes\x12$\n" +
-	"\x0enum_tx_dropped\x18\x0e \x01(\rR\fnumTxDropped\"\x98\x01\n" +
+	"\x0enum_tx_dropped\x18\x0e \x01(\rR\fnumTxDropped\x12\x1f\n" +
+	"\vnoise_floor\x18\x0f \x01(\x05R\n" +
+	"noiseFloor\"\x98\x01\n" +
 	"\rHealthMetrics\x12 \n" +
 	"\theart_bpm\x18\x01 \x01(\rH\x00R\bheartBpm\x88\x01\x01\x12\x17\n" +
 	"\x04spO2\x18\x02 \x01(\rH\x01R\x04spO2\x88\x01\x01\x12%\n" +

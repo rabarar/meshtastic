@@ -258,6 +258,7 @@ type NodeInfoLite struct {
 	NextHop uint32 `protobuf:"varint,12,opt,name=next_hop,json=nextHop,proto3" json:"next_hop,omitempty"`
 	// Bitfield for storing booleans.
 	// LSB 0 is_key_manually_verified
+	// LSB 1 is_muted
 	Bitfield      uint32 `protobuf:"varint,13,opt,name=bitfield,proto3" json:"bitfield,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

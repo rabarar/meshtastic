@@ -315,20 +315,25 @@ const (
 	// Used to configure and view some parameters of MeshSolar.
 	// https://heltec.org/project/meshsolar/
 	ModuleConfig_SerialConfig_MS_CONFIG ModuleConfig_SerialConfig_Serial_Mode = 8
+	// Logs mesh traffic to the serial pins, ideal for logging via openLog or similar.
+	ModuleConfig_SerialConfig_LOG     ModuleConfig_SerialConfig_Serial_Mode = 9  // includes other packets
+	ModuleConfig_SerialConfig_LOGTEXT ModuleConfig_SerialConfig_Serial_Mode = 10 // only text (channel & DM)
 )
 
 // Enum value maps for ModuleConfig_SerialConfig_Serial_Mode.
 var (
 	ModuleConfig_SerialConfig_Serial_Mode_name = map[int32]string{
-		0: "DEFAULT",
-		1: "SIMPLE",
-		2: "PROTO",
-		3: "TEXTMSG",
-		4: "NMEA",
-		5: "CALTOPO",
-		6: "WS85",
-		7: "VE_DIRECT",
-		8: "MS_CONFIG",
+		0:  "DEFAULT",
+		1:  "SIMPLE",
+		2:  "PROTO",
+		3:  "TEXTMSG",
+		4:  "NMEA",
+		5:  "CALTOPO",
+		6:  "WS85",
+		7:  "VE_DIRECT",
+		8:  "MS_CONFIG",
+		9:  "LOG",
+		10: "LOGTEXT",
 	}
 	ModuleConfig_SerialConfig_Serial_Mode_value = map[string]int32{
 		"DEFAULT":   0,
@@ -340,6 +345,8 @@ var (
 		"WS85":      6,
 		"VE_DIRECT": 7,
 		"MS_CONFIG": 8,
+		"LOG":       9,
+		"LOGTEXT":   10,
 	}
 )
 
@@ -463,6 +470,7 @@ type ModuleConfig struct {
 	//	*ModuleConfig_AmbientLighting
 	//	*ModuleConfig_DetectionSensor
 	//	*ModuleConfig_Paxcounter
+	//	*ModuleConfig_Statusmessage
 	PayloadVariant isModuleConfig_PayloadVariant `protobuf_oneof:"payload_variant"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -622,6 +630,15 @@ func (x *ModuleConfig) GetPaxcounter() *ModuleConfig_PaxcounterConfig {
 	return nil
 }
 
+func (x *ModuleConfig) GetStatusmessage() *ModuleConfig_StatusMessageConfig {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*ModuleConfig_Statusmessage); ok {
+			return x.Statusmessage
+		}
+	}
+	return nil
+}
+
 type isModuleConfig_PayloadVariant interface {
 	isModuleConfig_PayloadVariant()
 }
@@ -691,6 +708,11 @@ type ModuleConfig_Paxcounter struct {
 	Paxcounter *ModuleConfig_PaxcounterConfig `protobuf:"bytes,13,opt,name=paxcounter,proto3,oneof"`
 }
 
+type ModuleConfig_Statusmessage struct {
+	// TODO: REPLACE
+	Statusmessage *ModuleConfig_StatusMessageConfig `protobuf:"bytes,14,opt,name=statusmessage,proto3,oneof"`
+}
+
 func (*ModuleConfig_Mqtt) isModuleConfig_PayloadVariant() {}
 
 func (*ModuleConfig_Serial) isModuleConfig_PayloadVariant() {}
@@ -716,6 +738,8 @@ func (*ModuleConfig_AmbientLighting) isModuleConfig_PayloadVariant() {}
 func (*ModuleConfig_DetectionSensor) isModuleConfig_PayloadVariant() {}
 
 func (*ModuleConfig_Paxcounter) isModuleConfig_PayloadVariant() {}
+
+func (*ModuleConfig_Statusmessage) isModuleConfig_PayloadVariant() {}
 
 // A GPIO pin definition for remote hardware module
 type RemoteHardwarePin struct {
@@ -1908,8 +1932,10 @@ type ModuleConfig_TelemetryConfig struct {
 	// Enable/Disable the device telemetry module to send metrics to the mesh
 	// Note: We will still send telemtry to the connected phone / client every minute over the API
 	DeviceTelemetryEnabled bool `protobuf:"varint,14,opt,name=device_telemetry_enabled,json=deviceTelemetryEnabled,proto3" json:"device_telemetry_enabled,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// Enable/Disable the air quality telemetry measurement module on-device display
+	AirQualityScreenEnabled bool `protobuf:"varint,15,opt,name=air_quality_screen_enabled,json=airQualityScreenEnabled,proto3" json:"air_quality_screen_enabled,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *ModuleConfig_TelemetryConfig) Reset() {
@@ -2036,6 +2062,13 @@ func (x *ModuleConfig_TelemetryConfig) GetHealthScreenEnabled() bool {
 func (x *ModuleConfig_TelemetryConfig) GetDeviceTelemetryEnabled() bool {
 	if x != nil {
 		return x.DeviceTelemetryEnabled
+	}
+	return false
+}
+
+func (x *ModuleConfig_TelemetryConfig) GetAirQualityScreenEnabled() bool {
+	if x != nil {
+		return x.AirQualityScreenEnabled
 	}
 	return false
 }
@@ -2267,12 +2300,58 @@ func (x *ModuleConfig_AmbientLightingConfig) GetBlue() uint32 {
 	return 0
 }
 
+// StatusMessage config - Allows setting a status message for a node to periodically rebroadcast
+type ModuleConfig_StatusMessageConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The actual status string
+	NodeStatus    string `protobuf:"bytes,1,opt,name=node_status,json=nodeStatus,proto3" json:"node_status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ModuleConfig_StatusMessageConfig) Reset() {
+	*x = ModuleConfig_StatusMessageConfig{}
+	mi := &file_meshtastic_module_config_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModuleConfig_StatusMessageConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModuleConfig_StatusMessageConfig) ProtoMessage() {}
+
+func (x *ModuleConfig_StatusMessageConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_module_config_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModuleConfig_StatusMessageConfig.ProtoReflect.Descriptor instead.
+func (*ModuleConfig_StatusMessageConfig) Descriptor() ([]byte, []int) {
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 14}
+}
+
+func (x *ModuleConfig_StatusMessageConfig) GetNodeStatus() string {
+	if x != nil {
+		return x.NodeStatus
+	}
+	return ""
+}
+
 var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\"\xb03\n" +
+	"meshtastic\"\x925\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2290,7 +2369,8 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x10detection_sensor\x18\f \x01(\v2..meshtastic.ModuleConfig.DetectionSensorConfigH\x00R\x0fdetectionSensor\x12K\n" +
 	"\n" +
 	"paxcounter\x18\r \x01(\v2).meshtastic.ModuleConfig.PaxcounterConfigH\x00R\n" +
-	"paxcounter\x1a\xc6\x03\n" +
+	"paxcounter\x12T\n" +
+	"\rstatusmessage\x18\x0e \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigH\x00R\rstatusmessage\x1a\xc6\x03\n" +
 	"\n" +
 	"MQTTConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x18\n" +
@@ -2361,7 +2441,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12<\n" +
 	"\x1apaxcounter_update_interval\x18\x02 \x01(\rR\x18paxcounterUpdateInterval\x12%\n" +
 	"\x0ewifi_threshold\x18\x03 \x01(\x05R\rwifiThreshold\x12#\n" +
-	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xd5\x05\n" +
+	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xec\x05\n" +
 	"\fSerialConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x12\n" +
 	"\x04echo\x18\x02 \x01(\bR\x04echo\x12\x10\n" +
@@ -2391,7 +2471,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\vBAUD_230400\x10\f\x12\x0f\n" +
 	"\vBAUD_460800\x10\r\x12\x0f\n" +
 	"\vBAUD_576000\x10\x0e\x12\x0f\n" +
-	"\vBAUD_921600\x10\x0f\"}\n" +
+	"\vBAUD_921600\x10\x0f\"\x93\x01\n" +
 	"\vSerial_Mode\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\n" +
 	"\n" +
@@ -2402,7 +2482,10 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\aCALTOPO\x10\x05\x12\b\n" +
 	"\x04WS85\x10\x06\x12\r\n" +
 	"\tVE_DIRECT\x10\a\x12\r\n" +
-	"\tMS_CONFIG\x10\b\x1a\xac\x04\n" +
+	"\tMS_CONFIG\x10\b\x12\a\n" +
+	"\x03LOG\x10\t\x12\v\n" +
+	"\aLOGTEXT\x10\n" +
+	"\x1a\xac\x04\n" +
 	"\x1aExternalNotificationConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x1b\n" +
 	"\toutput_ms\x18\x02 \x01(\rR\boutputMs\x12\x16\n" +
@@ -2433,7 +2516,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x16\n" +
 	"\x06sender\x18\x02 \x01(\rR\x06sender\x12\x12\n" +
 	"\x04save\x18\x03 \x01(\bR\x04save\x12&\n" +
-	"\x0fclear_on_reboot\x18\x04 \x01(\bR\rclearOnReboot\x1a\xb9\x06\n" +
+	"\x0fclear_on_reboot\x18\x04 \x01(\bR\rclearOnReboot\x1a\xf6\x06\n" +
 	"\x0fTelemetryConfig\x124\n" +
 	"\x16device_update_interval\x18\x01 \x01(\rR\x14deviceUpdateInterval\x12>\n" +
 	"\x1benvironment_update_interval\x18\x02 \x01(\rR\x19environmentUpdateInterval\x12F\n" +
@@ -2449,7 +2532,8 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x1ahealth_measurement_enabled\x18\v \x01(\bR\x18healthMeasurementEnabled\x124\n" +
 	"\x16health_update_interval\x18\f \x01(\rR\x14healthUpdateInterval\x122\n" +
 	"\x15health_screen_enabled\x18\r \x01(\bR\x13healthScreenEnabled\x128\n" +
-	"\x18device_telemetry_enabled\x18\x0e \x01(\bR\x16deviceTelemetryEnabled\x1a\x9a\x06\n" +
+	"\x18device_telemetry_enabled\x18\x0e \x01(\bR\x16deviceTelemetryEnabled\x12;\n" +
+	"\x1aair_quality_screen_enabled\x18\x0f \x01(\bR\x17airQualityScreenEnabled\x1a\x9a\x06\n" +
 	"\x13CannedMessageConfig\x12'\n" +
 	"\x0frotary1_enabled\x18\x01 \x01(\bR\x0erotary1Enabled\x12*\n" +
 	"\x11inputbroker_pin_a\x18\x02 \x01(\rR\x0finputbrokerPinA\x12*\n" +
@@ -2480,7 +2564,10 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\acurrent\x18\x02 \x01(\rR\acurrent\x12\x10\n" +
 	"\x03red\x18\x03 \x01(\rR\x03red\x12\x14\n" +
 	"\x05green\x18\x04 \x01(\rR\x05green\x12\x12\n" +
-	"\x04blue\x18\x05 \x01(\rR\x04blueB\x11\n" +
+	"\x04blue\x18\x05 \x01(\rR\x04blue\x1a6\n" +
+	"\x13StatusMessageConfig\x12\x1f\n" +
+	"\vnode_status\x18\x01 \x01(\tR\n" +
+	"nodeStatusB\x11\n" +
 	"\x0fpayload_variant\"y\n" +
 	"\x11RemoteHardwarePin\x12\x19\n" +
 	"\bgpio_pin\x18\x01 \x01(\rR\agpioPin\x12\x12\n" +
@@ -2505,7 +2592,7 @@ func file_meshtastic_module_config_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_module_config_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_meshtastic_module_config_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_meshtastic_module_config_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_meshtastic_module_config_proto_goTypes = []any{
 	(RemoteHardwarePinType)(0),                           // 0: meshtastic.RemoteHardwarePinType
 	(ModuleConfig_DetectionSensorConfig_TriggerType)(0),  // 1: meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
@@ -2529,6 +2616,7 @@ var file_meshtastic_module_config_proto_goTypes = []any{
 	(*ModuleConfig_TelemetryConfig)(nil),                 // 19: meshtastic.ModuleConfig.TelemetryConfig
 	(*ModuleConfig_CannedMessageConfig)(nil),             // 20: meshtastic.ModuleConfig.CannedMessageConfig
 	(*ModuleConfig_AmbientLightingConfig)(nil),           // 21: meshtastic.ModuleConfig.AmbientLightingConfig
+	(*ModuleConfig_StatusMessageConfig)(nil),             // 22: meshtastic.ModuleConfig.StatusMessageConfig
 }
 var file_meshtastic_module_config_proto_depIdxs = []int32{
 	8,  // 0: meshtastic.ModuleConfig.mqtt:type_name -> meshtastic.ModuleConfig.MQTTConfig
@@ -2544,21 +2632,22 @@ var file_meshtastic_module_config_proto_depIdxs = []int32{
 	21, // 10: meshtastic.ModuleConfig.ambient_lighting:type_name -> meshtastic.ModuleConfig.AmbientLightingConfig
 	12, // 11: meshtastic.ModuleConfig.detection_sensor:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig
 	14, // 12: meshtastic.ModuleConfig.paxcounter:type_name -> meshtastic.ModuleConfig.PaxcounterConfig
-	0,  // 13: meshtastic.RemoteHardwarePin.type:type_name -> meshtastic.RemoteHardwarePinType
-	9,  // 14: meshtastic.ModuleConfig.MQTTConfig.map_report_settings:type_name -> meshtastic.ModuleConfig.MapReportSettings
-	7,  // 15: meshtastic.ModuleConfig.RemoteHardwareConfig.available_pins:type_name -> meshtastic.RemoteHardwarePin
-	1,  // 16: meshtastic.ModuleConfig.DetectionSensorConfig.detection_trigger_type:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
-	2,  // 17: meshtastic.ModuleConfig.AudioConfig.bitrate:type_name -> meshtastic.ModuleConfig.AudioConfig.Audio_Baud
-	3,  // 18: meshtastic.ModuleConfig.SerialConfig.baud:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Baud
-	4,  // 19: meshtastic.ModuleConfig.SerialConfig.mode:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Mode
-	5,  // 20: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_cw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	5,  // 21: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_ccw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	5,  // 22: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_press:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	23, // [23:23] is the sub-list for method output_type
-	23, // [23:23] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	22, // 13: meshtastic.ModuleConfig.statusmessage:type_name -> meshtastic.ModuleConfig.StatusMessageConfig
+	0,  // 14: meshtastic.RemoteHardwarePin.type:type_name -> meshtastic.RemoteHardwarePinType
+	9,  // 15: meshtastic.ModuleConfig.MQTTConfig.map_report_settings:type_name -> meshtastic.ModuleConfig.MapReportSettings
+	7,  // 16: meshtastic.ModuleConfig.RemoteHardwareConfig.available_pins:type_name -> meshtastic.RemoteHardwarePin
+	1,  // 17: meshtastic.ModuleConfig.DetectionSensorConfig.detection_trigger_type:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
+	2,  // 18: meshtastic.ModuleConfig.AudioConfig.bitrate:type_name -> meshtastic.ModuleConfig.AudioConfig.Audio_Baud
+	3,  // 19: meshtastic.ModuleConfig.SerialConfig.baud:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Baud
+	4,  // 20: meshtastic.ModuleConfig.SerialConfig.mode:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Mode
+	5,  // 21: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_cw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	5,  // 22: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_ccw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	5,  // 23: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_press:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	24, // [24:24] is the sub-list for method output_type
+	24, // [24:24] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_module_config_proto_init() }
@@ -2580,6 +2669,7 @@ func file_meshtastic_module_config_proto_init() {
 		(*ModuleConfig_AmbientLighting)(nil),
 		(*ModuleConfig_DetectionSensor)(nil),
 		(*ModuleConfig_Paxcounter)(nil),
+		(*ModuleConfig_Statusmessage)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2587,7 +2677,7 @@ func file_meshtastic_module_config_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_module_config_proto_rawDesc), len(file_meshtastic_module_config_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   16,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

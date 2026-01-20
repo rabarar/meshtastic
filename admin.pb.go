@@ -185,6 +185,8 @@ const (
 	AdminMessage_DETECTIONSENSOR_CONFIG AdminMessage_ModuleConfigType = 11
 	// TODO: REPLACE
 	AdminMessage_PAXCOUNTER_CONFIG AdminMessage_ModuleConfigType = 12
+	// TODO: REPLACE
+	AdminMessage_STATUSMESSAGE_CONFIG AdminMessage_ModuleConfigType = 13
 )
 
 // Enum value maps for AdminMessage_ModuleConfigType.
@@ -203,6 +205,7 @@ var (
 		10: "AMBIENTLIGHTING_CONFIG",
 		11: "DETECTIONSENSOR_CONFIG",
 		12: "PAXCOUNTER_CONFIG",
+		13: "STATUSMESSAGE_CONFIG",
 	}
 	AdminMessage_ModuleConfigType_value = map[string]int32{
 		"MQTT_CONFIG":            0,
@@ -218,6 +221,7 @@ var (
 		"AMBIENTLIGHTING_CONFIG": 10,
 		"DETECTIONSENSOR_CONFIG": 11,
 		"PAXCOUNTER_CONFIG":      12,
+		"STATUSMESSAGE_CONFIG":   13,
 	}
 )
 
@@ -410,6 +414,7 @@ type AdminMessage struct {
 	//	*AdminMessage_StoreUiConfig
 	//	*AdminMessage_SetIgnoredNode
 	//	*AdminMessage_RemoveIgnoredNode
+	//	*AdminMessage_ToggleMutedNode
 	//	*AdminMessage_BeginEditSettings
 	//	*AdminMessage_CommitEditSettings
 	//	*AdminMessage_AddContact
@@ -858,6 +863,15 @@ func (x *AdminMessage) GetRemoveIgnoredNode() uint32 {
 	return 0
 }
 
+func (x *AdminMessage) GetToggleMutedNode() uint32 {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*AdminMessage_ToggleMutedNode); ok {
+			return x.ToggleMutedNode
+		}
+	}
+	return 0
+}
+
 func (x *AdminMessage) GetBeginEditSettings() bool {
 	if x != nil {
 		if x, ok := x.PayloadVariant.(*AdminMessage_BeginEditSettings); ok {
@@ -1194,6 +1208,11 @@ type AdminMessage_RemoveIgnoredNode struct {
 	RemoveIgnoredNode uint32 `protobuf:"varint,48,opt,name=remove_ignored_node,json=removeIgnoredNode,proto3,oneof"`
 }
 
+type AdminMessage_ToggleMutedNode struct {
+	// Set specified node-num to be muted
+	ToggleMutedNode uint32 `protobuf:"varint,49,opt,name=toggle_muted_node,json=toggleMutedNode,proto3,oneof"`
+}
+
 type AdminMessage_BeginEditSettings struct {
 	// Begins an edit transaction for config, module config, owner, and channel settings changes
 	// This will delay the standard *implicit* save to the file system and subsequent reboot behavior until committed (commit_edit_settings)
@@ -1346,6 +1365,8 @@ func (*AdminMessage_StoreUiConfig) isAdminMessage_PayloadVariant() {}
 func (*AdminMessage_SetIgnoredNode) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_RemoveIgnoredNode) isAdminMessage_PayloadVariant() {}
+
+func (*AdminMessage_ToggleMutedNode) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_BeginEditSettings) isAdminMessage_PayloadVariant() {}
 
@@ -1771,7 +1792,7 @@ var File_meshtastic_admin_proto protoreflect.FileDescriptor
 const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"\x16meshtastic/admin.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\x81#\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\xc9#\n" +
 	"\fAdminMessage\x12'\n" +
 	"\x0fsession_passkey\x18e \x01(\fR\x0esessionPasskey\x120\n" +
 	"\x13get_channel_request\x18\x01 \x01(\rH\x00R\x11getChannelRequest\x12G\n" +
@@ -1820,7 +1841,8 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x16get_ui_config_response\x18- \x01(\v2\x1a.meshtastic.DeviceUIConfigH\x00R\x13getUiConfigResponse\x12D\n" +
 	"\x0fstore_ui_config\x18. \x01(\v2\x1a.meshtastic.DeviceUIConfigH\x00R\rstoreUiConfig\x12*\n" +
 	"\x10set_ignored_node\x18/ \x01(\rH\x00R\x0esetIgnoredNode\x120\n" +
-	"\x13remove_ignored_node\x180 \x01(\rH\x00R\x11removeIgnoredNode\x120\n" +
+	"\x13remove_ignored_node\x180 \x01(\rH\x00R\x11removeIgnoredNode\x12,\n" +
+	"\x11toggle_muted_node\x181 \x01(\rH\x00R\x0ftoggleMutedNode\x120\n" +
 	"\x13begin_edit_settings\x18@ \x01(\bH\x00R\x11beginEditSettings\x122\n" +
 	"\x14commit_edit_settings\x18A \x01(\bH\x00R\x12commitEditSettings\x12<\n" +
 	"\vadd_contact\x18B \x01(\v2\x19.meshtastic.SharedContactH\x00R\n" +
@@ -1856,7 +1878,7 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x10BLUETOOTH_CONFIG\x10\x06\x12\x13\n" +
 	"\x0fSECURITY_CONFIG\x10\a\x12\x15\n" +
 	"\x11SESSIONKEY_CONFIG\x10\b\x12\x13\n" +
-	"\x0fDEVICEUI_CONFIG\x10\t\"\xbb\x02\n" +
+	"\x0fDEVICEUI_CONFIG\x10\t\"\xd5\x02\n" +
 	"\x10ModuleConfigType\x12\x0f\n" +
 	"\vMQTT_CONFIG\x10\x00\x12\x11\n" +
 	"\rSERIAL_CONFIG\x10\x01\x12\x13\n" +
@@ -1871,7 +1893,8 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x16AMBIENTLIGHTING_CONFIG\x10\n" +
 	"\x12\x1a\n" +
 	"\x16DETECTIONSENSOR_CONFIG\x10\v\x12\x15\n" +
-	"\x11PAXCOUNTER_CONFIG\x10\f\"#\n" +
+	"\x11PAXCOUNTER_CONFIG\x10\f\x12\x18\n" +
+	"\x14STATUSMESSAGE_CONFIG\x10\r\"#\n" +
 	"\x0eBackupLocation\x12\t\n" +
 	"\x05FLASH\x10\x00\x12\x06\n" +
 	"\x02SD\x10\x01B\x11\n" +
@@ -2034,6 +2057,7 @@ func file_meshtastic_admin_proto_init() {
 		(*AdminMessage_StoreUiConfig)(nil),
 		(*AdminMessage_SetIgnoredNode)(nil),
 		(*AdminMessage_RemoveIgnoredNode)(nil),
+		(*AdminMessage_ToggleMutedNode)(nil),
 		(*AdminMessage_BeginEditSettings)(nil),
 		(*AdminMessage_CommitEditSettings)(nil),
 		(*AdminMessage_AddContact)(nil),
