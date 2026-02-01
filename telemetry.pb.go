@@ -1599,6 +1599,97 @@ func (x *Nau7802Config) GetCalibrationFactor() float32 {
 	return 0
 }
 
+// SEN5X State, for saving to flash
+type SEN5XState struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Last cleaning time for SEN5X
+	LastCleaningTime uint32 `protobuf:"varint,1,opt,name=last_cleaning_time,json=lastCleaningTime,proto3" json:"last_cleaning_time,omitempty"`
+	// Last cleaning time for SEN5X - valid flag
+	LastCleaningValid bool `protobuf:"varint,2,opt,name=last_cleaning_valid,json=lastCleaningValid,proto3" json:"last_cleaning_valid,omitempty"`
+	// Config flag for one-shot mode (see admin.proto)
+	OneShotMode bool `protobuf:"varint,3,opt,name=one_shot_mode,json=oneShotMode,proto3" json:"one_shot_mode,omitempty"`
+	// Last VOC state time for SEN55
+	VocStateTime *uint32 `protobuf:"varint,4,opt,name=voc_state_time,json=vocStateTime,proto3,oneof" json:"voc_state_time,omitempty"`
+	// Last VOC state validity flag for SEN55
+	VocStateValid *bool `protobuf:"varint,5,opt,name=voc_state_valid,json=vocStateValid,proto3,oneof" json:"voc_state_valid,omitempty"`
+	// VOC state array (8x uint8t) for SEN55
+	VocStateArray *uint64 `protobuf:"fixed64,6,opt,name=voc_state_array,json=vocStateArray,proto3,oneof" json:"voc_state_array,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SEN5XState) Reset() {
+	*x = SEN5XState{}
+	mi := &file_meshtastic_telemetry_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SEN5XState) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SEN5XState) ProtoMessage() {}
+
+func (x *SEN5XState) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_telemetry_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SEN5XState.ProtoReflect.Descriptor instead.
+func (*SEN5XState) Descriptor() ([]byte, []int) {
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SEN5XState) GetLastCleaningTime() uint32 {
+	if x != nil {
+		return x.LastCleaningTime
+	}
+	return 0
+}
+
+func (x *SEN5XState) GetLastCleaningValid() bool {
+	if x != nil {
+		return x.LastCleaningValid
+	}
+	return false
+}
+
+func (x *SEN5XState) GetOneShotMode() bool {
+	if x != nil {
+		return x.OneShotMode
+	}
+	return false
+}
+
+func (x *SEN5XState) GetVocStateTime() uint32 {
+	if x != nil && x.VocStateTime != nil {
+		return *x.VocStateTime
+	}
+	return 0
+}
+
+func (x *SEN5XState) GetVocStateValid() bool {
+	if x != nil && x.VocStateValid != nil {
+		return *x.VocStateValid
+	}
+	return false
+}
+
+func (x *SEN5XState) GetVocStateArray() uint64 {
+	if x != nil && x.VocStateArray != nil {
+		return *x.VocStateArray
+	}
+	return 0
+}
+
 var File_meshtastic_telemetry_proto protoreflect.FileDescriptor
 
 const file_meshtastic_telemetry_proto_rawDesc = "" +
@@ -1836,7 +1927,18 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"zeroOffset\x18\x01 \x01(\x05R\n" +
 	"zeroOffset\x12,\n" +
-	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor*\xf9\x04\n" +
+	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor\"\xce\x02\n" +
+	"\n" +
+	"SEN5XState\x12,\n" +
+	"\x12last_cleaning_time\x18\x01 \x01(\rR\x10lastCleaningTime\x12.\n" +
+	"\x13last_cleaning_valid\x18\x02 \x01(\bR\x11lastCleaningValid\x12\"\n" +
+	"\rone_shot_mode\x18\x03 \x01(\bR\voneShotMode\x12)\n" +
+	"\x0evoc_state_time\x18\x04 \x01(\rH\x00R\fvocStateTime\x88\x01\x01\x12+\n" +
+	"\x0fvoc_state_valid\x18\x05 \x01(\bH\x01R\rvocStateValid\x88\x01\x01\x12+\n" +
+	"\x0fvoc_state_array\x18\x06 \x01(\x06H\x02R\rvocStateArray\x88\x01\x01B\x11\n" +
+	"\x0f_voc_state_timeB\x12\n" +
+	"\x10_voc_state_validB\x12\n" +
+	"\x10_voc_state_array*\xf9\x04\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -1911,7 +2013,7 @@ func file_meshtastic_telemetry_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_telemetry_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_meshtastic_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_meshtastic_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_meshtastic_telemetry_proto_goTypes = []any{
 	(TelemetrySensorType)(0),   // 0: meshtastic.TelemetrySensorType
 	(*DeviceMetrics)(nil),      // 1: meshtastic.DeviceMetrics
@@ -1923,6 +2025,7 @@ var file_meshtastic_telemetry_proto_goTypes = []any{
 	(*HostMetrics)(nil),        // 7: meshtastic.HostMetrics
 	(*Telemetry)(nil),          // 8: meshtastic.Telemetry
 	(*Nau7802Config)(nil),      // 9: meshtastic.Nau7802Config
+	(*SEN5XState)(nil),         // 10: meshtastic.SEN5XState
 }
 var file_meshtastic_telemetry_proto_depIdxs = []int32{
 	1, // 0: meshtastic.Telemetry.device_metrics:type_name -> meshtastic.DeviceMetrics
@@ -1959,13 +2062,14 @@ func file_meshtastic_telemetry_proto_init() {
 		(*Telemetry_HealthMetrics)(nil),
 		(*Telemetry_HostMetrics)(nil),
 	}
+	file_meshtastic_telemetry_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_telemetry_proto_rawDesc), len(file_meshtastic_telemetry_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

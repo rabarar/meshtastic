@@ -427,6 +427,7 @@ type AdminMessage struct {
 	//	*AdminMessage_FactoryResetConfig
 	//	*AdminMessage_NodedbReset
 	//	*AdminMessage_OtaRequest
+	//	*AdminMessage_SensorConfig
 	PayloadVariant isAdminMessage_PayloadVariant `protobuf_oneof:"payload_variant"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -981,6 +982,15 @@ func (x *AdminMessage) GetOtaRequest() *AdminMessage_OTAEvent {
 	return nil
 }
 
+func (x *AdminMessage) GetSensorConfig() *SensorConfig {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*AdminMessage_SensorConfig); ok {
+			return x.SensorConfig
+		}
+	}
+	return nil
+}
+
 type isAdminMessage_PayloadVariant interface {
 	isAdminMessage_PayloadVariant()
 }
@@ -1280,6 +1290,11 @@ type AdminMessage_OtaRequest struct {
 	OtaRequest *AdminMessage_OTAEvent `protobuf:"bytes,102,opt,name=ota_request,json=otaRequest,proto3,oneof"`
 }
 
+type AdminMessage_SensorConfig struct {
+	// Parameters and sensor configuration
+	SensorConfig *SensorConfig `protobuf:"bytes,103,opt,name=sensor_config,json=sensorConfig,proto3,oneof"`
+}
+
 func (*AdminMessage_GetChannelRequest) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_GetChannelResponse) isAdminMessage_PayloadVariant() {}
@@ -1391,6 +1406,8 @@ func (*AdminMessage_FactoryResetConfig) isAdminMessage_PayloadVariant() {}
 func (*AdminMessage_NodedbReset) isAdminMessage_PayloadVariant() {}
 
 func (*AdminMessage_OtaRequest) isAdminMessage_PayloadVariant() {}
+
+func (*AdminMessage_SensorConfig) isAdminMessage_PayloadVariant() {}
 
 // Parameters for setting up Meshtastic for ameteur radio usage
 type HamParameters struct {
@@ -1657,6 +1674,213 @@ func (x *KeyVerificationAdmin) GetSecurityNumber() uint32 {
 	return 0
 }
 
+type SensorConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// SCD4X CO2 Sensor configuration
+	Scd4XConfig *SCD4XConfig `protobuf:"bytes,1,opt,name=scd4x_config,json=scd4xConfig,proto3" json:"scd4x_config,omitempty"`
+	// SEN5X PM Sensor configuration
+	Sen5XConfig   *SEN5XConfig `protobuf:"bytes,2,opt,name=sen5x_config,json=sen5xConfig,proto3" json:"sen5x_config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SensorConfig) Reset() {
+	*x = SensorConfig{}
+	mi := &file_meshtastic_admin_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SensorConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SensorConfig) ProtoMessage() {}
+
+func (x *SensorConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_admin_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SensorConfig.ProtoReflect.Descriptor instead.
+func (*SensorConfig) Descriptor() ([]byte, []int) {
+	return file_meshtastic_admin_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *SensorConfig) GetScd4XConfig() *SCD4XConfig {
+	if x != nil {
+		return x.Scd4XConfig
+	}
+	return nil
+}
+
+func (x *SensorConfig) GetSen5XConfig() *SEN5XConfig {
+	if x != nil {
+		return x.Sen5XConfig
+	}
+	return nil
+}
+
+type SCD4XConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Set Automatic self-calibration enabled
+	SetAsc *bool `protobuf:"varint,1,opt,name=set_asc,json=setAsc,proto3,oneof" json:"set_asc,omitempty"`
+	// Recalibration target CO2 concentration in ppm (FRC or ASC)
+	SetTargetCo2Conc *uint32 `protobuf:"varint,2,opt,name=set_target_co2_conc,json=setTargetCo2Conc,proto3,oneof" json:"set_target_co2_conc,omitempty"`
+	// Reference temperature in degC
+	SetTemperature *float32 `protobuf:"fixed32,3,opt,name=set_temperature,json=setTemperature,proto3,oneof" json:"set_temperature,omitempty"`
+	// Altitude of sensor in meters above sea level. 0 - 3000m (overrides ambient pressure)
+	SetAltitude *uint32 `protobuf:"varint,4,opt,name=set_altitude,json=setAltitude,proto3,oneof" json:"set_altitude,omitempty"`
+	// Sensor ambient pressure in Pa. 70000 - 120000 Pa (overrides altitude)
+	SetAmbientPressure *uint32 `protobuf:"varint,5,opt,name=set_ambient_pressure,json=setAmbientPressure,proto3,oneof" json:"set_ambient_pressure,omitempty"`
+	// Perform a factory reset of the sensor
+	FactoryReset *bool `protobuf:"varint,6,opt,name=factory_reset,json=factoryReset,proto3,oneof" json:"factory_reset,omitempty"`
+	// Power mode for sensor (true for low power, false for normal)
+	SetPowerMode  *bool `protobuf:"varint,7,opt,name=set_power_mode,json=setPowerMode,proto3,oneof" json:"set_power_mode,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SCD4XConfig) Reset() {
+	*x = SCD4XConfig{}
+	mi := &file_meshtastic_admin_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SCD4XConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SCD4XConfig) ProtoMessage() {}
+
+func (x *SCD4XConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_admin_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SCD4XConfig.ProtoReflect.Descriptor instead.
+func (*SCD4XConfig) Descriptor() ([]byte, []int) {
+	return file_meshtastic_admin_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *SCD4XConfig) GetSetAsc() bool {
+	if x != nil && x.SetAsc != nil {
+		return *x.SetAsc
+	}
+	return false
+}
+
+func (x *SCD4XConfig) GetSetTargetCo2Conc() uint32 {
+	if x != nil && x.SetTargetCo2Conc != nil {
+		return *x.SetTargetCo2Conc
+	}
+	return 0
+}
+
+func (x *SCD4XConfig) GetSetTemperature() float32 {
+	if x != nil && x.SetTemperature != nil {
+		return *x.SetTemperature
+	}
+	return 0
+}
+
+func (x *SCD4XConfig) GetSetAltitude() uint32 {
+	if x != nil && x.SetAltitude != nil {
+		return *x.SetAltitude
+	}
+	return 0
+}
+
+func (x *SCD4XConfig) GetSetAmbientPressure() uint32 {
+	if x != nil && x.SetAmbientPressure != nil {
+		return *x.SetAmbientPressure
+	}
+	return 0
+}
+
+func (x *SCD4XConfig) GetFactoryReset() bool {
+	if x != nil && x.FactoryReset != nil {
+		return *x.FactoryReset
+	}
+	return false
+}
+
+func (x *SCD4XConfig) GetSetPowerMode() bool {
+	if x != nil && x.SetPowerMode != nil {
+		return *x.SetPowerMode
+	}
+	return false
+}
+
+type SEN5XConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Reference temperature in degC
+	SetTemperature *float32 `protobuf:"fixed32,1,opt,name=set_temperature,json=setTemperature,proto3,oneof" json:"set_temperature,omitempty"`
+	// One-shot mode (true for low power - one-shot mode, false for normal - continuous mode)
+	SetOneShotMode *bool `protobuf:"varint,2,opt,name=set_one_shot_mode,json=setOneShotMode,proto3,oneof" json:"set_one_shot_mode,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *SEN5XConfig) Reset() {
+	*x = SEN5XConfig{}
+	mi := &file_meshtastic_admin_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SEN5XConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SEN5XConfig) ProtoMessage() {}
+
+func (x *SEN5XConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_admin_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SEN5XConfig.ProtoReflect.Descriptor instead.
+func (*SEN5XConfig) Descriptor() ([]byte, []int) {
+	return file_meshtastic_admin_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SEN5XConfig) GetSetTemperature() float32 {
+	if x != nil && x.SetTemperature != nil {
+		return *x.SetTemperature
+	}
+	return 0
+}
+
+func (x *SEN5XConfig) GetSetOneShotMode() bool {
+	if x != nil && x.SetOneShotMode != nil {
+		return *x.SetOneShotMode
+	}
+	return false
+}
+
 // Input event message to be sent to the node.
 type AdminMessage_InputEvent struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1674,7 +1898,7 @@ type AdminMessage_InputEvent struct {
 
 func (x *AdminMessage_InputEvent) Reset() {
 	*x = AdminMessage_InputEvent{}
-	mi := &file_meshtastic_admin_proto_msgTypes[5]
+	mi := &file_meshtastic_admin_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1686,7 +1910,7 @@ func (x *AdminMessage_InputEvent) String() string {
 func (*AdminMessage_InputEvent) ProtoMessage() {}
 
 func (x *AdminMessage_InputEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_admin_proto_msgTypes[5]
+	mi := &file_meshtastic_admin_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1745,7 +1969,7 @@ type AdminMessage_OTAEvent struct {
 
 func (x *AdminMessage_OTAEvent) Reset() {
 	*x = AdminMessage_OTAEvent{}
-	mi := &file_meshtastic_admin_proto_msgTypes[6]
+	mi := &file_meshtastic_admin_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1757,7 +1981,7 @@ func (x *AdminMessage_OTAEvent) String() string {
 func (*AdminMessage_OTAEvent) ProtoMessage() {}
 
 func (x *AdminMessage_OTAEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_admin_proto_msgTypes[6]
+	mi := &file_meshtastic_admin_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1792,7 +2016,7 @@ var File_meshtastic_admin_proto protoreflect.FileDescriptor
 const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"\x16meshtastic/admin.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\xc9#\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\x8a$\n" +
 	"\fAdminMessage\x12'\n" +
 	"\x0fsession_passkey\x18e \x01(\fR\x0esessionPasskey\x120\n" +
 	"\x13get_channel_request\x18\x01 \x01(\rH\x00R\x11getChannelRequest\x12G\n" +
@@ -1856,7 +2080,8 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x14factory_reset_config\x18c \x01(\x05H\x00R\x12factoryResetConfig\x12#\n" +
 	"\fnodedb_reset\x18d \x01(\bH\x00R\vnodedbReset\x12D\n" +
 	"\vota_request\x18f \x01(\v2!.meshtastic.AdminMessage.OTAEventH\x00R\n" +
-	"otaRequest\x1av\n" +
+	"otaRequest\x12?\n" +
+	"\rsensor_config\x18g \x01(\v2\x18.meshtastic.SensorConfigH\x00R\fsensorConfig\x1av\n" +
 	"\n" +
 	"InputEvent\x12\x1d\n" +
 	"\n" +
@@ -1922,7 +2147,31 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x17PROVIDE_SECURITY_NUMBER\x10\x01\x12\r\n" +
 	"\tDO_VERIFY\x10\x02\x12\x11\n" +
 	"\rDO_NOT_VERIFY\x10\x03B\x12\n" +
-	"\x10_security_number*7\n" +
+	"\x10_security_number\"\x88\x01\n" +
+	"\fSensorConfig\x12;\n" +
+	"\fscd4x_config\x18\x01 \x01(\v2\x18.meshtastic.SCD4X_configR\vscd4xConfig\x12;\n" +
+	"\fsen5x_config\x18\x02 \x01(\v2\x18.meshtastic.SEN5X_configR\vsen5xConfig\"\xc9\x03\n" +
+	"\fSCD4X_config\x12\x1c\n" +
+	"\aset_asc\x18\x01 \x01(\bH\x00R\x06setAsc\x88\x01\x01\x122\n" +
+	"\x13set_target_co2_conc\x18\x02 \x01(\rH\x01R\x10setTargetCo2Conc\x88\x01\x01\x12,\n" +
+	"\x0fset_temperature\x18\x03 \x01(\x02H\x02R\x0esetTemperature\x88\x01\x01\x12&\n" +
+	"\fset_altitude\x18\x04 \x01(\rH\x03R\vsetAltitude\x88\x01\x01\x125\n" +
+	"\x14set_ambient_pressure\x18\x05 \x01(\rH\x04R\x12setAmbientPressure\x88\x01\x01\x12(\n" +
+	"\rfactory_reset\x18\x06 \x01(\bH\x05R\ffactoryReset\x88\x01\x01\x12)\n" +
+	"\x0eset_power_mode\x18\a \x01(\bH\x06R\fsetPowerMode\x88\x01\x01B\n" +
+	"\n" +
+	"\b_set_ascB\x16\n" +
+	"\x14_set_target_co2_concB\x12\n" +
+	"\x10_set_temperatureB\x0f\n" +
+	"\r_set_altitudeB\x17\n" +
+	"\x15_set_ambient_pressureB\x10\n" +
+	"\x0e_factory_resetB\x11\n" +
+	"\x0f_set_power_mode\"\x96\x01\n" +
+	"\fSEN5X_config\x12,\n" +
+	"\x0fset_temperature\x18\x01 \x01(\x02H\x00R\x0esetTemperature\x88\x01\x01\x12.\n" +
+	"\x11set_one_shot_mode\x18\x02 \x01(\bH\x01R\x0esetOneShotMode\x88\x01\x01B\x12\n" +
+	"\x10_set_temperatureB\x14\n" +
+	"\x12_set_one_shot_mode*7\n" +
 	"\aOTAMode\x12\x11\n" +
 	"\rNO_REBOOT_OTA\x10\x00\x12\v\n" +
 	"\aOTA_BLE\x10\x01\x12\f\n" +
@@ -1942,7 +2191,7 @@ func file_meshtastic_admin_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_meshtastic_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_meshtastic_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_meshtastic_admin_proto_goTypes = []any{
 	(OTAMode)(0),                           // 0: meshtastic.OTAMode
 	(AdminMessage_ConfigType)(0),           // 1: meshtastic.AdminMessage.ConfigType
@@ -1954,52 +2203,58 @@ var file_meshtastic_admin_proto_goTypes = []any{
 	(*NodeRemoteHardwarePinsResponse)(nil), // 7: meshtastic.NodeRemoteHardwarePinsResponse
 	(*SharedContact)(nil),                  // 8: meshtastic.SharedContact
 	(*KeyVerificationAdmin)(nil),           // 9: meshtastic.KeyVerificationAdmin
-	(*AdminMessage_InputEvent)(nil),        // 10: meshtastic.AdminMessage.InputEvent
-	(*AdminMessage_OTAEvent)(nil),          // 11: meshtastic.AdminMessage.OTAEvent
-	(*Channel)(nil),                        // 12: meshtastic.Channel
-	(*User)(nil),                           // 13: meshtastic.User
-	(*Config)(nil),                         // 14: meshtastic.Config
-	(*ModuleConfig)(nil),                   // 15: meshtastic.ModuleConfig
-	(*DeviceMetadata)(nil),                 // 16: meshtastic.DeviceMetadata
-	(*DeviceConnectionStatus)(nil),         // 17: meshtastic.DeviceConnectionStatus
-	(*Position)(nil),                       // 18: meshtastic.Position
-	(*DeviceUIConfig)(nil),                 // 19: meshtastic.DeviceUIConfig
-	(*NodeRemoteHardwarePin)(nil),          // 20: meshtastic.NodeRemoteHardwarePin
+	(*SensorConfig)(nil),                   // 10: meshtastic.SensorConfig
+	(*SCD4XConfig)(nil),                    // 11: meshtastic.SCD4X_config
+	(*SEN5XConfig)(nil),                    // 12: meshtastic.SEN5X_config
+	(*AdminMessage_InputEvent)(nil),        // 13: meshtastic.AdminMessage.InputEvent
+	(*AdminMessage_OTAEvent)(nil),          // 14: meshtastic.AdminMessage.OTAEvent
+	(*Channel)(nil),                        // 15: meshtastic.Channel
+	(*User)(nil),                           // 16: meshtastic.User
+	(*Config)(nil),                         // 17: meshtastic.Config
+	(*ModuleConfig)(nil),                   // 18: meshtastic.ModuleConfig
+	(*DeviceMetadata)(nil),                 // 19: meshtastic.DeviceMetadata
+	(*DeviceConnectionStatus)(nil),         // 20: meshtastic.DeviceConnectionStatus
+	(*Position)(nil),                       // 21: meshtastic.Position
+	(*DeviceUIConfig)(nil),                 // 22: meshtastic.DeviceUIConfig
+	(*NodeRemoteHardwarePin)(nil),          // 23: meshtastic.NodeRemoteHardwarePin
 }
 var file_meshtastic_admin_proto_depIdxs = []int32{
-	12, // 0: meshtastic.AdminMessage.get_channel_response:type_name -> meshtastic.Channel
-	13, // 1: meshtastic.AdminMessage.get_owner_response:type_name -> meshtastic.User
+	15, // 0: meshtastic.AdminMessage.get_channel_response:type_name -> meshtastic.Channel
+	16, // 1: meshtastic.AdminMessage.get_owner_response:type_name -> meshtastic.User
 	1,  // 2: meshtastic.AdminMessage.get_config_request:type_name -> meshtastic.AdminMessage.ConfigType
-	14, // 3: meshtastic.AdminMessage.get_config_response:type_name -> meshtastic.Config
+	17, // 3: meshtastic.AdminMessage.get_config_response:type_name -> meshtastic.Config
 	2,  // 4: meshtastic.AdminMessage.get_module_config_request:type_name -> meshtastic.AdminMessage.ModuleConfigType
-	15, // 5: meshtastic.AdminMessage.get_module_config_response:type_name -> meshtastic.ModuleConfig
-	16, // 6: meshtastic.AdminMessage.get_device_metadata_response:type_name -> meshtastic.DeviceMetadata
-	17, // 7: meshtastic.AdminMessage.get_device_connection_status_response:type_name -> meshtastic.DeviceConnectionStatus
+	18, // 5: meshtastic.AdminMessage.get_module_config_response:type_name -> meshtastic.ModuleConfig
+	19, // 6: meshtastic.AdminMessage.get_device_metadata_response:type_name -> meshtastic.DeviceMetadata
+	20, // 7: meshtastic.AdminMessage.get_device_connection_status_response:type_name -> meshtastic.DeviceConnectionStatus
 	6,  // 8: meshtastic.AdminMessage.set_ham_mode:type_name -> meshtastic.HamParameters
 	7,  // 9: meshtastic.AdminMessage.get_node_remote_hardware_pins_response:type_name -> meshtastic.NodeRemoteHardwarePinsResponse
 	3,  // 10: meshtastic.AdminMessage.backup_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
 	3,  // 11: meshtastic.AdminMessage.restore_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
 	3,  // 12: meshtastic.AdminMessage.remove_backup_preferences:type_name -> meshtastic.AdminMessage.BackupLocation
-	10, // 13: meshtastic.AdminMessage.send_input_event:type_name -> meshtastic.AdminMessage.InputEvent
-	13, // 14: meshtastic.AdminMessage.set_owner:type_name -> meshtastic.User
-	12, // 15: meshtastic.AdminMessage.set_channel:type_name -> meshtastic.Channel
-	14, // 16: meshtastic.AdminMessage.set_config:type_name -> meshtastic.Config
-	15, // 17: meshtastic.AdminMessage.set_module_config:type_name -> meshtastic.ModuleConfig
-	18, // 18: meshtastic.AdminMessage.set_fixed_position:type_name -> meshtastic.Position
-	19, // 19: meshtastic.AdminMessage.get_ui_config_response:type_name -> meshtastic.DeviceUIConfig
-	19, // 20: meshtastic.AdminMessage.store_ui_config:type_name -> meshtastic.DeviceUIConfig
+	13, // 13: meshtastic.AdminMessage.send_input_event:type_name -> meshtastic.AdminMessage.InputEvent
+	16, // 14: meshtastic.AdminMessage.set_owner:type_name -> meshtastic.User
+	15, // 15: meshtastic.AdminMessage.set_channel:type_name -> meshtastic.Channel
+	17, // 16: meshtastic.AdminMessage.set_config:type_name -> meshtastic.Config
+	18, // 17: meshtastic.AdminMessage.set_module_config:type_name -> meshtastic.ModuleConfig
+	21, // 18: meshtastic.AdminMessage.set_fixed_position:type_name -> meshtastic.Position
+	22, // 19: meshtastic.AdminMessage.get_ui_config_response:type_name -> meshtastic.DeviceUIConfig
+	22, // 20: meshtastic.AdminMessage.store_ui_config:type_name -> meshtastic.DeviceUIConfig
 	8,  // 21: meshtastic.AdminMessage.add_contact:type_name -> meshtastic.SharedContact
 	9,  // 22: meshtastic.AdminMessage.key_verification:type_name -> meshtastic.KeyVerificationAdmin
-	11, // 23: meshtastic.AdminMessage.ota_request:type_name -> meshtastic.AdminMessage.OTAEvent
-	20, // 24: meshtastic.NodeRemoteHardwarePinsResponse.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
-	13, // 25: meshtastic.SharedContact.user:type_name -> meshtastic.User
-	4,  // 26: meshtastic.KeyVerificationAdmin.message_type:type_name -> meshtastic.KeyVerificationAdmin.MessageType
-	0,  // 27: meshtastic.AdminMessage.OTAEvent.reboot_ota_mode:type_name -> meshtastic.OTAMode
-	28, // [28:28] is the sub-list for method output_type
-	28, // [28:28] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	14, // 23: meshtastic.AdminMessage.ota_request:type_name -> meshtastic.AdminMessage.OTAEvent
+	10, // 24: meshtastic.AdminMessage.sensor_config:type_name -> meshtastic.SensorConfig
+	23, // 25: meshtastic.NodeRemoteHardwarePinsResponse.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
+	16, // 26: meshtastic.SharedContact.user:type_name -> meshtastic.User
+	4,  // 27: meshtastic.KeyVerificationAdmin.message_type:type_name -> meshtastic.KeyVerificationAdmin.MessageType
+	11, // 28: meshtastic.SensorConfig.scd4x_config:type_name -> meshtastic.SCD4X_config
+	12, // 29: meshtastic.SensorConfig.sen5x_config:type_name -> meshtastic.SEN5X_config
+	0,  // 30: meshtastic.AdminMessage.OTAEvent.reboot_ota_mode:type_name -> meshtastic.OTAMode
+	31, // [31:31] is the sub-list for method output_type
+	31, // [31:31] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_admin_proto_init() }
@@ -2070,15 +2325,18 @@ func file_meshtastic_admin_proto_init() {
 		(*AdminMessage_FactoryResetConfig)(nil),
 		(*AdminMessage_NodedbReset)(nil),
 		(*AdminMessage_OtaRequest)(nil),
+		(*AdminMessage_SensorConfig)(nil),
 	}
 	file_meshtastic_admin_proto_msgTypes[4].OneofWrappers = []any{}
+	file_meshtastic_admin_proto_msgTypes[6].OneofWrappers = []any{}
+	file_meshtastic_admin_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_admin_proto_rawDesc), len(file_meshtastic_admin_proto_rawDesc)),
 			NumEnums:      5,
-			NumMessages:   7,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
