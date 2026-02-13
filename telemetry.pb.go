@@ -117,6 +117,14 @@ const (
 	TelemetrySensorType_TSL2561 TelemetrySensorType = 44
 	// BH1750 light sensor
 	TelemetrySensorType_BH1750 TelemetrySensorType = 45
+	// HDC1080 Temperature and Humidity Sensor
+	TelemetrySensorType_HDC1080 TelemetrySensorType = 46
+	// STH21 Temperature and R. Humidity sensor
+	TelemetrySensorType_SHT21 TelemetrySensorType = 47
+	// Sensirion STC31 CO2 sensor
+	TelemetrySensorType_STC31 TelemetrySensorType = 48
+	// SCD30 CO2, humidity, temperature sensor
+	TelemetrySensorType_SCD30 TelemetrySensorType = 49
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -168,6 +176,10 @@ var (
 		43: "SEN5X",
 		44: "TSL2561",
 		45: "BH1750",
+		46: "HDC1080",
+		47: "SHT21",
+		48: "STC31",
+		49: "SCD30",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -216,6 +228,10 @@ var (
 		"SEN5X":         43,
 		"TSL2561":       44,
 		"BH1750":        45,
+		"HDC1080":       46,
+		"SHT21":         47,
+		"STC31":         48,
+		"SCD30":         49,
 	}
 )
 
@@ -1182,6 +1198,106 @@ func (x *LocalStats) GetNoiseFloor() int32 {
 	return 0
 }
 
+// Traffic management statistics for mesh network optimization
+type TrafficManagementStats struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Total number of packets inspected by traffic management
+	PacketsInspected uint32 `protobuf:"varint,1,opt,name=packets_inspected,json=packetsInspected,proto3" json:"packets_inspected,omitempty"`
+	// Number of position packets dropped due to deduplication
+	PositionDedupDrops uint32 `protobuf:"varint,2,opt,name=position_dedup_drops,json=positionDedupDrops,proto3" json:"position_dedup_drops,omitempty"`
+	// Number of NodeInfo requests answered from cache
+	NodeinfoCacheHits uint32 `protobuf:"varint,3,opt,name=nodeinfo_cache_hits,json=nodeinfoCacheHits,proto3" json:"nodeinfo_cache_hits,omitempty"`
+	// Number of packets dropped due to rate limiting
+	RateLimitDrops uint32 `protobuf:"varint,4,opt,name=rate_limit_drops,json=rateLimitDrops,proto3" json:"rate_limit_drops,omitempty"`
+	// Number of unknown/undecryptable packets dropped
+	UnknownPacketDrops uint32 `protobuf:"varint,5,opt,name=unknown_packet_drops,json=unknownPacketDrops,proto3" json:"unknown_packet_drops,omitempty"`
+	// Number of packets with hop_limit exhausted for local-only broadcast
+	HopExhaustedPackets uint32 `protobuf:"varint,6,opt,name=hop_exhausted_packets,json=hopExhaustedPackets,proto3" json:"hop_exhausted_packets,omitempty"`
+	// Number of times router hop preservation was applied
+	RouterHopsPreserved uint32 `protobuf:"varint,7,opt,name=router_hops_preserved,json=routerHopsPreserved,proto3" json:"router_hops_preserved,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *TrafficManagementStats) Reset() {
+	*x = TrafficManagementStats{}
+	mi := &file_meshtastic_telemetry_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrafficManagementStats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrafficManagementStats) ProtoMessage() {}
+
+func (x *TrafficManagementStats) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_telemetry_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrafficManagementStats.ProtoReflect.Descriptor instead.
+func (*TrafficManagementStats) Descriptor() ([]byte, []int) {
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *TrafficManagementStats) GetPacketsInspected() uint32 {
+	if x != nil {
+		return x.PacketsInspected
+	}
+	return 0
+}
+
+func (x *TrafficManagementStats) GetPositionDedupDrops() uint32 {
+	if x != nil {
+		return x.PositionDedupDrops
+	}
+	return 0
+}
+
+func (x *TrafficManagementStats) GetNodeinfoCacheHits() uint32 {
+	if x != nil {
+		return x.NodeinfoCacheHits
+	}
+	return 0
+}
+
+func (x *TrafficManagementStats) GetRateLimitDrops() uint32 {
+	if x != nil {
+		return x.RateLimitDrops
+	}
+	return 0
+}
+
+func (x *TrafficManagementStats) GetUnknownPacketDrops() uint32 {
+	if x != nil {
+		return x.UnknownPacketDrops
+	}
+	return 0
+}
+
+func (x *TrafficManagementStats) GetHopExhaustedPackets() uint32 {
+	if x != nil {
+		return x.HopExhaustedPackets
+	}
+	return 0
+}
+
+func (x *TrafficManagementStats) GetRouterHopsPreserved() uint32 {
+	if x != nil {
+		return x.RouterHopsPreserved
+	}
+	return 0
+}
+
 // Health telemetry metrics
 type HealthMetrics struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1197,7 +1313,7 @@ type HealthMetrics struct {
 
 func (x *HealthMetrics) Reset() {
 	*x = HealthMetrics{}
-	mi := &file_meshtastic_telemetry_proto_msgTypes[5]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1209,7 +1325,7 @@ func (x *HealthMetrics) String() string {
 func (*HealthMetrics) ProtoMessage() {}
 
 func (x *HealthMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_telemetry_proto_msgTypes[5]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1222,7 +1338,7 @@ func (x *HealthMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HealthMetrics.ProtoReflect.Descriptor instead.
 func (*HealthMetrics) Descriptor() ([]byte, []int) {
-	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{5}
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *HealthMetrics) GetHeartBpm() uint32 {
@@ -1274,7 +1390,7 @@ type HostMetrics struct {
 
 func (x *HostMetrics) Reset() {
 	*x = HostMetrics{}
-	mi := &file_meshtastic_telemetry_proto_msgTypes[6]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1286,7 +1402,7 @@ func (x *HostMetrics) String() string {
 func (*HostMetrics) ProtoMessage() {}
 
 func (x *HostMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_telemetry_proto_msgTypes[6]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1299,7 +1415,7 @@ func (x *HostMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HostMetrics.ProtoReflect.Descriptor instead.
 func (*HostMetrics) Descriptor() ([]byte, []int) {
-	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{6}
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *HostMetrics) GetUptimeSeconds() uint32 {
@@ -1379,6 +1495,7 @@ type Telemetry struct {
 	//	*Telemetry_LocalStats
 	//	*Telemetry_HealthMetrics
 	//	*Telemetry_HostMetrics
+	//	*Telemetry_TrafficManagementStats
 	Variant       isTelemetry_Variant `protobuf_oneof:"variant"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1386,7 +1503,7 @@ type Telemetry struct {
 
 func (x *Telemetry) Reset() {
 	*x = Telemetry{}
-	mi := &file_meshtastic_telemetry_proto_msgTypes[7]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1398,7 +1515,7 @@ func (x *Telemetry) String() string {
 func (*Telemetry) ProtoMessage() {}
 
 func (x *Telemetry) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_telemetry_proto_msgTypes[7]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1411,7 +1528,7 @@ func (x *Telemetry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Telemetry.ProtoReflect.Descriptor instead.
 func (*Telemetry) Descriptor() ([]byte, []int) {
-	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{7}
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Telemetry) GetTime() uint32 {
@@ -1491,6 +1608,15 @@ func (x *Telemetry) GetHostMetrics() *HostMetrics {
 	return nil
 }
 
+func (x *Telemetry) GetTrafficManagementStats() *TrafficManagementStats {
+	if x != nil {
+		if x, ok := x.Variant.(*Telemetry_TrafficManagementStats); ok {
+			return x.TrafficManagementStats
+		}
+	}
+	return nil
+}
+
 type isTelemetry_Variant interface {
 	isTelemetry_Variant()
 }
@@ -1530,6 +1656,11 @@ type Telemetry_HostMetrics struct {
 	HostMetrics *HostMetrics `protobuf:"bytes,8,opt,name=host_metrics,json=hostMetrics,proto3,oneof"`
 }
 
+type Telemetry_TrafficManagementStats struct {
+	// Traffic management statistics
+	TrafficManagementStats *TrafficManagementStats `protobuf:"bytes,9,opt,name=traffic_management_stats,json=trafficManagementStats,proto3,oneof"`
+}
+
 func (*Telemetry_DeviceMetrics) isTelemetry_Variant() {}
 
 func (*Telemetry_EnvironmentMetrics) isTelemetry_Variant() {}
@@ -1544,6 +1675,8 @@ func (*Telemetry_HealthMetrics) isTelemetry_Variant() {}
 
 func (*Telemetry_HostMetrics) isTelemetry_Variant() {}
 
+func (*Telemetry_TrafficManagementStats) isTelemetry_Variant() {}
+
 // NAU7802 Telemetry configuration, for saving to flash
 type Nau7802Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1557,7 +1690,7 @@ type Nau7802Config struct {
 
 func (x *Nau7802Config) Reset() {
 	*x = Nau7802Config{}
-	mi := &file_meshtastic_telemetry_proto_msgTypes[8]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1569,7 +1702,7 @@ func (x *Nau7802Config) String() string {
 func (*Nau7802Config) ProtoMessage() {}
 
 func (x *Nau7802Config) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_telemetry_proto_msgTypes[8]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1582,7 +1715,7 @@ func (x *Nau7802Config) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Nau7802Config.ProtoReflect.Descriptor instead.
 func (*Nau7802Config) Descriptor() ([]byte, []int) {
-	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{8}
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Nau7802Config) GetZeroOffset() int32 {
@@ -1620,7 +1753,7 @@ type SEN5XState struct {
 
 func (x *SEN5XState) Reset() {
 	*x = SEN5XState{}
-	mi := &file_meshtastic_telemetry_proto_msgTypes[9]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1632,7 +1765,7 @@ func (x *SEN5XState) String() string {
 func (*SEN5XState) ProtoMessage() {}
 
 func (x *SEN5XState) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_telemetry_proto_msgTypes[9]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1645,7 +1778,7 @@ func (x *SEN5XState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SEN5XState.ProtoReflect.Descriptor instead.
 func (*SEN5XState) Descriptor() ([]byte, []int) {
-	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{9}
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SEN5XState) GetLastCleaningTime() uint32 {
@@ -1889,7 +2022,15 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0fheap_free_bytes\x18\r \x01(\rR\rheapFreeBytes\x12$\n" +
 	"\x0enum_tx_dropped\x18\x0e \x01(\rR\fnumTxDropped\x12\x1f\n" +
 	"\vnoise_floor\x18\x0f \x01(\x05R\n" +
-	"noiseFloor\"\x98\x01\n" +
+	"noiseFloor\"\xeb\x02\n" +
+	"\x16TrafficManagementStats\x12+\n" +
+	"\x11packets_inspected\x18\x01 \x01(\rR\x10packetsInspected\x120\n" +
+	"\x14position_dedup_drops\x18\x02 \x01(\rR\x12positionDedupDrops\x12.\n" +
+	"\x13nodeinfo_cache_hits\x18\x03 \x01(\rR\x11nodeinfoCacheHits\x12(\n" +
+	"\x10rate_limit_drops\x18\x04 \x01(\rR\x0erateLimitDrops\x120\n" +
+	"\x14unknown_packet_drops\x18\x05 \x01(\rR\x12unknownPacketDrops\x122\n" +
+	"\x15hop_exhausted_packets\x18\x06 \x01(\rR\x13hopExhaustedPackets\x122\n" +
+	"\x15router_hops_preserved\x18\a \x01(\rR\x13routerHopsPreserved\"\x98\x01\n" +
 	"\rHealthMetrics\x12 \n" +
 	"\theart_bpm\x18\x01 \x01(\rH\x00R\bheartBpm\x88\x01\x01\x12\x17\n" +
 	"\x04spO2\x18\x02 \x01(\rH\x01R\x04spO2\x88\x01\x01\x12%\n" +
@@ -1911,7 +2052,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"userString\x88\x01\x01B\x12\n" +
 	"\x10_diskfree2_bytesB\x12\n" +
 	"\x10_diskfree3_bytesB\x0e\n" +
-	"\f_user_string\"\x90\x04\n" +
+	"\f_user_string\"\xf0\x04\n" +
 	"\tTelemetry\x12\x12\n" +
 	"\x04time\x18\x01 \x01(\aR\x04time\x12B\n" +
 	"\x0edevice_metrics\x18\x02 \x01(\v2\x19.meshtastic.DeviceMetricsH\x00R\rdeviceMetrics\x12Q\n" +
@@ -1921,7 +2062,8 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\vlocal_stats\x18\x06 \x01(\v2\x16.meshtastic.LocalStatsH\x00R\n" +
 	"localStats\x12B\n" +
 	"\x0ehealth_metrics\x18\a \x01(\v2\x19.meshtastic.HealthMetricsH\x00R\rhealthMetrics\x12<\n" +
-	"\fhost_metrics\x18\b \x01(\v2\x17.meshtastic.HostMetricsH\x00R\vhostMetricsB\t\n" +
+	"\fhost_metrics\x18\b \x01(\v2\x17.meshtastic.HostMetricsH\x00R\vhostMetrics\x12^\n" +
+	"\x18traffic_management_stats\x18\t \x01(\v2\".meshtastic.TrafficManagementStatsH\x00R\x16trafficManagementStatsB\t\n" +
 	"\avariant\"]\n" +
 	"\rNau7802Config\x12\x1e\n" +
 	"\n" +
@@ -1938,7 +2080,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0fvoc_state_array\x18\x06 \x01(\x06H\x02R\rvocStateArray\x88\x01\x01B\x11\n" +
 	"\x0f_voc_state_timeB\x12\n" +
 	"\x10_voc_state_validB\x12\n" +
-	"\x10_voc_state_array*\xf9\x04\n" +
+	"\x10_voc_state_array*\xa7\x05\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -1997,7 +2139,11 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x05SEN5X\x10+\x12\v\n" +
 	"\aTSL2561\x10,\x12\n" +
 	"\n" +
-	"\x06BH1750\x10-Bf\n" +
+	"\x06BH1750\x10-\x12\v\n" +
+	"\aHDC1080\x10.\x12\t\n" +
+	"\x05SHT21\x10/\x12\t\n" +
+	"\x05STC31\x100\x12\t\n" +
+	"\x05SCD30\x101Bf\n" +
 	"\x14org.meshtastic.protoB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
@@ -2013,19 +2159,20 @@ func file_meshtastic_telemetry_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_telemetry_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_meshtastic_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_meshtastic_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_meshtastic_telemetry_proto_goTypes = []any{
-	(TelemetrySensorType)(0),   // 0: meshtastic.TelemetrySensorType
-	(*DeviceMetrics)(nil),      // 1: meshtastic.DeviceMetrics
-	(*EnvironmentMetrics)(nil), // 2: meshtastic.EnvironmentMetrics
-	(*PowerMetrics)(nil),       // 3: meshtastic.PowerMetrics
-	(*AirQualityMetrics)(nil),  // 4: meshtastic.AirQualityMetrics
-	(*LocalStats)(nil),         // 5: meshtastic.LocalStats
-	(*HealthMetrics)(nil),      // 6: meshtastic.HealthMetrics
-	(*HostMetrics)(nil),        // 7: meshtastic.HostMetrics
-	(*Telemetry)(nil),          // 8: meshtastic.Telemetry
-	(*Nau7802Config)(nil),      // 9: meshtastic.Nau7802Config
-	(*SEN5XState)(nil),         // 10: meshtastic.SEN5XState
+	(TelemetrySensorType)(0),       // 0: meshtastic.TelemetrySensorType
+	(*DeviceMetrics)(nil),          // 1: meshtastic.DeviceMetrics
+	(*EnvironmentMetrics)(nil),     // 2: meshtastic.EnvironmentMetrics
+	(*PowerMetrics)(nil),           // 3: meshtastic.PowerMetrics
+	(*AirQualityMetrics)(nil),      // 4: meshtastic.AirQualityMetrics
+	(*LocalStats)(nil),             // 5: meshtastic.LocalStats
+	(*TrafficManagementStats)(nil), // 6: meshtastic.TrafficManagementStats
+	(*HealthMetrics)(nil),          // 7: meshtastic.HealthMetrics
+	(*HostMetrics)(nil),            // 8: meshtastic.HostMetrics
+	(*Telemetry)(nil),              // 9: meshtastic.Telemetry
+	(*Nau7802Config)(nil),          // 10: meshtastic.Nau7802Config
+	(*SEN5XState)(nil),             // 11: meshtastic.SEN5XState
 }
 var file_meshtastic_telemetry_proto_depIdxs = []int32{
 	1, // 0: meshtastic.Telemetry.device_metrics:type_name -> meshtastic.DeviceMetrics
@@ -2033,13 +2180,14 @@ var file_meshtastic_telemetry_proto_depIdxs = []int32{
 	4, // 2: meshtastic.Telemetry.air_quality_metrics:type_name -> meshtastic.AirQualityMetrics
 	3, // 3: meshtastic.Telemetry.power_metrics:type_name -> meshtastic.PowerMetrics
 	5, // 4: meshtastic.Telemetry.local_stats:type_name -> meshtastic.LocalStats
-	6, // 5: meshtastic.Telemetry.health_metrics:type_name -> meshtastic.HealthMetrics
-	7, // 6: meshtastic.Telemetry.host_metrics:type_name -> meshtastic.HostMetrics
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	7, // 5: meshtastic.Telemetry.health_metrics:type_name -> meshtastic.HealthMetrics
+	8, // 6: meshtastic.Telemetry.host_metrics:type_name -> meshtastic.HostMetrics
+	6, // 7: meshtastic.Telemetry.traffic_management_stats:type_name -> meshtastic.TrafficManagementStats
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_telemetry_proto_init() }
@@ -2051,9 +2199,9 @@ func file_meshtastic_telemetry_proto_init() {
 	file_meshtastic_telemetry_proto_msgTypes[1].OneofWrappers = []any{}
 	file_meshtastic_telemetry_proto_msgTypes[2].OneofWrappers = []any{}
 	file_meshtastic_telemetry_proto_msgTypes[3].OneofWrappers = []any{}
-	file_meshtastic_telemetry_proto_msgTypes[5].OneofWrappers = []any{}
 	file_meshtastic_telemetry_proto_msgTypes[6].OneofWrappers = []any{}
-	file_meshtastic_telemetry_proto_msgTypes[7].OneofWrappers = []any{
+	file_meshtastic_telemetry_proto_msgTypes[7].OneofWrappers = []any{}
+	file_meshtastic_telemetry_proto_msgTypes[8].OneofWrappers = []any{
 		(*Telemetry_DeviceMetrics)(nil),
 		(*Telemetry_EnvironmentMetrics)(nil),
 		(*Telemetry_AirQualityMetrics)(nil),
@@ -2061,15 +2209,16 @@ func file_meshtastic_telemetry_proto_init() {
 		(*Telemetry_LocalStats)(nil),
 		(*Telemetry_HealthMetrics)(nil),
 		(*Telemetry_HostMetrics)(nil),
+		(*Telemetry_TrafficManagementStats)(nil),
 	}
-	file_meshtastic_telemetry_proto_msgTypes[9].OneofWrappers = []any{}
+	file_meshtastic_telemetry_proto_msgTypes[10].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_telemetry_proto_rawDesc), len(file_meshtastic_telemetry_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -1949,8 +1949,10 @@ type Config_DisplayConfig struct {
 	// If false (default), the device will use short names for various display screens.
 	// If true, node names will show in long format
 	UseLongNodeName bool `protobuf:"varint,13,opt,name=use_long_node_name,json=useLongNodeName,proto3" json:"use_long_node_name,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// If true, the device will display message bubbles on screen.
+	EnableMessageBubbles bool `protobuf:"varint,14,opt,name=enable_message_bubbles,json=enableMessageBubbles,proto3" json:"enable_message_bubbles,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *Config_DisplayConfig) Reset() {
@@ -2072,6 +2074,13 @@ func (x *Config_DisplayConfig) GetUse_12HClock() bool {
 func (x *Config_DisplayConfig) GetUseLongNodeName() bool {
 	if x != nil {
 		return x.UseLongNodeName
+	}
+	return false
+}
+
+func (x *Config_DisplayConfig) GetEnableMessageBubbles() bool {
+	if x != nil {
+		return x.EnableMessageBubbles
 	}
 	return false
 }
@@ -2586,7 +2595,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xfd3\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xb34\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2724,7 +2733,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x06STATIC\x10\x01\"4\n" +
 	"\rProtocolFlags\x12\x10\n" +
 	"\fNO_BROADCAST\x10\x00\x12\x11\n" +
-	"\rUDP_BROADCAST\x10\x01\x1a\xc3\t\n" +
+	"\rUDP_BROADCAST\x10\x01\x1a\xf9\t\n" +
 	"\rDisplayConfig\x12$\n" +
 	"\x0escreen_on_secs\x18\x01 \x01(\rR\fscreenOnSecs\x12a\n" +
 	"\n" +
@@ -2741,7 +2750,8 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	" \x01(\bR\x11wakeOnTapOrMotion\x12d\n" +
 	"\x13compass_orientation\x18\v \x01(\x0e23.meshtastic.Config.DisplayConfig.CompassOrientationR\x12compassOrientation\x12\"\n" +
 	"\ruse_12h_clock\x18\f \x01(\bR\vuse12hClock\x12+\n" +
-	"\x12use_long_node_name\x18\r \x01(\bR\x0fuseLongNodeName\"+\n" +
+	"\x12use_long_node_name\x18\r \x01(\bR\x0fuseLongNodeName\x124\n" +
+	"\x16enable_message_bubbles\x18\x0e \x01(\bR\x14enableMessageBubbles\"+\n" +
 	"\x1dDeprecatedGpsCoordinateFormat\x12\n" +
 	"\n" +
 	"\x06UNUSED\x10\x00\"(\n" +

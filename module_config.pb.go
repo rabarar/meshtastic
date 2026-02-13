@@ -293,7 +293,7 @@ func (x ModuleConfig_SerialConfig_Serial_Baud) Number() protoreflect.EnumNumber 
 
 // Deprecated: Use ModuleConfig_SerialConfig_Serial_Baud.Descriptor instead.
 func (ModuleConfig_SerialConfig_Serial_Baud) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 7, 0}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 8, 0}
 }
 
 // TODO: REPLACE
@@ -374,7 +374,7 @@ func (x ModuleConfig_SerialConfig_Serial_Mode) Number() protoreflect.EnumNumber 
 
 // Deprecated: Use ModuleConfig_SerialConfig_Serial_Mode.Descriptor instead.
 func (ModuleConfig_SerialConfig_Serial_Mode) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 7, 1}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 8, 1}
 }
 
 // TODO: REPLACE
@@ -447,7 +447,7 @@ func (x ModuleConfig_CannedMessageConfig_InputEventChar) Number() protoreflect.E
 
 // Deprecated: Use ModuleConfig_CannedMessageConfig_InputEventChar.Descriptor instead.
 func (ModuleConfig_CannedMessageConfig_InputEventChar) EnumDescriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 12, 0}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 13, 0}
 }
 
 // Module Config
@@ -471,6 +471,7 @@ type ModuleConfig struct {
 	//	*ModuleConfig_DetectionSensor
 	//	*ModuleConfig_Paxcounter
 	//	*ModuleConfig_Statusmessage
+	//	*ModuleConfig_TrafficManagement
 	PayloadVariant isModuleConfig_PayloadVariant `protobuf_oneof:"payload_variant"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -639,6 +640,15 @@ func (x *ModuleConfig) GetStatusmessage() *ModuleConfig_StatusMessageConfig {
 	return nil
 }
 
+func (x *ModuleConfig) GetTrafficManagement() *ModuleConfig_TrafficManagementConfig {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*ModuleConfig_TrafficManagement); ok {
+			return x.TrafficManagement
+		}
+	}
+	return nil
+}
+
 type isModuleConfig_PayloadVariant interface {
 	isModuleConfig_PayloadVariant()
 }
@@ -713,6 +723,11 @@ type ModuleConfig_Statusmessage struct {
 	Statusmessage *ModuleConfig_StatusMessageConfig `protobuf:"bytes,14,opt,name=statusmessage,proto3,oneof"`
 }
 
+type ModuleConfig_TrafficManagement struct {
+	// Traffic management module config for mesh network optimization
+	TrafficManagement *ModuleConfig_TrafficManagementConfig `protobuf:"bytes,15,opt,name=traffic_management,json=trafficManagement,proto3,oneof"`
+}
+
 func (*ModuleConfig_Mqtt) isModuleConfig_PayloadVariant() {}
 
 func (*ModuleConfig_Serial) isModuleConfig_PayloadVariant() {}
@@ -740,6 +755,8 @@ func (*ModuleConfig_DetectionSensor) isModuleConfig_PayloadVariant() {}
 func (*ModuleConfig_Paxcounter) isModuleConfig_PayloadVariant() {}
 
 func (*ModuleConfig_Statusmessage) isModuleConfig_PayloadVariant() {}
+
+func (*ModuleConfig_TrafficManagement) isModuleConfig_PayloadVariant() {}
 
 // A GPIO pin definition for remote hardware module
 type RemoteHardwarePin struct {
@@ -1434,6 +1451,170 @@ func (x *ModuleConfig_PaxcounterConfig) GetBleThreshold() int32 {
 	return 0
 }
 
+// Config for the Traffic Management module.
+// Provides packet inspection and traffic shaping to help reduce channel utilization
+type ModuleConfig_TrafficManagementConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Master enable for traffic management module
+	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	// Enable position deduplication to drop redundant position broadcasts
+	PositionDedupEnabled bool `protobuf:"varint,2,opt,name=position_dedup_enabled,json=positionDedupEnabled,proto3" json:"position_dedup_enabled,omitempty"`
+	// Number of bits of precision for position deduplication (0-32)
+	PositionPrecisionBits uint32 `protobuf:"varint,3,opt,name=position_precision_bits,json=positionPrecisionBits,proto3" json:"position_precision_bits,omitempty"`
+	// Minimum interval in seconds between position updates from the same node
+	PositionMinIntervalSecs uint32 `protobuf:"varint,4,opt,name=position_min_interval_secs,json=positionMinIntervalSecs,proto3" json:"position_min_interval_secs,omitempty"`
+	// Enable direct response to NodeInfo requests from local cache
+	NodeinfoDirectResponse bool `protobuf:"varint,5,opt,name=nodeinfo_direct_response,json=nodeinfoDirectResponse,proto3" json:"nodeinfo_direct_response,omitempty"`
+	// Minimum hop distance from requestor before responding to NodeInfo requests
+	NodeinfoDirectResponseMaxHops uint32 `protobuf:"varint,6,opt,name=nodeinfo_direct_response_max_hops,json=nodeinfoDirectResponseMaxHops,proto3" json:"nodeinfo_direct_response_max_hops,omitempty"`
+	// Enable per-node rate limiting to throttle chatty nodes
+	RateLimitEnabled bool `protobuf:"varint,7,opt,name=rate_limit_enabled,json=rateLimitEnabled,proto3" json:"rate_limit_enabled,omitempty"`
+	// Time window in seconds for rate limiting calculations
+	RateLimitWindowSecs uint32 `protobuf:"varint,8,opt,name=rate_limit_window_secs,json=rateLimitWindowSecs,proto3" json:"rate_limit_window_secs,omitempty"`
+	// Maximum packets allowed per node within the rate limit window
+	RateLimitMaxPackets uint32 `protobuf:"varint,9,opt,name=rate_limit_max_packets,json=rateLimitMaxPackets,proto3" json:"rate_limit_max_packets,omitempty"`
+	// Enable dropping of unknown/undecryptable packets per rate_limit_window_secs
+	DropUnknownEnabled bool `protobuf:"varint,10,opt,name=drop_unknown_enabled,json=dropUnknownEnabled,proto3" json:"drop_unknown_enabled,omitempty"`
+	// Number of unknown packets before dropping from a node
+	UnknownPacketThreshold uint32 `protobuf:"varint,11,opt,name=unknown_packet_threshold,json=unknownPacketThreshold,proto3" json:"unknown_packet_threshold,omitempty"`
+	// Set hop_limit to 0 for relayed telemetry broadcasts (own packets unaffected)
+	ExhaustHopTelemetry bool `protobuf:"varint,12,opt,name=exhaust_hop_telemetry,json=exhaustHopTelemetry,proto3" json:"exhaust_hop_telemetry,omitempty"`
+	// Set hop_limit to 0 for relayed position broadcasts (own packets unaffected)
+	ExhaustHopPosition bool `protobuf:"varint,13,opt,name=exhaust_hop_position,json=exhaustHopPosition,proto3" json:"exhaust_hop_position,omitempty"`
+	// Preserve hop_limit for router-to-router traffic
+	RouterPreserveHops bool `protobuf:"varint,14,opt,name=router_preserve_hops,json=routerPreserveHops,proto3" json:"router_preserve_hops,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) Reset() {
+	*x = ModuleConfig_TrafficManagementConfig{}
+	mi := &file_meshtastic_module_config_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModuleConfig_TrafficManagementConfig) ProtoMessage() {}
+
+func (x *ModuleConfig_TrafficManagementConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_module_config_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModuleConfig_TrafficManagementConfig.ProtoReflect.Descriptor instead.
+func (*ModuleConfig_TrafficManagementConfig) Descriptor() ([]byte, []int) {
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 7}
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetPositionDedupEnabled() bool {
+	if x != nil {
+		return x.PositionDedupEnabled
+	}
+	return false
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetPositionPrecisionBits() uint32 {
+	if x != nil {
+		return x.PositionPrecisionBits
+	}
+	return 0
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetPositionMinIntervalSecs() uint32 {
+	if x != nil {
+		return x.PositionMinIntervalSecs
+	}
+	return 0
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetNodeinfoDirectResponse() bool {
+	if x != nil {
+		return x.NodeinfoDirectResponse
+	}
+	return false
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetNodeinfoDirectResponseMaxHops() uint32 {
+	if x != nil {
+		return x.NodeinfoDirectResponseMaxHops
+	}
+	return 0
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetRateLimitEnabled() bool {
+	if x != nil {
+		return x.RateLimitEnabled
+	}
+	return false
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetRateLimitWindowSecs() uint32 {
+	if x != nil {
+		return x.RateLimitWindowSecs
+	}
+	return 0
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetRateLimitMaxPackets() uint32 {
+	if x != nil {
+		return x.RateLimitMaxPackets
+	}
+	return 0
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetDropUnknownEnabled() bool {
+	if x != nil {
+		return x.DropUnknownEnabled
+	}
+	return false
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetUnknownPacketThreshold() uint32 {
+	if x != nil {
+		return x.UnknownPacketThreshold
+	}
+	return 0
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetExhaustHopTelemetry() bool {
+	if x != nil {
+		return x.ExhaustHopTelemetry
+	}
+	return false
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetExhaustHopPosition() bool {
+	if x != nil {
+		return x.ExhaustHopPosition
+	}
+	return false
+}
+
+func (x *ModuleConfig_TrafficManagementConfig) GetRouterPreserveHops() bool {
+	if x != nil {
+		return x.RouterPreserveHops
+	}
+	return false
+}
+
 // Serial Config
 type ModuleConfig_SerialConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1461,7 +1642,7 @@ type ModuleConfig_SerialConfig struct {
 
 func (x *ModuleConfig_SerialConfig) Reset() {
 	*x = ModuleConfig_SerialConfig{}
-	mi := &file_meshtastic_module_config_proto_msgTypes[9]
+	mi := &file_meshtastic_module_config_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1473,7 +1654,7 @@ func (x *ModuleConfig_SerialConfig) String() string {
 func (*ModuleConfig_SerialConfig) ProtoMessage() {}
 
 func (x *ModuleConfig_SerialConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_module_config_proto_msgTypes[9]
+	mi := &file_meshtastic_module_config_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1486,7 +1667,7 @@ func (x *ModuleConfig_SerialConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ModuleConfig_SerialConfig.ProtoReflect.Descriptor instead.
 func (*ModuleConfig_SerialConfig) Descriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 7}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 8}
 }
 
 func (x *ModuleConfig_SerialConfig) GetEnabled() bool {
@@ -1595,7 +1776,7 @@ type ModuleConfig_ExternalNotificationConfig struct {
 
 func (x *ModuleConfig_ExternalNotificationConfig) Reset() {
 	*x = ModuleConfig_ExternalNotificationConfig{}
-	mi := &file_meshtastic_module_config_proto_msgTypes[10]
+	mi := &file_meshtastic_module_config_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1607,7 +1788,7 @@ func (x *ModuleConfig_ExternalNotificationConfig) String() string {
 func (*ModuleConfig_ExternalNotificationConfig) ProtoMessage() {}
 
 func (x *ModuleConfig_ExternalNotificationConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_module_config_proto_msgTypes[10]
+	mi := &file_meshtastic_module_config_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1620,7 +1801,7 @@ func (x *ModuleConfig_ExternalNotificationConfig) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use ModuleConfig_ExternalNotificationConfig.ProtoReflect.Descriptor instead.
 func (*ModuleConfig_ExternalNotificationConfig) Descriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 8}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 9}
 }
 
 func (x *ModuleConfig_ExternalNotificationConfig) GetEnabled() bool {
@@ -1749,7 +1930,7 @@ type ModuleConfig_StoreForwardConfig struct {
 
 func (x *ModuleConfig_StoreForwardConfig) Reset() {
 	*x = ModuleConfig_StoreForwardConfig{}
-	mi := &file_meshtastic_module_config_proto_msgTypes[11]
+	mi := &file_meshtastic_module_config_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1761,7 +1942,7 @@ func (x *ModuleConfig_StoreForwardConfig) String() string {
 func (*ModuleConfig_StoreForwardConfig) ProtoMessage() {}
 
 func (x *ModuleConfig_StoreForwardConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_module_config_proto_msgTypes[11]
+	mi := &file_meshtastic_module_config_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1774,7 +1955,7 @@ func (x *ModuleConfig_StoreForwardConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ModuleConfig_StoreForwardConfig.ProtoReflect.Descriptor instead.
 func (*ModuleConfig_StoreForwardConfig) Descriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 9}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 10}
 }
 
 func (x *ModuleConfig_StoreForwardConfig) GetEnabled() bool {
@@ -1838,7 +2019,7 @@ type ModuleConfig_RangeTestConfig struct {
 
 func (x *ModuleConfig_RangeTestConfig) Reset() {
 	*x = ModuleConfig_RangeTestConfig{}
-	mi := &file_meshtastic_module_config_proto_msgTypes[12]
+	mi := &file_meshtastic_module_config_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1850,7 +2031,7 @@ func (x *ModuleConfig_RangeTestConfig) String() string {
 func (*ModuleConfig_RangeTestConfig) ProtoMessage() {}
 
 func (x *ModuleConfig_RangeTestConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_module_config_proto_msgTypes[12]
+	mi := &file_meshtastic_module_config_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1863,7 +2044,7 @@ func (x *ModuleConfig_RangeTestConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ModuleConfig_RangeTestConfig.ProtoReflect.Descriptor instead.
 func (*ModuleConfig_RangeTestConfig) Descriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 10}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 11}
 }
 
 func (x *ModuleConfig_RangeTestConfig) GetEnabled() bool {
@@ -1940,7 +2121,7 @@ type ModuleConfig_TelemetryConfig struct {
 
 func (x *ModuleConfig_TelemetryConfig) Reset() {
 	*x = ModuleConfig_TelemetryConfig{}
-	mi := &file_meshtastic_module_config_proto_msgTypes[13]
+	mi := &file_meshtastic_module_config_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1952,7 +2133,7 @@ func (x *ModuleConfig_TelemetryConfig) String() string {
 func (*ModuleConfig_TelemetryConfig) ProtoMessage() {}
 
 func (x *ModuleConfig_TelemetryConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_module_config_proto_msgTypes[13]
+	mi := &file_meshtastic_module_config_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1965,7 +2146,7 @@ func (x *ModuleConfig_TelemetryConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ModuleConfig_TelemetryConfig.ProtoReflect.Descriptor instead.
 func (*ModuleConfig_TelemetryConfig) Descriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 11}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 12}
 }
 
 func (x *ModuleConfig_TelemetryConfig) GetDeviceUpdateInterval() uint32 {
@@ -2110,7 +2291,7 @@ type ModuleConfig_CannedMessageConfig struct {
 
 func (x *ModuleConfig_CannedMessageConfig) Reset() {
 	*x = ModuleConfig_CannedMessageConfig{}
-	mi := &file_meshtastic_module_config_proto_msgTypes[14]
+	mi := &file_meshtastic_module_config_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2122,7 +2303,7 @@ func (x *ModuleConfig_CannedMessageConfig) String() string {
 func (*ModuleConfig_CannedMessageConfig) ProtoMessage() {}
 
 func (x *ModuleConfig_CannedMessageConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_module_config_proto_msgTypes[14]
+	mi := &file_meshtastic_module_config_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2135,7 +2316,7 @@ func (x *ModuleConfig_CannedMessageConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ModuleConfig_CannedMessageConfig.ProtoReflect.Descriptor instead.
 func (*ModuleConfig_CannedMessageConfig) Descriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 12}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 13}
 }
 
 func (x *ModuleConfig_CannedMessageConfig) GetRotary1Enabled() bool {
@@ -2237,7 +2418,7 @@ type ModuleConfig_AmbientLightingConfig struct {
 
 func (x *ModuleConfig_AmbientLightingConfig) Reset() {
 	*x = ModuleConfig_AmbientLightingConfig{}
-	mi := &file_meshtastic_module_config_proto_msgTypes[15]
+	mi := &file_meshtastic_module_config_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2249,7 +2430,7 @@ func (x *ModuleConfig_AmbientLightingConfig) String() string {
 func (*ModuleConfig_AmbientLightingConfig) ProtoMessage() {}
 
 func (x *ModuleConfig_AmbientLightingConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_module_config_proto_msgTypes[15]
+	mi := &file_meshtastic_module_config_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2262,7 +2443,7 @@ func (x *ModuleConfig_AmbientLightingConfig) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use ModuleConfig_AmbientLightingConfig.ProtoReflect.Descriptor instead.
 func (*ModuleConfig_AmbientLightingConfig) Descriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 13}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 14}
 }
 
 func (x *ModuleConfig_AmbientLightingConfig) GetLedState() bool {
@@ -2311,7 +2492,7 @@ type ModuleConfig_StatusMessageConfig struct {
 
 func (x *ModuleConfig_StatusMessageConfig) Reset() {
 	*x = ModuleConfig_StatusMessageConfig{}
-	mi := &file_meshtastic_module_config_proto_msgTypes[16]
+	mi := &file_meshtastic_module_config_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2323,7 +2504,7 @@ func (x *ModuleConfig_StatusMessageConfig) String() string {
 func (*ModuleConfig_StatusMessageConfig) ProtoMessage() {}
 
 func (x *ModuleConfig_StatusMessageConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_module_config_proto_msgTypes[16]
+	mi := &file_meshtastic_module_config_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2336,7 +2517,7 @@ func (x *ModuleConfig_StatusMessageConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ModuleConfig_StatusMessageConfig.ProtoReflect.Descriptor instead.
 func (*ModuleConfig_StatusMessageConfig) Descriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 14}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 15}
 }
 
 func (x *ModuleConfig_StatusMessageConfig) GetNodeStatus() string {
@@ -2351,7 +2532,7 @@ var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\"\x925\n" +
+	"meshtastic\"\xf6;\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2370,7 +2551,8 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"paxcounter\x18\r \x01(\v2).meshtastic.ModuleConfig.PaxcounterConfigH\x00R\n" +
 	"paxcounter\x12T\n" +
-	"\rstatusmessage\x18\x0e \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigH\x00R\rstatusmessage\x1a\xc6\x03\n" +
+	"\rstatusmessage\x18\x0e \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigH\x00R\rstatusmessage\x12a\n" +
+	"\x12traffic_management\x18\x0f \x01(\v20.meshtastic.ModuleConfig.TrafficManagementConfigH\x00R\x11trafficManagement\x1a\xc6\x03\n" +
 	"\n" +
 	"MQTTConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x18\n" +
@@ -2441,7 +2623,23 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12<\n" +
 	"\x1apaxcounter_update_interval\x18\x02 \x01(\rR\x18paxcounterUpdateInterval\x12%\n" +
 	"\x0ewifi_threshold\x18\x03 \x01(\x05R\rwifiThreshold\x12#\n" +
-	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xec\x05\n" +
+	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xfe\x05\n" +
+	"\x17TrafficManagementConfig\x12\x18\n" +
+	"\aenabled\x18\x01 \x01(\bR\aenabled\x124\n" +
+	"\x16position_dedup_enabled\x18\x02 \x01(\bR\x14positionDedupEnabled\x126\n" +
+	"\x17position_precision_bits\x18\x03 \x01(\rR\x15positionPrecisionBits\x12;\n" +
+	"\x1aposition_min_interval_secs\x18\x04 \x01(\rR\x17positionMinIntervalSecs\x128\n" +
+	"\x18nodeinfo_direct_response\x18\x05 \x01(\bR\x16nodeinfoDirectResponse\x12H\n" +
+	"!nodeinfo_direct_response_max_hops\x18\x06 \x01(\rR\x1dnodeinfoDirectResponseMaxHops\x12,\n" +
+	"\x12rate_limit_enabled\x18\a \x01(\bR\x10rateLimitEnabled\x123\n" +
+	"\x16rate_limit_window_secs\x18\b \x01(\rR\x13rateLimitWindowSecs\x123\n" +
+	"\x16rate_limit_max_packets\x18\t \x01(\rR\x13rateLimitMaxPackets\x120\n" +
+	"\x14drop_unknown_enabled\x18\n" +
+	" \x01(\bR\x12dropUnknownEnabled\x128\n" +
+	"\x18unknown_packet_threshold\x18\v \x01(\rR\x16unknownPacketThreshold\x122\n" +
+	"\x15exhaust_hop_telemetry\x18\f \x01(\bR\x13exhaustHopTelemetry\x120\n" +
+	"\x14exhaust_hop_position\x18\r \x01(\bR\x12exhaustHopPosition\x120\n" +
+	"\x14router_preserve_hops\x18\x0e \x01(\bR\x12routerPreserveHops\x1a\xec\x05\n" +
 	"\fSerialConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x12\n" +
 	"\x04echo\x18\x02 \x01(\bR\x04echo\x12\x10\n" +
@@ -2592,7 +2790,7 @@ func file_meshtastic_module_config_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_module_config_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_meshtastic_module_config_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_meshtastic_module_config_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_meshtastic_module_config_proto_goTypes = []any{
 	(RemoteHardwarePinType)(0),                           // 0: meshtastic.RemoteHardwarePinType
 	(ModuleConfig_DetectionSensorConfig_TriggerType)(0),  // 1: meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
@@ -2609,45 +2807,47 @@ var file_meshtastic_module_config_proto_goTypes = []any{
 	(*ModuleConfig_DetectionSensorConfig)(nil),           // 12: meshtastic.ModuleConfig.DetectionSensorConfig
 	(*ModuleConfig_AudioConfig)(nil),                     // 13: meshtastic.ModuleConfig.AudioConfig
 	(*ModuleConfig_PaxcounterConfig)(nil),                // 14: meshtastic.ModuleConfig.PaxcounterConfig
-	(*ModuleConfig_SerialConfig)(nil),                    // 15: meshtastic.ModuleConfig.SerialConfig
-	(*ModuleConfig_ExternalNotificationConfig)(nil),      // 16: meshtastic.ModuleConfig.ExternalNotificationConfig
-	(*ModuleConfig_StoreForwardConfig)(nil),              // 17: meshtastic.ModuleConfig.StoreForwardConfig
-	(*ModuleConfig_RangeTestConfig)(nil),                 // 18: meshtastic.ModuleConfig.RangeTestConfig
-	(*ModuleConfig_TelemetryConfig)(nil),                 // 19: meshtastic.ModuleConfig.TelemetryConfig
-	(*ModuleConfig_CannedMessageConfig)(nil),             // 20: meshtastic.ModuleConfig.CannedMessageConfig
-	(*ModuleConfig_AmbientLightingConfig)(nil),           // 21: meshtastic.ModuleConfig.AmbientLightingConfig
-	(*ModuleConfig_StatusMessageConfig)(nil),             // 22: meshtastic.ModuleConfig.StatusMessageConfig
+	(*ModuleConfig_TrafficManagementConfig)(nil),         // 15: meshtastic.ModuleConfig.TrafficManagementConfig
+	(*ModuleConfig_SerialConfig)(nil),                    // 16: meshtastic.ModuleConfig.SerialConfig
+	(*ModuleConfig_ExternalNotificationConfig)(nil),      // 17: meshtastic.ModuleConfig.ExternalNotificationConfig
+	(*ModuleConfig_StoreForwardConfig)(nil),              // 18: meshtastic.ModuleConfig.StoreForwardConfig
+	(*ModuleConfig_RangeTestConfig)(nil),                 // 19: meshtastic.ModuleConfig.RangeTestConfig
+	(*ModuleConfig_TelemetryConfig)(nil),                 // 20: meshtastic.ModuleConfig.TelemetryConfig
+	(*ModuleConfig_CannedMessageConfig)(nil),             // 21: meshtastic.ModuleConfig.CannedMessageConfig
+	(*ModuleConfig_AmbientLightingConfig)(nil),           // 22: meshtastic.ModuleConfig.AmbientLightingConfig
+	(*ModuleConfig_StatusMessageConfig)(nil),             // 23: meshtastic.ModuleConfig.StatusMessageConfig
 }
 var file_meshtastic_module_config_proto_depIdxs = []int32{
 	8,  // 0: meshtastic.ModuleConfig.mqtt:type_name -> meshtastic.ModuleConfig.MQTTConfig
-	15, // 1: meshtastic.ModuleConfig.serial:type_name -> meshtastic.ModuleConfig.SerialConfig
-	16, // 2: meshtastic.ModuleConfig.external_notification:type_name -> meshtastic.ModuleConfig.ExternalNotificationConfig
-	17, // 3: meshtastic.ModuleConfig.store_forward:type_name -> meshtastic.ModuleConfig.StoreForwardConfig
-	18, // 4: meshtastic.ModuleConfig.range_test:type_name -> meshtastic.ModuleConfig.RangeTestConfig
-	19, // 5: meshtastic.ModuleConfig.telemetry:type_name -> meshtastic.ModuleConfig.TelemetryConfig
-	20, // 6: meshtastic.ModuleConfig.canned_message:type_name -> meshtastic.ModuleConfig.CannedMessageConfig
+	16, // 1: meshtastic.ModuleConfig.serial:type_name -> meshtastic.ModuleConfig.SerialConfig
+	17, // 2: meshtastic.ModuleConfig.external_notification:type_name -> meshtastic.ModuleConfig.ExternalNotificationConfig
+	18, // 3: meshtastic.ModuleConfig.store_forward:type_name -> meshtastic.ModuleConfig.StoreForwardConfig
+	19, // 4: meshtastic.ModuleConfig.range_test:type_name -> meshtastic.ModuleConfig.RangeTestConfig
+	20, // 5: meshtastic.ModuleConfig.telemetry:type_name -> meshtastic.ModuleConfig.TelemetryConfig
+	21, // 6: meshtastic.ModuleConfig.canned_message:type_name -> meshtastic.ModuleConfig.CannedMessageConfig
 	13, // 7: meshtastic.ModuleConfig.audio:type_name -> meshtastic.ModuleConfig.AudioConfig
 	10, // 8: meshtastic.ModuleConfig.remote_hardware:type_name -> meshtastic.ModuleConfig.RemoteHardwareConfig
 	11, // 9: meshtastic.ModuleConfig.neighbor_info:type_name -> meshtastic.ModuleConfig.NeighborInfoConfig
-	21, // 10: meshtastic.ModuleConfig.ambient_lighting:type_name -> meshtastic.ModuleConfig.AmbientLightingConfig
+	22, // 10: meshtastic.ModuleConfig.ambient_lighting:type_name -> meshtastic.ModuleConfig.AmbientLightingConfig
 	12, // 11: meshtastic.ModuleConfig.detection_sensor:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig
 	14, // 12: meshtastic.ModuleConfig.paxcounter:type_name -> meshtastic.ModuleConfig.PaxcounterConfig
-	22, // 13: meshtastic.ModuleConfig.statusmessage:type_name -> meshtastic.ModuleConfig.StatusMessageConfig
-	0,  // 14: meshtastic.RemoteHardwarePin.type:type_name -> meshtastic.RemoteHardwarePinType
-	9,  // 15: meshtastic.ModuleConfig.MQTTConfig.map_report_settings:type_name -> meshtastic.ModuleConfig.MapReportSettings
-	7,  // 16: meshtastic.ModuleConfig.RemoteHardwareConfig.available_pins:type_name -> meshtastic.RemoteHardwarePin
-	1,  // 17: meshtastic.ModuleConfig.DetectionSensorConfig.detection_trigger_type:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
-	2,  // 18: meshtastic.ModuleConfig.AudioConfig.bitrate:type_name -> meshtastic.ModuleConfig.AudioConfig.Audio_Baud
-	3,  // 19: meshtastic.ModuleConfig.SerialConfig.baud:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Baud
-	4,  // 20: meshtastic.ModuleConfig.SerialConfig.mode:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Mode
-	5,  // 21: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_cw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	5,  // 22: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_ccw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	5,  // 23: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_press:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	24, // [24:24] is the sub-list for method output_type
-	24, // [24:24] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	23, // 13: meshtastic.ModuleConfig.statusmessage:type_name -> meshtastic.ModuleConfig.StatusMessageConfig
+	15, // 14: meshtastic.ModuleConfig.traffic_management:type_name -> meshtastic.ModuleConfig.TrafficManagementConfig
+	0,  // 15: meshtastic.RemoteHardwarePin.type:type_name -> meshtastic.RemoteHardwarePinType
+	9,  // 16: meshtastic.ModuleConfig.MQTTConfig.map_report_settings:type_name -> meshtastic.ModuleConfig.MapReportSettings
+	7,  // 17: meshtastic.ModuleConfig.RemoteHardwareConfig.available_pins:type_name -> meshtastic.RemoteHardwarePin
+	1,  // 18: meshtastic.ModuleConfig.DetectionSensorConfig.detection_trigger_type:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
+	2,  // 19: meshtastic.ModuleConfig.AudioConfig.bitrate:type_name -> meshtastic.ModuleConfig.AudioConfig.Audio_Baud
+	3,  // 20: meshtastic.ModuleConfig.SerialConfig.baud:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Baud
+	4,  // 21: meshtastic.ModuleConfig.SerialConfig.mode:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Mode
+	5,  // 22: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_cw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	5,  // 23: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_ccw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	5,  // 24: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_press:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_module_config_proto_init() }
@@ -2670,6 +2870,7 @@ func file_meshtastic_module_config_proto_init() {
 		(*ModuleConfig_DetectionSensor)(nil),
 		(*ModuleConfig_Paxcounter)(nil),
 		(*ModuleConfig_Statusmessage)(nil),
+		(*ModuleConfig_TrafficManagement)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2677,7 +2878,7 @@ func file_meshtastic_module_config_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_module_config_proto_rawDesc), len(file_meshtastic_module_config_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   17,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
