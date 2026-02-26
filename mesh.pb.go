@@ -307,6 +307,10 @@ const (
 	HardwareModel_TBEAM_1_WATT HardwareModel = 122
 	// LilyGo T5 S3 ePaper Pro (V1 and V2)
 	HardwareModel_T5_S3_EPAPER_PRO HardwareModel = 123
+	// LilyGo T-Beam BPF (144-148Mhz)
+	HardwareModel_TBEAM_BPF HardwareModel = 124
+	// LilyGo T-Mini E-paper S3 Kit
+	HardwareModel_MINI_EPAPER_S3 HardwareModel = 125
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -440,6 +444,8 @@ var (
 		121: "MESHSTICK_1262",
 		122: "TBEAM_1_WATT",
 		123: "T5_S3_EPAPER_PRO",
+		124: "TBEAM_BPF",
+		125: "MINI_EPAPER_S3",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -567,6 +573,8 @@ var (
 		"MESHSTICK_1262":               121,
 		"TBEAM_1_WATT":                 122,
 		"T5_S3_EPAPER_PRO":             123,
+		"TBEAM_BPF":                    124,
+		"MINI_EPAPER_S3":               125,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -5483,7 +5491,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\xc3\x12\n" +
+	"\x0fpayload_variant*\xe6\x12\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -5620,7 +5628,9 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\fTHINKNODE_M6\x10x\x12\x12\n" +
 	"\x0eMESHSTICK_1262\x10y\x12\x10\n" +
 	"\fTBEAM_1_WATT\x10z\x12\x14\n" +
-	"\x10T5_S3_EPAPER_PRO\x10{\x12\x0f\n" +
+	"\x10T5_S3_EPAPER_PRO\x10{\x12\r\n" +
+	"\tTBEAM_BPF\x10|\x12\x12\n" +
+	"\x0eMINI_EPAPER_S3\x10}\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +

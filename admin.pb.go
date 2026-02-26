@@ -189,6 +189,8 @@ const (
 	AdminMessage_STATUSMESSAGE_CONFIG AdminMessage_ModuleConfigType = 13
 	// Traffic management module config
 	AdminMessage_TRAFFICMANAGEMENT_CONFIG AdminMessage_ModuleConfigType = 14
+	// TAK module config
+	AdminMessage_TAK_CONFIG AdminMessage_ModuleConfigType = 15
 )
 
 // Enum value maps for AdminMessage_ModuleConfigType.
@@ -209,6 +211,7 @@ var (
 		12: "PAXCOUNTER_CONFIG",
 		13: "STATUSMESSAGE_CONFIG",
 		14: "TRAFFICMANAGEMENT_CONFIG",
+		15: "TAK_CONFIG",
 	}
 	AdminMessage_ModuleConfigType_value = map[string]int32{
 		"MQTT_CONFIG":              0,
@@ -226,6 +229,7 @@ var (
 		"PAXCOUNTER_CONFIG":        12,
 		"STATUSMESSAGE_CONFIG":     13,
 		"TRAFFICMANAGEMENT_CONFIG": 14,
+		"TAK_CONFIG":               15,
 	}
 )
 
@@ -2119,7 +2123,7 @@ var File_meshtastic_admin_proto protoreflect.FileDescriptor
 const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"\x16meshtastic/admin.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\xa8$\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\xb8$\n" +
 	"\fAdminMessage\x12'\n" +
 	"\x0fsession_passkey\x18e \x01(\fR\x0esessionPasskey\x120\n" +
 	"\x13get_channel_request\x18\x01 \x01(\rH\x00R\x11getChannelRequest\x12G\n" +
@@ -2206,7 +2210,7 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x10BLUETOOTH_CONFIG\x10\x06\x12\x13\n" +
 	"\x0fSECURITY_CONFIG\x10\a\x12\x15\n" +
 	"\x11SESSIONKEY_CONFIG\x10\b\x12\x13\n" +
-	"\x0fDEVICEUI_CONFIG\x10\t\"\xf3\x02\n" +
+	"\x0fDEVICEUI_CONFIG\x10\t\"\x83\x03\n" +
 	"\x10ModuleConfigType\x12\x0f\n" +
 	"\vMQTT_CONFIG\x10\x00\x12\x11\n" +
 	"\rSERIAL_CONFIG\x10\x01\x12\x13\n" +
@@ -2223,7 +2227,9 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x16DETECTIONSENSOR_CONFIG\x10\v\x12\x15\n" +
 	"\x11PAXCOUNTER_CONFIG\x10\f\x12\x18\n" +
 	"\x14STATUSMESSAGE_CONFIG\x10\r\x12\x1c\n" +
-	"\x18TRAFFICMANAGEMENT_CONFIG\x10\x0e\"#\n" +
+	"\x18TRAFFICMANAGEMENT_CONFIG\x10\x0e\x12\x0e\n" +
+	"\n" +
+	"TAK_CONFIG\x10\x0f\"#\n" +
 	"\x0eBackupLocation\x12\t\n" +
 	"\x05FLASH\x10\x00\x12\x06\n" +
 	"\x02SD\x10\x01B\x11\n" +

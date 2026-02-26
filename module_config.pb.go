@@ -472,6 +472,7 @@ type ModuleConfig struct {
 	//	*ModuleConfig_Paxcounter
 	//	*ModuleConfig_Statusmessage
 	//	*ModuleConfig_TrafficManagement
+	//	*ModuleConfig_Tak
 	PayloadVariant isModuleConfig_PayloadVariant `protobuf_oneof:"payload_variant"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -649,6 +650,15 @@ func (x *ModuleConfig) GetTrafficManagement() *ModuleConfig_TrafficManagementCon
 	return nil
 }
 
+func (x *ModuleConfig) GetTak() *ModuleConfig_TAKConfig {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*ModuleConfig_Tak); ok {
+			return x.Tak
+		}
+	}
+	return nil
+}
+
 type isModuleConfig_PayloadVariant interface {
 	isModuleConfig_PayloadVariant()
 }
@@ -728,6 +738,11 @@ type ModuleConfig_TrafficManagement struct {
 	TrafficManagement *ModuleConfig_TrafficManagementConfig `protobuf:"bytes,15,opt,name=traffic_management,json=trafficManagement,proto3,oneof"`
 }
 
+type ModuleConfig_Tak struct {
+	// TAK team/role configuration for TAK_TRACKER
+	Tak *ModuleConfig_TAKConfig `protobuf:"bytes,16,opt,name=tak,proto3,oneof"`
+}
+
 func (*ModuleConfig_Mqtt) isModuleConfig_PayloadVariant() {}
 
 func (*ModuleConfig_Serial) isModuleConfig_PayloadVariant() {}
@@ -757,6 +772,8 @@ func (*ModuleConfig_Paxcounter) isModuleConfig_PayloadVariant() {}
 func (*ModuleConfig_Statusmessage) isModuleConfig_PayloadVariant() {}
 
 func (*ModuleConfig_TrafficManagement) isModuleConfig_PayloadVariant() {}
+
+func (*ModuleConfig_Tak) isModuleConfig_PayloadVariant() {}
 
 // A GPIO pin definition for remote hardware module
 type RemoteHardwarePin struct {
@@ -2527,12 +2544,69 @@ func (x *ModuleConfig_StatusMessageConfig) GetNodeStatus() string {
 	return ""
 }
 
+// TAK team/role configuration
+type ModuleConfig_TAKConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Team color.
+	// Default Unspecifed_Color -> firmware uses Cyan
+	Team Team `protobuf:"varint,1,opt,name=team,proto3,enum=meshtastic.Team" json:"team,omitempty"`
+	// Member role.
+	// Default Unspecifed -> firmware uses TeamMember
+	Role          MemberRole `protobuf:"varint,2,opt,name=role,proto3,enum=meshtastic.MemberRole" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ModuleConfig_TAKConfig) Reset() {
+	*x = ModuleConfig_TAKConfig{}
+	mi := &file_meshtastic_module_config_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModuleConfig_TAKConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModuleConfig_TAKConfig) ProtoMessage() {}
+
+func (x *ModuleConfig_TAKConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_module_config_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModuleConfig_TAKConfig.ProtoReflect.Descriptor instead.
+func (*ModuleConfig_TAKConfig) Descriptor() ([]byte, []int) {
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 16}
+}
+
+func (x *ModuleConfig_TAKConfig) GetTeam() Team {
+	if x != nil {
+		return x.Team
+	}
+	return Team_Unspecifed_Color
+}
+
+func (x *ModuleConfig_TAKConfig) GetRole() MemberRole {
+	if x != nil {
+		return x.Role
+	}
+	return MemberRole_Unspecifed
+}
+
 var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\"\xf6;\n" +
+	"meshtastic\x1a\x15meshtastic/atak.proto\"\x8d=\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2552,7 +2626,8 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"paxcounter\x18\r \x01(\v2).meshtastic.ModuleConfig.PaxcounterConfigH\x00R\n" +
 	"paxcounter\x12T\n" +
 	"\rstatusmessage\x18\x0e \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigH\x00R\rstatusmessage\x12a\n" +
-	"\x12traffic_management\x18\x0f \x01(\v20.meshtastic.ModuleConfig.TrafficManagementConfigH\x00R\x11trafficManagement\x1a\xc6\x03\n" +
+	"\x12traffic_management\x18\x0f \x01(\v20.meshtastic.ModuleConfig.TrafficManagementConfigH\x00R\x11trafficManagement\x126\n" +
+	"\x03tak\x18\x10 \x01(\v2\".meshtastic.ModuleConfig.TAKConfigH\x00R\x03tak\x1a\xc6\x03\n" +
 	"\n" +
 	"MQTTConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x18\n" +
@@ -2765,7 +2840,10 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x04blue\x18\x05 \x01(\rR\x04blue\x1a6\n" +
 	"\x13StatusMessageConfig\x12\x1f\n" +
 	"\vnode_status\x18\x01 \x01(\tR\n" +
-	"nodeStatusB\x11\n" +
+	"nodeStatus\x1a]\n" +
+	"\tTAKConfig\x12$\n" +
+	"\x04team\x18\x01 \x01(\x0e2\x10.meshtastic.TeamR\x04team\x12*\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x16.meshtastic.MemberRoleR\x04roleB\x11\n" +
 	"\x0fpayload_variant\"y\n" +
 	"\x11RemoteHardwarePin\x12\x19\n" +
 	"\bgpio_pin\x18\x01 \x01(\rR\agpioPin\x12\x12\n" +
@@ -2790,7 +2868,7 @@ func file_meshtastic_module_config_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_module_config_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_meshtastic_module_config_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_meshtastic_module_config_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_meshtastic_module_config_proto_goTypes = []any{
 	(RemoteHardwarePinType)(0),                           // 0: meshtastic.RemoteHardwarePinType
 	(ModuleConfig_DetectionSensorConfig_TriggerType)(0),  // 1: meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
@@ -2816,6 +2894,9 @@ var file_meshtastic_module_config_proto_goTypes = []any{
 	(*ModuleConfig_CannedMessageConfig)(nil),             // 21: meshtastic.ModuleConfig.CannedMessageConfig
 	(*ModuleConfig_AmbientLightingConfig)(nil),           // 22: meshtastic.ModuleConfig.AmbientLightingConfig
 	(*ModuleConfig_StatusMessageConfig)(nil),             // 23: meshtastic.ModuleConfig.StatusMessageConfig
+	(*ModuleConfig_TAKConfig)(nil),                       // 24: meshtastic.ModuleConfig.TAKConfig
+	(Team)(0),                                            // 25: meshtastic.Team
+	(MemberRole)(0),                                      // 26: meshtastic.MemberRole
 }
 var file_meshtastic_module_config_proto_depIdxs = []int32{
 	8,  // 0: meshtastic.ModuleConfig.mqtt:type_name -> meshtastic.ModuleConfig.MQTTConfig
@@ -2833,21 +2914,24 @@ var file_meshtastic_module_config_proto_depIdxs = []int32{
 	14, // 12: meshtastic.ModuleConfig.paxcounter:type_name -> meshtastic.ModuleConfig.PaxcounterConfig
 	23, // 13: meshtastic.ModuleConfig.statusmessage:type_name -> meshtastic.ModuleConfig.StatusMessageConfig
 	15, // 14: meshtastic.ModuleConfig.traffic_management:type_name -> meshtastic.ModuleConfig.TrafficManagementConfig
-	0,  // 15: meshtastic.RemoteHardwarePin.type:type_name -> meshtastic.RemoteHardwarePinType
-	9,  // 16: meshtastic.ModuleConfig.MQTTConfig.map_report_settings:type_name -> meshtastic.ModuleConfig.MapReportSettings
-	7,  // 17: meshtastic.ModuleConfig.RemoteHardwareConfig.available_pins:type_name -> meshtastic.RemoteHardwarePin
-	1,  // 18: meshtastic.ModuleConfig.DetectionSensorConfig.detection_trigger_type:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
-	2,  // 19: meshtastic.ModuleConfig.AudioConfig.bitrate:type_name -> meshtastic.ModuleConfig.AudioConfig.Audio_Baud
-	3,  // 20: meshtastic.ModuleConfig.SerialConfig.baud:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Baud
-	4,  // 21: meshtastic.ModuleConfig.SerialConfig.mode:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Mode
-	5,  // 22: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_cw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	5,  // 23: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_ccw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	5,  // 24: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_press:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	24, // 15: meshtastic.ModuleConfig.tak:type_name -> meshtastic.ModuleConfig.TAKConfig
+	0,  // 16: meshtastic.RemoteHardwarePin.type:type_name -> meshtastic.RemoteHardwarePinType
+	9,  // 17: meshtastic.ModuleConfig.MQTTConfig.map_report_settings:type_name -> meshtastic.ModuleConfig.MapReportSettings
+	7,  // 18: meshtastic.ModuleConfig.RemoteHardwareConfig.available_pins:type_name -> meshtastic.RemoteHardwarePin
+	1,  // 19: meshtastic.ModuleConfig.DetectionSensorConfig.detection_trigger_type:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
+	2,  // 20: meshtastic.ModuleConfig.AudioConfig.bitrate:type_name -> meshtastic.ModuleConfig.AudioConfig.Audio_Baud
+	3,  // 21: meshtastic.ModuleConfig.SerialConfig.baud:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Baud
+	4,  // 22: meshtastic.ModuleConfig.SerialConfig.mode:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Mode
+	5,  // 23: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_cw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	5,  // 24: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_ccw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	5,  // 25: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_press:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	25, // 26: meshtastic.ModuleConfig.TAKConfig.team:type_name -> meshtastic.Team
+	26, // 27: meshtastic.ModuleConfig.TAKConfig.role:type_name -> meshtastic.MemberRole
+	28, // [28:28] is the sub-list for method output_type
+	28, // [28:28] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_module_config_proto_init() }
@@ -2855,6 +2939,7 @@ func file_meshtastic_module_config_proto_init() {
 	if File_meshtastic_module_config_proto != nil {
 		return
 	}
+	file_meshtastic_atak_proto_init()
 	file_meshtastic_module_config_proto_msgTypes[0].OneofWrappers = []any{
 		(*ModuleConfig_Mqtt)(nil),
 		(*ModuleConfig_Serial)(nil),
@@ -2871,6 +2956,7 @@ func file_meshtastic_module_config_proto_init() {
 		(*ModuleConfig_Paxcounter)(nil),
 		(*ModuleConfig_Statusmessage)(nil),
 		(*ModuleConfig_TrafficManagement)(nil),
+		(*ModuleConfig_Tak)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2878,7 +2964,7 @@ func file_meshtastic_module_config_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_module_config_proto_rawDesc), len(file_meshtastic_module_config_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   18,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
