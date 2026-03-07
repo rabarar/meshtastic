@@ -1063,6 +1063,58 @@ func (Config_LoRaConfig_ModemPreset) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_config_proto_rawDescGZIP(), []int{0, 5, 1}
 }
 
+type Config_LoRaConfig_FEM_LNA_Mode int32
+
+const (
+	// FEM_LNA is present but disabled
+	Config_LoRaConfig_DISABLED Config_LoRaConfig_FEM_LNA_Mode = 0
+	// FEM_LNA is present and enabled
+	Config_LoRaConfig_ENABLED Config_LoRaConfig_FEM_LNA_Mode = 1
+	// FEM_LNA is not present on the device
+	Config_LoRaConfig_NOT_PRESENT Config_LoRaConfig_FEM_LNA_Mode = 2
+)
+
+// Enum value maps for Config_LoRaConfig_FEM_LNA_Mode.
+var (
+	Config_LoRaConfig_FEM_LNA_Mode_name = map[int32]string{
+		0: "DISABLED",
+		1: "ENABLED",
+		2: "NOT_PRESENT",
+	}
+	Config_LoRaConfig_FEM_LNA_Mode_value = map[string]int32{
+		"DISABLED":    0,
+		"ENABLED":     1,
+		"NOT_PRESENT": 2,
+	}
+)
+
+func (x Config_LoRaConfig_FEM_LNA_Mode) Enum() *Config_LoRaConfig_FEM_LNA_Mode {
+	p := new(Config_LoRaConfig_FEM_LNA_Mode)
+	*p = x
+	return p
+}
+
+func (x Config_LoRaConfig_FEM_LNA_Mode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Config_LoRaConfig_FEM_LNA_Mode) Descriptor() protoreflect.EnumDescriptor {
+	return file_meshtastic_config_proto_enumTypes[14].Descriptor()
+}
+
+func (Config_LoRaConfig_FEM_LNA_Mode) Type() protoreflect.EnumType {
+	return &file_meshtastic_config_proto_enumTypes[14]
+}
+
+func (x Config_LoRaConfig_FEM_LNA_Mode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Config_LoRaConfig_FEM_LNA_Mode.Descriptor instead.
+func (Config_LoRaConfig_FEM_LNA_Mode) EnumDescriptor() ([]byte, []int) {
+	return file_meshtastic_config_proto_rawDescGZIP(), []int{0, 5, 2}
+}
+
 type Config_BluetoothConfig_PairingMode int32
 
 const (
@@ -1099,11 +1151,11 @@ func (x Config_BluetoothConfig_PairingMode) String() string {
 }
 
 func (Config_BluetoothConfig_PairingMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_config_proto_enumTypes[14].Descriptor()
+	return file_meshtastic_config_proto_enumTypes[15].Descriptor()
 }
 
 func (Config_BluetoothConfig_PairingMode) Type() protoreflect.EnumType {
-	return &file_meshtastic_config_proto_enumTypes[14]
+	return &file_meshtastic_config_proto_enumTypes[15]
 }
 
 func (x Config_BluetoothConfig_PairingMode) Number() protoreflect.EnumNumber {
@@ -2155,8 +2207,10 @@ type Config_LoRaConfig struct {
 	IgnoreMqtt bool `protobuf:"varint,104,opt,name=ignore_mqtt,json=ignoreMqtt,proto3" json:"ignore_mqtt,omitempty"`
 	// Sets the ok_to_mqtt bit on outgoing packets
 	ConfigOkToMqtt bool `protobuf:"varint,105,opt,name=config_ok_to_mqtt,json=configOkToMqtt,proto3" json:"config_ok_to_mqtt,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Set where LORA FEM is enabled, disabled, or not present
+	FemLnaMode    Config_LoRaConfig_FEM_LNA_Mode `protobuf:"varint,106,opt,name=fem_lna_mode,json=femLnaMode,proto3,enum=meshtastic.Config_LoRaConfig_FEM_LNA_Mode" json:"fem_lna_mode,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Config_LoRaConfig) Reset() {
@@ -2313,6 +2367,13 @@ func (x *Config_LoRaConfig) GetConfigOkToMqtt() bool {
 		return x.ConfigOkToMqtt
 	}
 	return false
+}
+
+func (x *Config_LoRaConfig) GetFemLnaMode() Config_LoRaConfig_FEM_LNA_Mode {
+	if x != nil {
+		return x.FemLnaMode
+	}
+	return Config_LoRaConfig_DISABLED
 }
 
 type Config_BluetoothConfig struct {
@@ -2595,7 +2656,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xb34\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xbd5\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2779,7 +2840,8 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x12DEGREES_0_INVERTED\x10\x04\x12\x17\n" +
 	"\x13DEGREES_90_INVERTED\x10\x05\x12\x18\n" +
 	"\x14DEGREES_180_INVERTED\x10\x06\x12\x18\n" +
-	"\x14DEGREES_270_INVERTED\x10\a\x1a\xe4\t\n" +
+	"\x14DEGREES_270_INVERTED\x10\a\x1a\xee\n" +
+	"\n" +
 	"\n" +
 	"LoRaConfig\x12\x1d\n" +
 	"\n" +
@@ -2805,7 +2867,9 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x0fignore_incoming\x18g \x03(\rR\x0eignoreIncoming\x12\x1f\n" +
 	"\vignore_mqtt\x18h \x01(\bR\n" +
 	"ignoreMqtt\x12)\n" +
-	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\"\xae\x02\n" +
+	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\x12L\n" +
+	"\ffem_lna_mode\x18j \x01(\x0e2*.meshtastic.Config.LoRaConfig.FEM_LNA_ModeR\n" +
+	"femLnaMode\"\xae\x02\n" +
 	"\n" +
 	"RegionCode\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\x06\n" +
@@ -2864,7 +2928,11 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\rLONG_MODERATE\x10\a\x12\x0f\n" +
 	"\vSHORT_TURBO\x10\b\x12\x0e\n" +
 	"\n" +
-	"LONG_TURBO\x10\t\x1a\xc6\x01\n" +
+	"LONG_TURBO\x10\t\":\n" +
+	"\fFEM_LNA_Mode\x12\f\n" +
+	"\bDISABLED\x10\x00\x12\v\n" +
+	"\aENABLED\x10\x01\x12\x0f\n" +
+	"\vNOT_PRESENT\x10\x02\x1a\xc6\x01\n" +
 	"\x0fBluetoothConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12B\n" +
 	"\x04mode\x18\x02 \x01(\x0e2..meshtastic.Config.BluetoothConfig.PairingModeR\x04mode\x12\x1b\n" +
@@ -2902,7 +2970,7 @@ func file_meshtastic_config_proto_rawDescGZIP() []byte {
 	return file_meshtastic_config_proto_rawDescData
 }
 
-var file_meshtastic_config_proto_enumTypes = make([]protoimpl.EnumInfo, 15)
+var file_meshtastic_config_proto_enumTypes = make([]protoimpl.EnumInfo, 16)
 var file_meshtastic_config_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_meshtastic_config_proto_goTypes = []any{
 	(Config_DeviceConfig_Role)(0),                           // 0: meshtastic.Config.DeviceConfig.Role
@@ -2919,37 +2987,38 @@ var file_meshtastic_config_proto_goTypes = []any{
 	(Config_DisplayConfig_CompassOrientation)(0),            // 11: meshtastic.Config.DisplayConfig.CompassOrientation
 	(Config_LoRaConfig_RegionCode)(0),                       // 12: meshtastic.Config.LoRaConfig.RegionCode
 	(Config_LoRaConfig_ModemPreset)(0),                      // 13: meshtastic.Config.LoRaConfig.ModemPreset
-	(Config_BluetoothConfig_PairingMode)(0),                 // 14: meshtastic.Config.BluetoothConfig.PairingMode
-	(*Config)(nil),                                          // 15: meshtastic.Config
-	(*Config_DeviceConfig)(nil),                             // 16: meshtastic.Config.DeviceConfig
-	(*Config_PositionConfig)(nil),                           // 17: meshtastic.Config.PositionConfig
-	(*Config_PowerConfig)(nil),                              // 18: meshtastic.Config.PowerConfig
-	(*Config_NetworkConfig)(nil),                            // 19: meshtastic.Config.NetworkConfig
-	(*Config_DisplayConfig)(nil),                            // 20: meshtastic.Config.DisplayConfig
-	(*Config_LoRaConfig)(nil),                               // 21: meshtastic.Config.LoRaConfig
-	(*Config_BluetoothConfig)(nil),                          // 22: meshtastic.Config.BluetoothConfig
-	(*Config_SecurityConfig)(nil),                           // 23: meshtastic.Config.SecurityConfig
-	(*Config_SessionkeyConfig)(nil),                         // 24: meshtastic.Config.SessionkeyConfig
-	(*Config_NetworkConfig_IpV4Config)(nil),                 // 25: meshtastic.Config.NetworkConfig.IpV4Config
-	(*DeviceUIConfig)(nil),                                  // 26: meshtastic.DeviceUIConfig
+	(Config_LoRaConfig_FEM_LNA_Mode)(0),                     // 14: meshtastic.Config.LoRaConfig.FEM_LNA_Mode
+	(Config_BluetoothConfig_PairingMode)(0),                 // 15: meshtastic.Config.BluetoothConfig.PairingMode
+	(*Config)(nil),                                          // 16: meshtastic.Config
+	(*Config_DeviceConfig)(nil),                             // 17: meshtastic.Config.DeviceConfig
+	(*Config_PositionConfig)(nil),                           // 18: meshtastic.Config.PositionConfig
+	(*Config_PowerConfig)(nil),                              // 19: meshtastic.Config.PowerConfig
+	(*Config_NetworkConfig)(nil),                            // 20: meshtastic.Config.NetworkConfig
+	(*Config_DisplayConfig)(nil),                            // 21: meshtastic.Config.DisplayConfig
+	(*Config_LoRaConfig)(nil),                               // 22: meshtastic.Config.LoRaConfig
+	(*Config_BluetoothConfig)(nil),                          // 23: meshtastic.Config.BluetoothConfig
+	(*Config_SecurityConfig)(nil),                           // 24: meshtastic.Config.SecurityConfig
+	(*Config_SessionkeyConfig)(nil),                         // 25: meshtastic.Config.SessionkeyConfig
+	(*Config_NetworkConfig_IpV4Config)(nil),                 // 26: meshtastic.Config.NetworkConfig.IpV4Config
+	(*DeviceUIConfig)(nil),                                  // 27: meshtastic.DeviceUIConfig
 }
 var file_meshtastic_config_proto_depIdxs = []int32{
-	16, // 0: meshtastic.Config.device:type_name -> meshtastic.Config.DeviceConfig
-	17, // 1: meshtastic.Config.position:type_name -> meshtastic.Config.PositionConfig
-	18, // 2: meshtastic.Config.power:type_name -> meshtastic.Config.PowerConfig
-	19, // 3: meshtastic.Config.network:type_name -> meshtastic.Config.NetworkConfig
-	20, // 4: meshtastic.Config.display:type_name -> meshtastic.Config.DisplayConfig
-	21, // 5: meshtastic.Config.lora:type_name -> meshtastic.Config.LoRaConfig
-	22, // 6: meshtastic.Config.bluetooth:type_name -> meshtastic.Config.BluetoothConfig
-	23, // 7: meshtastic.Config.security:type_name -> meshtastic.Config.SecurityConfig
-	24, // 8: meshtastic.Config.sessionkey:type_name -> meshtastic.Config.SessionkeyConfig
-	26, // 9: meshtastic.Config.device_ui:type_name -> meshtastic.DeviceUIConfig
+	17, // 0: meshtastic.Config.device:type_name -> meshtastic.Config.DeviceConfig
+	18, // 1: meshtastic.Config.position:type_name -> meshtastic.Config.PositionConfig
+	19, // 2: meshtastic.Config.power:type_name -> meshtastic.Config.PowerConfig
+	20, // 3: meshtastic.Config.network:type_name -> meshtastic.Config.NetworkConfig
+	21, // 4: meshtastic.Config.display:type_name -> meshtastic.Config.DisplayConfig
+	22, // 5: meshtastic.Config.lora:type_name -> meshtastic.Config.LoRaConfig
+	23, // 6: meshtastic.Config.bluetooth:type_name -> meshtastic.Config.BluetoothConfig
+	24, // 7: meshtastic.Config.security:type_name -> meshtastic.Config.SecurityConfig
+	25, // 8: meshtastic.Config.sessionkey:type_name -> meshtastic.Config.SessionkeyConfig
+	27, // 9: meshtastic.Config.device_ui:type_name -> meshtastic.DeviceUIConfig
 	0,  // 10: meshtastic.Config.DeviceConfig.role:type_name -> meshtastic.Config.DeviceConfig.Role
 	1,  // 11: meshtastic.Config.DeviceConfig.rebroadcast_mode:type_name -> meshtastic.Config.DeviceConfig.RebroadcastMode
 	2,  // 12: meshtastic.Config.DeviceConfig.buzzer_mode:type_name -> meshtastic.Config.DeviceConfig.BuzzerMode
 	4,  // 13: meshtastic.Config.PositionConfig.gps_mode:type_name -> meshtastic.Config.PositionConfig.GpsMode
 	5,  // 14: meshtastic.Config.NetworkConfig.address_mode:type_name -> meshtastic.Config.NetworkConfig.AddressMode
-	25, // 15: meshtastic.Config.NetworkConfig.ipv4_config:type_name -> meshtastic.Config.NetworkConfig.IpV4Config
+	26, // 15: meshtastic.Config.NetworkConfig.ipv4_config:type_name -> meshtastic.Config.NetworkConfig.IpV4Config
 	7,  // 16: meshtastic.Config.DisplayConfig.gps_format:type_name -> meshtastic.Config.DisplayConfig.DeprecatedGpsCoordinateFormat
 	8,  // 17: meshtastic.Config.DisplayConfig.units:type_name -> meshtastic.Config.DisplayConfig.DisplayUnits
 	9,  // 18: meshtastic.Config.DisplayConfig.oled:type_name -> meshtastic.Config.DisplayConfig.OledType
@@ -2957,12 +3026,13 @@ var file_meshtastic_config_proto_depIdxs = []int32{
 	11, // 20: meshtastic.Config.DisplayConfig.compass_orientation:type_name -> meshtastic.Config.DisplayConfig.CompassOrientation
 	13, // 21: meshtastic.Config.LoRaConfig.modem_preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
 	12, // 22: meshtastic.Config.LoRaConfig.region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
-	14, // 23: meshtastic.Config.BluetoothConfig.mode:type_name -> meshtastic.Config.BluetoothConfig.PairingMode
-	24, // [24:24] is the sub-list for method output_type
-	24, // [24:24] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	14, // 23: meshtastic.Config.LoRaConfig.fem_lna_mode:type_name -> meshtastic.Config.LoRaConfig.FEM_LNA_Mode
+	15, // 24: meshtastic.Config.BluetoothConfig.mode:type_name -> meshtastic.Config.BluetoothConfig.PairingMode
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_config_proto_init() }
@@ -2988,7 +3058,7 @@ func file_meshtastic_config_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_config_proto_rawDesc), len(file_meshtastic_config_proto_rawDesc)),
-			NumEnums:      15,
+			NumEnums:      16,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,

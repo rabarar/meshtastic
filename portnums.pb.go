@@ -153,6 +153,9 @@ const (
 	PortNum_MAP_REPORT_APP PortNum = 73
 	// PowerStress based monitoring support (for automated power consumption testing)
 	PortNum_POWERSTRESS_APP PortNum = 74
+	// LoraWAN Payload Transport
+	// ENCODING: compact binary LoRaWAN uplink (10-byte RF metadata + PHY payload) - see LoRaWANBridgeModule
+	PortNum_LORAWAN_BRIDGE PortNum = 75
 	// Reticulum Network Stack Tunnel App
 	// ENCODING: Fragmented RNS Packet. Handled by Meshtastic RNS interface
 	PortNum_RETICULUM_TUNNEL_APP PortNum = 76
@@ -203,6 +206,7 @@ var (
 		72:  "ATAK_PLUGIN",
 		73:  "MAP_REPORT_APP",
 		74:  "POWERSTRESS_APP",
+		75:  "LORAWAN_BRIDGE",
 		76:  "RETICULUM_TUNNEL_APP",
 		77:  "CAYENNE_APP",
 		256: "PRIVATE_APP",
@@ -239,6 +243,7 @@ var (
 		"ATAK_PLUGIN":                 72,
 		"MAP_REPORT_APP":              73,
 		"POWERSTRESS_APP":             74,
+		"LORAWAN_BRIDGE":              75,
 		"RETICULUM_TUNNEL_APP":        76,
 		"CAYENNE_APP":                 77,
 		"PRIVATE_APP":                 256,
@@ -279,7 +284,7 @@ var File_meshtastic_portnums_proto protoreflect.FileDescriptor
 const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\n" +
 	"\x19meshtastic/portnums.proto\x12\n" +
-	"meshtastic*\xab\x05\n" +
+	"meshtastic*\xbf\x05\n" +
 	"\aPortNum\x12\x0f\n" +
 	"\vUNKNOWN_APP\x10\x00\x12\x14\n" +
 	"\x10TEXT_MESSAGE_APP\x10\x01\x12\x17\n" +
@@ -311,7 +316,8 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\x10NEIGHBORINFO_APP\x10G\x12\x0f\n" +
 	"\vATAK_PLUGIN\x10H\x12\x12\n" +
 	"\x0eMAP_REPORT_APP\x10I\x12\x13\n" +
-	"\x0fPOWERSTRESS_APP\x10J\x12\x18\n" +
+	"\x0fPOWERSTRESS_APP\x10J\x12\x12\n" +
+	"\x0eLORAWAN_BRIDGE\x10K\x12\x18\n" +
 	"\x14RETICULUM_TUNNEL_APP\x10L\x12\x0f\n" +
 	"\vCAYENNE_APP\x10M\x12\x10\n" +
 	"\vPRIVATE_APP\x10\x80\x02\x12\x13\n" +
