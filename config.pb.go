@@ -649,6 +649,8 @@ const (
 	Config_DisplayConfig_OLED_SH1107 Config_DisplayConfig_OledType = 3
 	// Can not be auto detected but set by proto. Used for 128x128 screens
 	Config_DisplayConfig_OLED_SH1107_128_128 Config_DisplayConfig_OledType = 4
+	// Can not be auto detected but set by proto. Used for 64x128 rotated screens
+	Config_DisplayConfig_OLED_SH1107_ROTATED Config_DisplayConfig_OledType = 5
 )
 
 // Enum value maps for Config_DisplayConfig_OledType.
@@ -659,6 +661,7 @@ var (
 		2: "OLED_SH1106",
 		3: "OLED_SH1107",
 		4: "OLED_SH1107_128_128",
+		5: "OLED_SH1107_ROTATED",
 	}
 	Config_DisplayConfig_OledType_value = map[string]int32{
 		"OLED_AUTO":           0,
@@ -666,6 +669,7 @@ var (
 		"OLED_SH1106":         2,
 		"OLED_SH1107":         3,
 		"OLED_SH1107_128_128": 4,
+		"OLED_SH1107_ROTATED": 5,
 	}
 )
 
@@ -881,6 +885,19 @@ const (
 	Config_LoRaConfig_NP_865 Config_LoRaConfig_RegionCode = 25
 	// Brazil 902MHz
 	Config_LoRaConfig_BR_902 Config_LoRaConfig_RegionCode = 26
+	// ITU Region 1 Amateur Radio 2m band (144-146 MHz)
+	Config_LoRaConfig_ITU1_2M Config_LoRaConfig_RegionCode = 27
+	// ITU Region 2 Amateur Radio 2m band (144-148 MHz)
+	Config_LoRaConfig_ITU2_2M Config_LoRaConfig_RegionCode = 28
+	// EU 866MHz band (Band no. 47b of 2006/771/EC and subsequent amendments) for Non-specific short-range devices (SRD)
+	Config_LoRaConfig_EU_866 Config_LoRaConfig_RegionCode = 29
+	// EU 874MHz and 917MHz bands (Band no. 1 and 4 of 2022/172/EC and subsequent amendments) for Non-specific short-range devices (SRD)
+	Config_LoRaConfig_EU_874 Config_LoRaConfig_RegionCode = 30
+	Config_LoRaConfig_EU_917 Config_LoRaConfig_RegionCode = 31
+	// EU 868MHz band, with narrow presets
+	Config_LoRaConfig_EU_N_868 Config_LoRaConfig_RegionCode = 32
+	// ITU Region 3 Amateur Radio 2m band (144-148 MHz)
+	Config_LoRaConfig_ITU3_2M Config_LoRaConfig_RegionCode = 33
 )
 
 // Enum value maps for Config_LoRaConfig_RegionCode.
@@ -913,35 +930,49 @@ var (
 		24: "KZ_863",
 		25: "NP_865",
 		26: "BR_902",
+		27: "ITU1_2M",
+		28: "ITU2_2M",
+		29: "EU_866",
+		30: "EU_874",
+		31: "EU_917",
+		32: "EU_N_868",
+		33: "ITU3_2M",
 	}
 	Config_LoRaConfig_RegionCode_value = map[string]int32{
-		"UNSET":   0,
-		"US":      1,
-		"EU_433":  2,
-		"EU_868":  3,
-		"CN":      4,
-		"JP":      5,
-		"ANZ":     6,
-		"KR":      7,
-		"TW":      8,
-		"RU":      9,
-		"IN":      10,
-		"NZ_865":  11,
-		"TH":      12,
-		"LORA_24": 13,
-		"UA_433":  14,
-		"UA_868":  15,
-		"MY_433":  16,
-		"MY_919":  17,
-		"SG_923":  18,
-		"PH_433":  19,
-		"PH_868":  20,
-		"PH_915":  21,
-		"ANZ_433": 22,
-		"KZ_433":  23,
-		"KZ_863":  24,
-		"NP_865":  25,
-		"BR_902":  26,
+		"UNSET":    0,
+		"US":       1,
+		"EU_433":   2,
+		"EU_868":   3,
+		"CN":       4,
+		"JP":       5,
+		"ANZ":      6,
+		"KR":       7,
+		"TW":       8,
+		"RU":       9,
+		"IN":       10,
+		"NZ_865":   11,
+		"TH":       12,
+		"LORA_24":  13,
+		"UA_433":   14,
+		"UA_868":   15,
+		"MY_433":   16,
+		"MY_919":   17,
+		"SG_923":   18,
+		"PH_433":   19,
+		"PH_868":   20,
+		"PH_915":   21,
+		"ANZ_433":  22,
+		"KZ_433":   23,
+		"KZ_863":   24,
+		"NP_865":   25,
+		"BR_902":   26,
+		"ITU1_2M":  27,
+		"ITU2_2M":  28,
+		"EU_866":   29,
+		"EU_874":   30,
+		"EU_917":   31,
+		"EU_N_868": 32,
+		"ITU3_2M":  33,
 	}
 )
 
@@ -1006,21 +1037,42 @@ const (
 	// Long Range - Turbo
 	// This preset performs similarly to LongFast, but with 500Khz bandwidth.
 	Config_LoRaConfig_LONG_TURBO Config_LoRaConfig_ModemPreset = 9
+	// Lite Fast
+	// Medium range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
+	// Comparable link budget to MEDIUM_FAST but compliant with Band no. 47b of 2006/771/EC.
+	Config_LoRaConfig_LITE_FAST Config_LoRaConfig_ModemPreset = 10
+	// Lite Slow
+	// Medium-to-moderate range preset optimized for EU 866MHz SRD band with 125kHz bandwidth.
+	// Comparable link budget to LONG_FAST but compliant with Band no. 47b of 2006/771/EC.
+	Config_LoRaConfig_LITE_SLOW Config_LoRaConfig_ModemPreset = 11
+	// Narrow Fast
+	// Medium-to-moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
+	// Comparable link budget to SHORT_SLOW, but with half the data rate.
+	// Intended to avoid interference with other devices.
+	Config_LoRaConfig_NARROW_FAST Config_LoRaConfig_ModemPreset = 12
+	// Narrow Slow
+	// Moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
+	// Comparable link budget and data rate to LONG_FAST.
+	Config_LoRaConfig_NARROW_SLOW Config_LoRaConfig_ModemPreset = 13
 )
 
 // Enum value maps for Config_LoRaConfig_ModemPreset.
 var (
 	Config_LoRaConfig_ModemPreset_name = map[int32]string{
-		0: "LONG_FAST",
-		1: "LONG_SLOW",
-		2: "VERY_LONG_SLOW",
-		3: "MEDIUM_SLOW",
-		4: "MEDIUM_FAST",
-		5: "SHORT_SLOW",
-		6: "SHORT_FAST",
-		7: "LONG_MODERATE",
-		8: "SHORT_TURBO",
-		9: "LONG_TURBO",
+		0:  "LONG_FAST",
+		1:  "LONG_SLOW",
+		2:  "VERY_LONG_SLOW",
+		3:  "MEDIUM_SLOW",
+		4:  "MEDIUM_FAST",
+		5:  "SHORT_SLOW",
+		6:  "SHORT_FAST",
+		7:  "LONG_MODERATE",
+		8:  "SHORT_TURBO",
+		9:  "LONG_TURBO",
+		10: "LITE_FAST",
+		11: "LITE_SLOW",
+		12: "NARROW_FAST",
+		13: "NARROW_SLOW",
 	}
 	Config_LoRaConfig_ModemPreset_value = map[string]int32{
 		"LONG_FAST":      0,
@@ -1033,6 +1085,10 @@ var (
 		"LONG_MODERATE":  7,
 		"SHORT_TURBO":    8,
 		"LONG_TURBO":     9,
+		"LITE_FAST":      10,
+		"LITE_SLOW":      11,
+		"NARROW_FAST":    12,
+		"NARROW_SLOW":    13,
 	}
 )
 
@@ -2208,7 +2264,9 @@ type Config_LoRaConfig struct {
 	// Sets the ok_to_mqtt bit on outgoing packets
 	ConfigOkToMqtt bool `protobuf:"varint,105,opt,name=config_ok_to_mqtt,json=configOkToMqtt,proto3" json:"config_ok_to_mqtt,omitempty"`
 	// Set where LORA FEM is enabled, disabled, or not present
-	FemLnaMode    Config_LoRaConfig_FEM_LNA_Mode `protobuf:"varint,106,opt,name=fem_lna_mode,json=femLnaMode,proto3,enum=meshtastic.Config_LoRaConfig_FEM_LNA_Mode" json:"fem_lna_mode,omitempty"`
+	FemLnaMode Config_LoRaConfig_FEM_LNA_Mode `protobuf:"varint,106,opt,name=fem_lna_mode,json=femLnaMode,proto3,enum=meshtastic.Config_LoRaConfig_FEM_LNA_Mode" json:"fem_lna_mode,omitempty"`
+	// Don't use radiolib to initialize the radio, instead listen for a serialHal connection
+	SerialHalOnly bool `protobuf:"varint,107,opt,name=serial_hal_only,json=serialHalOnly,proto3" json:"serial_hal_only,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2374,6 +2432,13 @@ func (x *Config_LoRaConfig) GetFemLnaMode() Config_LoRaConfig_FEM_LNA_Mode {
 		return x.FemLnaMode
 	}
 	return Config_LoRaConfig_DISABLED
+}
+
+func (x *Config_LoRaConfig) GetSerialHalOnly() bool {
+	if x != nil {
+		return x.SerialHalOnly
+	}
+	return false
 }
 
 type Config_BluetoothConfig struct {
@@ -2656,7 +2721,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xbd5\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x977\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2794,7 +2859,8 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x06STATIC\x10\x01\"4\n" +
 	"\rProtocolFlags\x12\x10\n" +
 	"\fNO_BROADCAST\x10\x00\x12\x11\n" +
-	"\rUDP_BROADCAST\x10\x01\x1a\xf9\t\n" +
+	"\rUDP_BROADCAST\x10\x01\x1a\x92\n" +
+	"\n" +
 	"\rDisplayConfig\x12$\n" +
 	"\x0escreen_on_secs\x18\x01 \x01(\rR\fscreenOnSecs\x12a\n" +
 	"\n" +
@@ -2819,13 +2885,14 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\fDisplayUnits\x12\n" +
 	"\n" +
 	"\x06METRIC\x10\x00\x12\f\n" +
-	"\bIMPERIAL\x10\x01\"f\n" +
+	"\bIMPERIAL\x10\x01\"\x7f\n" +
 	"\bOledType\x12\r\n" +
 	"\tOLED_AUTO\x10\x00\x12\x10\n" +
 	"\fOLED_SSD1306\x10\x01\x12\x0f\n" +
 	"\vOLED_SH1106\x10\x02\x12\x0f\n" +
 	"\vOLED_SH1107\x10\x03\x12\x17\n" +
-	"\x13OLED_SH1107_128_128\x10\x04\"A\n" +
+	"\x13OLED_SH1107_128_128\x10\x04\x12\x17\n" +
+	"\x13OLED_SH1107_ROTATED\x10\x05\"A\n" +
 	"\vDisplayMode\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\f\n" +
 	"\bTWOCOLOR\x10\x01\x12\f\n" +
@@ -2840,8 +2907,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x12DEGREES_0_INVERTED\x10\x04\x12\x17\n" +
 	"\x13DEGREES_90_INVERTED\x10\x05\x12\x18\n" +
 	"\x14DEGREES_180_INVERTED\x10\x06\x12\x18\n" +
-	"\x14DEGREES_270_INVERTED\x10\a\x1a\xee\n" +
-	"\n" +
+	"\x14DEGREES_270_INVERTED\x10\a\x1a\xaf\f\n" +
 	"\n" +
 	"LoRaConfig\x12\x1d\n" +
 	"\n" +
@@ -2869,7 +2935,8 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"ignoreMqtt\x12)\n" +
 	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\x12L\n" +
 	"\ffem_lna_mode\x18j \x01(\x0e2*.meshtastic.Config.LoRaConfig.FEM_LNA_ModeR\n" +
-	"femLnaMode\"\xae\x02\n" +
+	"femLnaMode\x12&\n" +
+	"\x0fserial_hal_only\x18k \x01(\bR\rserialHalOnly\"\x87\x03\n" +
 	"\n" +
 	"RegionCode\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\x06\n" +
@@ -2914,7 +2981,17 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x06NP_865\x10\x19\x12\n" +
 	"\n" +
-	"\x06BR_902\x10\x1a\"\xbd\x01\n" +
+	"\x06BR_902\x10\x1a\x12\v\n" +
+	"\aITU1_2M\x10\x1b\x12\v\n" +
+	"\aITU2_2M\x10\x1c\x12\n" +
+	"\n" +
+	"\x06EU_866\x10\x1d\x12\n" +
+	"\n" +
+	"\x06EU_874\x10\x1e\x12\n" +
+	"\n" +
+	"\x06EU_917\x10\x1f\x12\f\n" +
+	"\bEU_N_868\x10 \x12\v\n" +
+	"\aITU3_2M\x10!\"\xfd\x01\n" +
 	"\vModemPreset\x12\r\n" +
 	"\tLONG_FAST\x10\x00\x12\x11\n" +
 	"\tLONG_SLOW\x10\x01\x1a\x02\b\x01\x12\x16\n" +
@@ -2928,7 +3005,12 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\rLONG_MODERATE\x10\a\x12\x0f\n" +
 	"\vSHORT_TURBO\x10\b\x12\x0e\n" +
 	"\n" +
-	"LONG_TURBO\x10\t\":\n" +
+	"LONG_TURBO\x10\t\x12\r\n" +
+	"\tLITE_FAST\x10\n" +
+	"\x12\r\n" +
+	"\tLITE_SLOW\x10\v\x12\x0f\n" +
+	"\vNARROW_FAST\x10\f\x12\x0f\n" +
+	"\vNARROW_SLOW\x10\r\":\n" +
 	"\fFEM_LNA_Mode\x12\f\n" +
 	"\bDISABLED\x10\x00\x12\v\n" +
 	"\aENABLED\x10\x01\x12\x0f\n" +

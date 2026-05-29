@@ -39,7 +39,7 @@ const (
 	TelemetrySensorType_INA219 TelemetrySensorType = 5
 	// High accuracy temperature and pressure
 	TelemetrySensorType_BMP280 TelemetrySensorType = 6
-	// High accuracy temperature and humidity
+	// TODO - REMOVE High accuracy temperature and humidity
 	TelemetrySensorType_SHTC3 TelemetrySensorType = 7
 	// High accuracy pressure
 	TelemetrySensorType_LPS22 TelemetrySensorType = 8
@@ -49,7 +49,7 @@ const (
 	TelemetrySensorType_QMI8658 TelemetrySensorType = 10
 	// 3-Axis magnetic sensor
 	TelemetrySensorType_QMC5883L TelemetrySensorType = 11
-	// High accuracy temperature and humidity
+	// TODO - REMOVE High accuracy temperature and humidity
 	TelemetrySensorType_SHT31 TelemetrySensorType = 12
 	// PM2.5 air quality sensor
 	TelemetrySensorType_PMSA003I TelemetrySensorType = 13
@@ -59,7 +59,7 @@ const (
 	TelemetrySensorType_BMP085 TelemetrySensorType = 15
 	// RCWL-9620 Doppler Radar Distance Sensor, used for water level detection
 	TelemetrySensorType_RCWL9620 TelemetrySensorType = 16
-	// Sensirion High accuracy temperature and humidity
+	// TODO - REMOVE Sensirion High accuracy temperature and humidity
 	TelemetrySensorType_SHT4X TelemetrySensorType = 17
 	// VEML7700 high accuracy ambient light(Lux) digital 16-bit resolution sensor.
 	TelemetrySensorType_VEML7700 TelemetrySensorType = 18
@@ -119,12 +119,20 @@ const (
 	TelemetrySensorType_BH1750 TelemetrySensorType = 45
 	// HDC1080 Temperature and Humidity Sensor
 	TelemetrySensorType_HDC1080 TelemetrySensorType = 46
-	// STH21 Temperature and R. Humidity sensor
+	// TODO - REMOVE STH21 Temperature and R. Humidity sensor
 	TelemetrySensorType_SHT21 TelemetrySensorType = 47
 	// Sensirion STC31 CO2 sensor
 	TelemetrySensorType_STC31 TelemetrySensorType = 48
 	// SCD30 CO2, humidity, temperature sensor
 	TelemetrySensorType_SCD30 TelemetrySensorType = 49
+	// SHT family of sensors for temperature and humidity
+	TelemetrySensorType_SHTXX TelemetrySensorType = 50
+	// DS248X Bridge for one-wire temperature sensors
+	TelemetrySensorType_DS248X TelemetrySensorType = 51
+	// MMC5983MA 3-Axis Digital Magnetic Sensor
+	TelemetrySensorType_MMC5983MA TelemetrySensorType = 52
+	// ICM-42607-P 6‑Axis IMU
+	TelemetrySensorType_ICM42607P TelemetrySensorType = 53
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -180,6 +188,10 @@ var (
 		47: "SHT21",
 		48: "STC31",
 		49: "SCD30",
+		50: "SHTXX",
+		51: "DS248X",
+		52: "MMC5983MA",
+		53: "ICM42607P",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -232,6 +244,10 @@ var (
 		"SHT21":         47,
 		"STC31":         48,
 		"SCD30":         49,
+		"SHTXX":         50,
+		"DS248X":        51,
+		"MMC5983MA":     52,
+		"ICM42607P":     53,
 	}
 )
 
@@ -393,8 +409,10 @@ type EnvironmentMetrics struct {
 	SoilMoisture *uint32 `protobuf:"varint,21,opt,name=soil_moisture,json=soilMoisture,proto3,oneof" json:"soil_moisture,omitempty"`
 	// Soil temperature measured (*C)
 	SoilTemperature *float32 `protobuf:"fixed32,22,opt,name=soil_temperature,json=soilTemperature,proto3,oneof" json:"soil_temperature,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// One-wire temperature (*C)
+	OneWireTemperature []float32 `protobuf:"fixed32,23,rep,packed,name=one_wire_temperature,json=oneWireTemperature,proto3" json:"one_wire_temperature,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *EnvironmentMetrics) Reset() {
@@ -579,6 +597,13 @@ func (x *EnvironmentMetrics) GetSoilTemperature() float32 {
 		return *x.SoilTemperature
 	}
 	return 0
+}
+
+func (x *EnvironmentMetrics) GetOneWireTemperature() []float32 {
+	if x != nil {
+		return x.OneWireTemperature
+	}
+	return nil
 }
 
 // Power Metrics (voltage / current / etc)
@@ -1840,7 +1865,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\b_voltageB\x16\n" +
 	"\x14_channel_utilizationB\x0e\n" +
 	"\f_air_util_txB\x11\n" +
-	"\x0f_uptime_seconds\"\xfb\b\n" +
+	"\x0f_uptime_seconds\"\xad\t\n" +
 	"\x12EnvironmentMetrics\x12%\n" +
 	"\vtemperature\x18\x01 \x01(\x02H\x00R\vtemperature\x88\x01\x01\x120\n" +
 	"\x11relative_humidity\x18\x02 \x01(\x02H\x01R\x10relativeHumidity\x88\x01\x01\x124\n" +
@@ -1867,7 +1892,8 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"rainfall1h\x88\x01\x01\x12&\n" +
 	"\frainfall_24h\x18\x14 \x01(\x02H\x13R\vrainfall24h\x88\x01\x01\x12(\n" +
 	"\rsoil_moisture\x18\x15 \x01(\rH\x14R\fsoilMoisture\x88\x01\x01\x12.\n" +
-	"\x10soil_temperature\x18\x16 \x01(\x02H\x15R\x0fsoilTemperature\x88\x01\x01B\x0e\n" +
+	"\x10soil_temperature\x18\x16 \x01(\x02H\x15R\x0fsoilTemperature\x88\x01\x01\x120\n" +
+	"\x14one_wire_temperature\x18\x17 \x03(\x02R\x12oneWireTemperatureB\x0e\n" +
 	"\f_temperatureB\x14\n" +
 	"\x12_relative_humidityB\x16\n" +
 	"\x14_barometric_pressureB\x11\n" +
@@ -2080,7 +2106,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0fvoc_state_array\x18\x06 \x01(\x06H\x02R\rvocStateArray\x88\x01\x01B\x11\n" +
 	"\x0f_voc_state_timeB\x12\n" +
 	"\x10_voc_state_validB\x12\n" +
-	"\x10_voc_state_array*\xa7\x05\n" +
+	"\x10_voc_state_array*\xdc\x05\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -2143,7 +2169,12 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\aHDC1080\x10.\x12\t\n" +
 	"\x05SHT21\x10/\x12\t\n" +
 	"\x05STC31\x100\x12\t\n" +
-	"\x05SCD30\x101Bf\n" +
+	"\x05SCD30\x101\x12\t\n" +
+	"\x05SHTXX\x102\x12\n" +
+	"\n" +
+	"\x06DS248X\x103\x12\r\n" +
+	"\tMMC5983MA\x104\x12\r\n" +
+	"\tICM42607P\x105Bf\n" +
 	"\x14org.meshtastic.protoB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (

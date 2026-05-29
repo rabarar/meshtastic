@@ -861,7 +861,9 @@ type ModuleConfig_MQTTConfig struct {
 	// (the default official mqtt.meshtastic.org server can handle encrypted packets)
 	// Decrypted packets may be useful for external systems that want to consume meshtastic packets
 	EncryptionEnabled bool `protobuf:"varint,5,opt,name=encryption_enabled,json=encryptionEnabled,proto3" json:"encryption_enabled,omitempty"`
-	// Whether to send / consume json packets on MQTT
+	// Deprecated: JSON packet support on MQTT was removed, and this field is ignored.
+	//
+	// Deprecated: Marked as deprecated in meshtastic/module_config.proto.
 	JsonEnabled bool `protobuf:"varint,6,opt,name=json_enabled,json=jsonEnabled,proto3" json:"json_enabled,omitempty"`
 	// If true, we attempt to establish a secure connection using TLS
 	TlsEnabled bool `protobuf:"varint,7,opt,name=tls_enabled,json=tlsEnabled,proto3" json:"tls_enabled,omitempty"`
@@ -943,6 +945,7 @@ func (x *ModuleConfig_MQTTConfig) GetEncryptionEnabled() bool {
 	return false
 }
 
+// Deprecated: Marked as deprecated in meshtastic/module_config.proto.
 func (x *ModuleConfig_MQTTConfig) GetJsonEnabled() bool {
 	if x != nil {
 		return x.JsonEnabled
@@ -2606,7 +2609,7 @@ var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\x1a\x15meshtastic/atak.proto\"\x8d=\n" +
+	"meshtastic\x1a\x15meshtastic/atak.proto\"\x91=\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2627,15 +2630,15 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"paxcounter\x12T\n" +
 	"\rstatusmessage\x18\x0e \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigH\x00R\rstatusmessage\x12a\n" +
 	"\x12traffic_management\x18\x0f \x01(\v20.meshtastic.ModuleConfig.TrafficManagementConfigH\x00R\x11trafficManagement\x126\n" +
-	"\x03tak\x18\x10 \x01(\v2\".meshtastic.ModuleConfig.TAKConfigH\x00R\x03tak\x1a\xc6\x03\n" +
+	"\x03tak\x18\x10 \x01(\v2\".meshtastic.ModuleConfig.TAKConfigH\x00R\x03tak\x1a\xca\x03\n" +
 	"\n" +
 	"MQTTConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x18\n" +
 	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x1a\n" +
 	"\busername\x18\x03 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x04 \x01(\tR\bpassword\x12-\n" +
-	"\x12encryption_enabled\x18\x05 \x01(\bR\x11encryptionEnabled\x12!\n" +
-	"\fjson_enabled\x18\x06 \x01(\bR\vjsonEnabled\x12\x1f\n" +
+	"\x12encryption_enabled\x18\x05 \x01(\bR\x11encryptionEnabled\x12%\n" +
+	"\fjson_enabled\x18\x06 \x01(\bB\x02\x18\x01R\vjsonEnabled\x12\x1f\n" +
 	"\vtls_enabled\x18\a \x01(\bR\n" +
 	"tlsEnabled\x12\x12\n" +
 	"\x04root\x18\b \x01(\tR\x04root\x125\n" +

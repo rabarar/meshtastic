@@ -89,6 +89,8 @@ const (
 	PortNum_ALERT_APP PortNum = 11
 	// Module/port for handling key verification requests.
 	PortNum_KEY_VERIFICATION_APP PortNum = 12
+	// Module/port for handling primitive remote shell access.
+	PortNum_REMOTE_SHELL_APP PortNum = 13
 	// Provides a 'ping' service that replies to any packet it receives.
 	// Also serves as a small example module.
 	// ENCODING: ASCII Plaintext
@@ -163,6 +165,14 @@ const (
 	// arbitrary telemetry over meshtastic that is not covered by telemetry.proto
 	// ENCODING: CayenneLLP
 	PortNum_CAYENNE_APP PortNum = 77
+	// ATAK Plugin V2
+	// Portnum for payloads from the official Meshtastic ATAK plugin using
+	// TAKPacketV2 with zstd dictionary compression.
+	PortNum_ATAK_PLUGIN_V2 PortNum = 78
+	// GroupAlarm integration
+	// Used for transporting GroupAlarm-related messages between Meshtastic nodes
+	// and companion applications/services.
+	PortNum_GROUPALARM_APP PortNum = 112
 	// Private applications should use portnums >= 256.
 	// To simplify initial development and testing you can use "PRIVATE_APP"
 	// in your code without needing to rebuild protobuf files (via [regen-protos.sh](https://github.com/meshtastic/firmware/blob/master/bin/regen-protos.sh))
@@ -190,6 +200,7 @@ var (
 		10:  "DETECTION_SENSOR_APP",
 		11:  "ALERT_APP",
 		12:  "KEY_VERIFICATION_APP",
+		13:  "REMOTE_SHELL_APP",
 		32:  "REPLY_APP",
 		33:  "IP_TUNNEL_APP",
 		34:  "PAXCOUNTER_APP",
@@ -209,6 +220,8 @@ var (
 		75:  "LORAWAN_BRIDGE",
 		76:  "RETICULUM_TUNNEL_APP",
 		77:  "CAYENNE_APP",
+		78:  "ATAK_PLUGIN_V2",
+		112: "GROUPALARM_APP",
 		256: "PRIVATE_APP",
 		257: "ATAK_FORWARDER",
 		511: "MAX",
@@ -227,6 +240,7 @@ var (
 		"DETECTION_SENSOR_APP":        10,
 		"ALERT_APP":                   11,
 		"KEY_VERIFICATION_APP":        12,
+		"REMOTE_SHELL_APP":            13,
 		"REPLY_APP":                   32,
 		"IP_TUNNEL_APP":               33,
 		"PAXCOUNTER_APP":              34,
@@ -246,6 +260,8 @@ var (
 		"LORAWAN_BRIDGE":              75,
 		"RETICULUM_TUNNEL_APP":        76,
 		"CAYENNE_APP":                 77,
+		"ATAK_PLUGIN_V2":              78,
+		"GROUPALARM_APP":              112,
 		"PRIVATE_APP":                 256,
 		"ATAK_FORWARDER":              257,
 		"MAX":                         511,
@@ -284,7 +300,7 @@ var File_meshtastic_portnums_proto protoreflect.FileDescriptor
 const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\n" +
 	"\x19meshtastic/portnums.proto\x12\n" +
-	"meshtastic*\xbf\x05\n" +
+	"meshtastic*\xfd\x05\n" +
 	"\aPortNum\x12\x0f\n" +
 	"\vUNKNOWN_APP\x10\x00\x12\x14\n" +
 	"\x10TEXT_MESSAGE_APP\x10\x01\x12\x17\n" +
@@ -299,7 +315,8 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\x14DETECTION_SENSOR_APP\x10\n" +
 	"\x12\r\n" +
 	"\tALERT_APP\x10\v\x12\x18\n" +
-	"\x14KEY_VERIFICATION_APP\x10\f\x12\r\n" +
+	"\x14KEY_VERIFICATION_APP\x10\f\x12\x14\n" +
+	"\x10REMOTE_SHELL_APP\x10\r\x12\r\n" +
 	"\tREPLY_APP\x10 \x12\x11\n" +
 	"\rIP_TUNNEL_APP\x10!\x12\x12\n" +
 	"\x0ePAXCOUNTER_APP\x10\"\x12\x1e\n" +
@@ -319,7 +336,9 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\x0fPOWERSTRESS_APP\x10J\x12\x12\n" +
 	"\x0eLORAWAN_BRIDGE\x10K\x12\x18\n" +
 	"\x14RETICULUM_TUNNEL_APP\x10L\x12\x0f\n" +
-	"\vCAYENNE_APP\x10M\x12\x10\n" +
+	"\vCAYENNE_APP\x10M\x12\x12\n" +
+	"\x0eATAK_PLUGIN_V2\x10N\x12\x12\n" +
+	"\x0eGROUPALARM_APP\x10p\x12\x10\n" +
 	"\vPRIVATE_APP\x10\x80\x02\x12\x13\n" +
 	"\x0eATAK_FORWARDER\x10\x81\x02\x12\b\n" +
 	"\x03MAX\x10\xff\x03B_\n" +
