@@ -336,6 +336,10 @@ const (
 	HardwareModel_SEEED_WIO_TRACKER_L2 HardwareModel = 137
 	// Elecrow CrowPanel Advance P4 models, ESP32-P4 and TFT with SX1262 radio plugin
 	HardwareModel_CROWPANEL_P4 HardwareModel = 138
+	// Heltec Mesh Tower V2
+	HardwareModel_HELTEC_MESH_TOWER_V2 HardwareModel = 139
+	// Meshnology W10
+	HardwareModel_MESHNOLOGY_W10 HardwareModel = 140
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -484,6 +488,8 @@ var (
 		136: "T_ECHO_CARD",
 		137: "SEEED_WIO_TRACKER_L2",
 		138: "CROWPANEL_P4",
+		139: "HELTEC_MESH_TOWER_V2",
+		140: "MESHNOLOGY_W10",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -626,6 +632,8 @@ var (
 		"T_ECHO_CARD":                  136,
 		"SEEED_WIO_TRACKER_L2":         137,
 		"CROWPANEL_P4":                 138,
+		"HELTEC_MESH_TOWER_V2":         139,
+		"MESHNOLOGY_W10":               140,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -5984,7 +5992,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\xfc\x14\n" +
+	"\x0fpayload_variant*\xac\x15\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -6137,7 +6145,9 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x0eT_IMPULSE_PLUS\x10\x87\x01\x12\x10\n" +
 	"\vT_ECHO_CARD\x10\x88\x01\x12\x19\n" +
 	"\x14SEEED_WIO_TRACKER_L2\x10\x89\x01\x12\x11\n" +
-	"\fCROWPANEL_P4\x10\x8a\x01\x12\x0f\n" +
+	"\fCROWPANEL_P4\x10\x8a\x01\x12\x19\n" +
+	"\x14HELTEC_MESH_TOWER_V2\x10\x8b\x01\x12\x13\n" +
+	"\x0eMESHNOLOGY_W10\x10\x8c\x01\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +
