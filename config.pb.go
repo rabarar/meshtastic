@@ -898,6 +898,19 @@ const (
 	Config_LoRaConfig_EU_N_868 Config_LoRaConfig_RegionCode = 32
 	// ITU Region 3 Amateur Radio 2m band (144-148 MHz)
 	Config_LoRaConfig_ITU3_2M Config_LoRaConfig_RegionCode = 33
+	// ITU Region 1 Amateur Radio 70cm band (430-440 MHz)
+	Config_LoRaConfig_ITU1_70CM Config_LoRaConfig_RegionCode = 34
+	// ITU Region 2 Amateur Radio 70cm band (420-450 MHz)
+	// Note: Some countries do not allocate 420-430 MHz or 440-450 MHz.
+	// Check local law!
+	Config_LoRaConfig_ITU2_70CM Config_LoRaConfig_RegionCode = 35
+	// ITU Region 3 Amateur Radio 70cm band (430-450 MHz)
+	// Note: Some countries do not allocate 440-450 MHz. Check local law!
+	Config_LoRaConfig_ITU3_70CM Config_LoRaConfig_RegionCode = 36
+	// ITU Region 2 Amateur Radio 1.25m '125cm' band (220-225 MHz)
+	// Note: Some countries do not allocate 220-222 MHz (Ex: USA/Canada).
+	// Check local law!
+	Config_LoRaConfig_ITU2_125CM Config_LoRaConfig_RegionCode = 37
 )
 
 // Enum value maps for Config_LoRaConfig_RegionCode.
@@ -937,42 +950,50 @@ var (
 		31: "EU_917",
 		32: "EU_N_868",
 		33: "ITU3_2M",
+		34: "ITU1_70CM",
+		35: "ITU2_70CM",
+		36: "ITU3_70CM",
+		37: "ITU2_125CM",
 	}
 	Config_LoRaConfig_RegionCode_value = map[string]int32{
-		"UNSET":    0,
-		"US":       1,
-		"EU_433":   2,
-		"EU_868":   3,
-		"CN":       4,
-		"JP":       5,
-		"ANZ":      6,
-		"KR":       7,
-		"TW":       8,
-		"RU":       9,
-		"IN":       10,
-		"NZ_865":   11,
-		"TH":       12,
-		"LORA_24":  13,
-		"UA_433":   14,
-		"UA_868":   15,
-		"MY_433":   16,
-		"MY_919":   17,
-		"SG_923":   18,
-		"PH_433":   19,
-		"PH_868":   20,
-		"PH_915":   21,
-		"ANZ_433":  22,
-		"KZ_433":   23,
-		"KZ_863":   24,
-		"NP_865":   25,
-		"BR_902":   26,
-		"ITU1_2M":  27,
-		"ITU2_2M":  28,
-		"EU_866":   29,
-		"EU_874":   30,
-		"EU_917":   31,
-		"EU_N_868": 32,
-		"ITU3_2M":  33,
+		"UNSET":      0,
+		"US":         1,
+		"EU_433":     2,
+		"EU_868":     3,
+		"CN":         4,
+		"JP":         5,
+		"ANZ":        6,
+		"KR":         7,
+		"TW":         8,
+		"RU":         9,
+		"IN":         10,
+		"NZ_865":     11,
+		"TH":         12,
+		"LORA_24":    13,
+		"UA_433":     14,
+		"UA_868":     15,
+		"MY_433":     16,
+		"MY_919":     17,
+		"SG_923":     18,
+		"PH_433":     19,
+		"PH_868":     20,
+		"PH_915":     21,
+		"ANZ_433":    22,
+		"KZ_433":     23,
+		"KZ_863":     24,
+		"NP_865":     25,
+		"BR_902":     26,
+		"ITU1_2M":    27,
+		"ITU2_2M":    28,
+		"EU_866":     29,
+		"EU_874":     30,
+		"EU_917":     31,
+		"EU_N_868":   32,
+		"ITU3_2M":    33,
+		"ITU1_70CM":  34,
+		"ITU2_70CM":  35,
+		"ITU3_70CM":  36,
+		"ITU2_125CM": 37,
 	}
 )
 
@@ -1054,6 +1075,20 @@ const (
 	// Moderate range preset optimized for EU 868MHz band with 62.5kHz bandwidth.
 	// Comparable link budget and data rate to LONG_FAST.
 	Config_LoRaConfig_NARROW_SLOW Config_LoRaConfig_ModemPreset = 13
+	// Tiny Fast
+	// Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+	// Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+	// Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+	// Only compatible with SX127x and SX126x chipsets.
+	// Comparable link budget and data rate to LONG_FAST.
+	Config_LoRaConfig_TINY_FAST Config_LoRaConfig_ModemPreset = 14
+	// Tiny Slow
+	// Preset optimized for compliance with Amateur Radio restrictions with 20kHz bandwidth.
+	// Many regions limit data transmission bandwidth in lower amateur bands (2 Meter).
+	// Note: TCXO with tight tolerances (±5 ppm or better) is *absolutely required* at these narrow bandwidths.
+	// Only compatible with SX127x and SX126x chipsets.
+	// Comparable link budget and data rate to LONG_MODERATE.
+	Config_LoRaConfig_TINY_SLOW Config_LoRaConfig_ModemPreset = 15
 )
 
 // Enum value maps for Config_LoRaConfig_ModemPreset.
@@ -1073,6 +1108,8 @@ var (
 		11: "LITE_SLOW",
 		12: "NARROW_FAST",
 		13: "NARROW_SLOW",
+		14: "TINY_FAST",
+		15: "TINY_SLOW",
 	}
 	Config_LoRaConfig_ModemPreset_value = map[string]int32{
 		"LONG_FAST":      0,
@@ -1089,6 +1126,8 @@ var (
 		"LITE_SLOW":      11,
 		"NARROW_FAST":    12,
 		"NARROW_SLOW":    13,
+		"TINY_FAST":      14,
+		"TINY_SLOW":      15,
 	}
 )
 
@@ -2721,7 +2760,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x977\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xf27\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2907,7 +2946,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x12DEGREES_0_INVERTED\x10\x04\x12\x17\n" +
 	"\x13DEGREES_90_INVERTED\x10\x05\x12\x18\n" +
 	"\x14DEGREES_180_INVERTED\x10\x06\x12\x18\n" +
-	"\x14DEGREES_270_INVERTED\x10\a\x1a\xaf\f\n" +
+	"\x14DEGREES_270_INVERTED\x10\a\x1a\x8a\r\n" +
 	"\n" +
 	"LoRaConfig\x12\x1d\n" +
 	"\n" +
@@ -2936,7 +2975,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\x12L\n" +
 	"\ffem_lna_mode\x18j \x01(\x0e2*.meshtastic.Config.LoRaConfig.FEM_LNA_ModeR\n" +
 	"femLnaMode\x12&\n" +
-	"\x0fserial_hal_only\x18k \x01(\bR\rserialHalOnly\"\x87\x03\n" +
+	"\x0fserial_hal_only\x18k \x01(\bR\rserialHalOnly\"\xc4\x03\n" +
 	"\n" +
 	"RegionCode\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\x06\n" +
@@ -2991,7 +3030,12 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x06EU_917\x10\x1f\x12\f\n" +
 	"\bEU_N_868\x10 \x12\v\n" +
-	"\aITU3_2M\x10!\"\xfd\x01\n" +
+	"\aITU3_2M\x10!\x12\r\n" +
+	"\tITU1_70CM\x10\"\x12\r\n" +
+	"\tITU2_70CM\x10#\x12\r\n" +
+	"\tITU3_70CM\x10$\x12\x0e\n" +
+	"\n" +
+	"ITU2_125CM\x10%\"\x9b\x02\n" +
 	"\vModemPreset\x12\r\n" +
 	"\tLONG_FAST\x10\x00\x12\x11\n" +
 	"\tLONG_SLOW\x10\x01\x1a\x02\b\x01\x12\x16\n" +
@@ -3010,7 +3054,9 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x12\r\n" +
 	"\tLITE_SLOW\x10\v\x12\x0f\n" +
 	"\vNARROW_FAST\x10\f\x12\x0f\n" +
-	"\vNARROW_SLOW\x10\r\":\n" +
+	"\vNARROW_SLOW\x10\r\x12\r\n" +
+	"\tTINY_FAST\x10\x0e\x12\r\n" +
+	"\tTINY_SLOW\x10\x0f\":\n" +
 	"\fFEM_LNA_Mode\x12\f\n" +
 	"\bDISABLED\x10\x00\x12\v\n" +
 	"\aENABLED\x10\x01\x12\x0f\n" +

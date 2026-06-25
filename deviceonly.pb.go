@@ -39,8 +39,10 @@ type PositionLite struct {
 	Time uint32 `protobuf:"fixed32,4,opt,name=time,proto3" json:"time,omitempty"`
 	// TODO: REPLACE
 	LocationSource Position_LocSource `protobuf:"varint,5,opt,name=location_source,json=locationSource,proto3,enum=meshtastic.Position_LocSource" json:"location_source,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Indicates the bits of precision set by the sending node
+	PrecisionBits uint32 `protobuf:"varint,6,opt,name=precision_bits,json=precisionBits,proto3" json:"precision_bits,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PositionLite) Reset() {
@@ -106,6 +108,13 @@ func (x *PositionLite) GetLocationSource() Position_LocSource {
 		return x.LocationSource
 	}
 	return Position_LOC_UNSET
+}
+
+func (x *PositionLite) GetPrecisionBits() uint32 {
+	if x != nil {
+		return x.PrecisionBits
+	}
+	return 0
 }
 
 type UserLite struct {
@@ -230,36 +239,34 @@ type NodeInfoLite struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The node number
 	Num uint32 `protobuf:"varint,1,opt,name=num,proto3" json:"num,omitempty"`
-	// The user info for this node
-	User *UserLite `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
-	// This position data. Note: before 1.2.14 we would also store the last time we've heard from this node in position.time, that is no longer true.
-	// Position.time now indicates the last time we received a POSITION from that node.
-	Position *PositionLite `protobuf:"bytes,3,opt,name=position,proto3" json:"position,omitempty"`
-	// Returns the Signal-to-noise ratio (SNR) of the last received message,
-	// as measured by the receiver. Return SNR of the last received message in dB
+	// In-memory SNR of the last received message in dB. Not serialised directly:
+	// always zeroed before encode; persisted as snr_q4 = 19 below.
 	Snr float32 `protobuf:"fixed32,4,opt,name=snr,proto3" json:"snr,omitempty"`
 	// Set to indicate the last time we received a packet from this node
 	LastHeard uint32 `protobuf:"fixed32,5,opt,name=last_heard,json=lastHeard,proto3" json:"last_heard,omitempty"`
-	// The latest device metrics for the node.
-	DeviceMetrics *DeviceMetrics `protobuf:"bytes,6,opt,name=device_metrics,json=deviceMetrics,proto3" json:"device_metrics,omitempty"`
 	// local channel index we heard that node on. Only populated if its not the default channel.
 	Channel uint32 `protobuf:"varint,7,opt,name=channel,proto3" json:"channel,omitempty"`
-	// True if we witnessed the node over MQTT instead of LoRA transport
-	ViaMqtt bool `protobuf:"varint,8,opt,name=via_mqtt,json=viaMqtt,proto3" json:"via_mqtt,omitempty"`
 	// Number of hops away from us this node is (0 if direct neighbor)
 	HopsAway *uint32 `protobuf:"varint,9,opt,name=hops_away,json=hopsAway,proto3,oneof" json:"hops_away,omitempty"`
-	// True if node is in our favorites list
-	// Persists between NodeDB internal clean ups
-	IsFavorite bool `protobuf:"varint,10,opt,name=is_favorite,json=isFavorite,proto3" json:"is_favorite,omitempty"`
-	// True if node is in our ignored list
-	// Persists between NodeDB internal clean ups
-	IsIgnored bool `protobuf:"varint,11,opt,name=is_ignored,json=isIgnored,proto3" json:"is_ignored,omitempty"`
 	// Last byte of the node number of the node that should be used as the next hop to reach this node.
 	NextHop uint32 `protobuf:"varint,12,opt,name=next_hop,json=nextHop,proto3" json:"next_hop,omitempty"`
-	// Bitfield for storing booleans.
-	// LSB 0 is_key_manually_verified
-	// LSB 1 is_muted
-	Bitfield      uint32 `protobuf:"varint,13,opt,name=bitfield,proto3" json:"bitfield,omitempty"`
+	// Bitfield for storing booleans. See NODEINFO_BITFIELD_* in src/mesh/NodeDB.h.
+	Bitfield uint32 `protobuf:"varint,13,opt,name=bitfield,proto3" json:"bitfield,omitempty"`
+	// A full name for this user, i.e. "Kevin Hester".
+	LongName string `protobuf:"bytes,14,opt,name=long_name,json=longName,proto3" json:"long_name,omitempty"`
+	// A VERY short name, ideally two characters or an emoji.
+	// Suitable for a tiny OLED screen.
+	ShortName string `protobuf:"bytes,15,opt,name=short_name,json=shortName,proto3" json:"short_name,omitempty"`
+	// Hardware model the user's device is running.
+	HwModel HardwareModel `protobuf:"varint,16,opt,name=hw_model,json=hwModel,proto3,enum=meshtastic.HardwareModel" json:"hw_model,omitempty"`
+	// The user's role in the mesh.
+	Role Config_DeviceConfig_Role `protobuf:"varint,17,opt,name=role,proto3,enum=meshtastic.Config_DeviceConfig_Role" json:"role,omitempty"`
+	// The public key of the user's device, for PKI-based encrypted DMs.
+	PublicKey []byte `protobuf:"bytes,18,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	// Q4-encoded SNR: dB × 4, sint32 zigzag. Matches RouteDiscovery convention.
+	// Encode: snr_q4 = (int32_t)(snr * 4.0f). Decode: snr = snr_q4 / 4.0f.
+	// float snr is always zeroed on disk; this field carries all persisted SNR.
+	SnrQ4         int32 `protobuf:"zigzag32,19,opt,name=snr_q4,json=snrQ4,proto3" json:"snr_q4,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -301,20 +308,6 @@ func (x *NodeInfoLite) GetNum() uint32 {
 	return 0
 }
 
-func (x *NodeInfoLite) GetUser() *UserLite {
-	if x != nil {
-		return x.User
-	}
-	return nil
-}
-
-func (x *NodeInfoLite) GetPosition() *PositionLite {
-	if x != nil {
-		return x.Position
-	}
-	return nil
-}
-
 func (x *NodeInfoLite) GetSnr() float32 {
 	if x != nil {
 		return x.Snr
@@ -329,13 +322,6 @@ func (x *NodeInfoLite) GetLastHeard() uint32 {
 	return 0
 }
 
-func (x *NodeInfoLite) GetDeviceMetrics() *DeviceMetrics {
-	if x != nil {
-		return x.DeviceMetrics
-	}
-	return nil
-}
-
 func (x *NodeInfoLite) GetChannel() uint32 {
 	if x != nil {
 		return x.Channel
@@ -343,32 +329,11 @@ func (x *NodeInfoLite) GetChannel() uint32 {
 	return 0
 }
 
-func (x *NodeInfoLite) GetViaMqtt() bool {
-	if x != nil {
-		return x.ViaMqtt
-	}
-	return false
-}
-
 func (x *NodeInfoLite) GetHopsAway() uint32 {
 	if x != nil && x.HopsAway != nil {
 		return *x.HopsAway
 	}
 	return 0
-}
-
-func (x *NodeInfoLite) GetIsFavorite() bool {
-	if x != nil {
-		return x.IsFavorite
-	}
-	return false
-}
-
-func (x *NodeInfoLite) GetIsIgnored() bool {
-	if x != nil {
-		return x.IsIgnored
-	}
-	return false
 }
 
 func (x *NodeInfoLite) GetNextHop() uint32 {
@@ -381,6 +346,48 @@ func (x *NodeInfoLite) GetNextHop() uint32 {
 func (x *NodeInfoLite) GetBitfield() uint32 {
 	if x != nil {
 		return x.Bitfield
+	}
+	return 0
+}
+
+func (x *NodeInfoLite) GetLongName() string {
+	if x != nil {
+		return x.LongName
+	}
+	return ""
+}
+
+func (x *NodeInfoLite) GetShortName() string {
+	if x != nil {
+		return x.ShortName
+	}
+	return ""
+}
+
+func (x *NodeInfoLite) GetHwModel() HardwareModel {
+	if x != nil {
+		return x.HwModel
+	}
+	return HardwareModel_UNSET
+}
+
+func (x *NodeInfoLite) GetRole() Config_DeviceConfig_Role {
+	if x != nil {
+		return x.Role
+	}
+	return Config_DeviceConfig_CLIENT
+}
+
+func (x *NodeInfoLite) GetPublicKey() []byte {
+	if x != nil {
+		return x.PublicKey
+	}
+	return nil
+}
+
+func (x *NodeInfoLite) GetSnrQ4() int32 {
+	if x != nil {
+		return x.SnrQ4
 	}
 	return 0
 }
@@ -522,6 +529,214 @@ func (x *DeviceState) GetNodeRemoteHardwarePins() []*NodeRemoteHardwarePin {
 	return nil
 }
 
+type NodePositionEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Num           uint32                 `protobuf:"varint,1,opt,name=num,proto3" json:"num,omitempty"`
+	Position      *PositionLite          `protobuf:"bytes,2,opt,name=position,proto3" json:"position,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NodePositionEntry) Reset() {
+	*x = NodePositionEntry{}
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NodePositionEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodePositionEntry) ProtoMessage() {}
+
+func (x *NodePositionEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodePositionEntry.ProtoReflect.Descriptor instead.
+func (*NodePositionEntry) Descriptor() ([]byte, []int) {
+	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *NodePositionEntry) GetNum() uint32 {
+	if x != nil {
+		return x.Num
+	}
+	return 0
+}
+
+func (x *NodePositionEntry) GetPosition() *PositionLite {
+	if x != nil {
+		return x.Position
+	}
+	return nil
+}
+
+type NodeTelemetryEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Num           uint32                 `protobuf:"varint,1,opt,name=num,proto3" json:"num,omitempty"`
+	DeviceMetrics *DeviceMetrics         `protobuf:"bytes,2,opt,name=device_metrics,json=deviceMetrics,proto3" json:"device_metrics,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NodeTelemetryEntry) Reset() {
+	*x = NodeTelemetryEntry{}
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NodeTelemetryEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeTelemetryEntry) ProtoMessage() {}
+
+func (x *NodeTelemetryEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeTelemetryEntry.ProtoReflect.Descriptor instead.
+func (*NodeTelemetryEntry) Descriptor() ([]byte, []int) {
+	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *NodeTelemetryEntry) GetNum() uint32 {
+	if x != nil {
+		return x.Num
+	}
+	return 0
+}
+
+func (x *NodeTelemetryEntry) GetDeviceMetrics() *DeviceMetrics {
+	if x != nil {
+		return x.DeviceMetrics
+	}
+	return nil
+}
+
+type NodeEnvironmentEntry struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Num                uint32                 `protobuf:"varint,1,opt,name=num,proto3" json:"num,omitempty"`
+	EnvironmentMetrics *EnvironmentMetrics    `protobuf:"bytes,2,opt,name=environment_metrics,json=environmentMetrics,proto3" json:"environment_metrics,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *NodeEnvironmentEntry) Reset() {
+	*x = NodeEnvironmentEntry{}
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NodeEnvironmentEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeEnvironmentEntry) ProtoMessage() {}
+
+func (x *NodeEnvironmentEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeEnvironmentEntry.ProtoReflect.Descriptor instead.
+func (*NodeEnvironmentEntry) Descriptor() ([]byte, []int) {
+	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *NodeEnvironmentEntry) GetNum() uint32 {
+	if x != nil {
+		return x.Num
+	}
+	return 0
+}
+
+func (x *NodeEnvironmentEntry) GetEnvironmentMetrics() *EnvironmentMetrics {
+	if x != nil {
+		return x.EnvironmentMetrics
+	}
+	return nil
+}
+
+type NodeStatusEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Num           uint32                 `protobuf:"varint,1,opt,name=num,proto3" json:"num,omitempty"`
+	Status        *StatusMessage         `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NodeStatusEntry) Reset() {
+	*x = NodeStatusEntry{}
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NodeStatusEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeStatusEntry) ProtoMessage() {}
+
+func (x *NodeStatusEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeStatusEntry.ProtoReflect.Descriptor instead.
+func (*NodeStatusEntry) Descriptor() ([]byte, []int) {
+	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *NodeStatusEntry) GetNum() uint32 {
+	if x != nil {
+		return x.Num
+	}
+	return 0
+}
+
+func (x *NodeStatusEntry) GetStatus() *StatusMessage {
+	if x != nil {
+		return x.Status
+	}
+	return nil
+}
+
 type NodeDatabase struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// A version integer used to invalidate old save files when we make
@@ -529,14 +744,20 @@ type NodeDatabase struct {
 	// NodeDB.cpp in the device code.
 	Version uint32 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
 	// New lite version of NodeDB to decrease memory footprint
-	Nodes         []*NodeInfoLite `protobuf:"bytes,2,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	Nodes []*NodeInfoLite `protobuf:"bytes,2,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	// Per-NodeNum satellite arrays. Constrained platforms (e.g. STM32WL) omit
+	// these via MESHTASTIC_EXCLUDE_*DB build flags.
+	Positions     []*NodePositionEntry    `protobuf:"bytes,3,rep,name=positions,proto3" json:"positions,omitempty"`
+	Telemetry     []*NodeTelemetryEntry   `protobuf:"bytes,4,rep,name=telemetry,proto3" json:"telemetry,omitempty"`
+	Status        []*NodeStatusEntry      `protobuf:"bytes,5,rep,name=status,proto3" json:"status,omitempty"`
+	Environment   []*NodeEnvironmentEntry `protobuf:"bytes,6,rep,name=environment,proto3" json:"environment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *NodeDatabase) Reset() {
 	*x = NodeDatabase{}
-	mi := &file_meshtastic_deviceonly_proto_msgTypes[4]
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -548,7 +769,7 @@ func (x *NodeDatabase) String() string {
 func (*NodeDatabase) ProtoMessage() {}
 
 func (x *NodeDatabase) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_deviceonly_proto_msgTypes[4]
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -561,7 +782,7 @@ func (x *NodeDatabase) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeDatabase.ProtoReflect.Descriptor instead.
 func (*NodeDatabase) Descriptor() ([]byte, []int) {
-	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{4}
+	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *NodeDatabase) GetVersion() uint32 {
@@ -574,6 +795,34 @@ func (x *NodeDatabase) GetVersion() uint32 {
 func (x *NodeDatabase) GetNodes() []*NodeInfoLite {
 	if x != nil {
 		return x.Nodes
+	}
+	return nil
+}
+
+func (x *NodeDatabase) GetPositions() []*NodePositionEntry {
+	if x != nil {
+		return x.Positions
+	}
+	return nil
+}
+
+func (x *NodeDatabase) GetTelemetry() []*NodeTelemetryEntry {
+	if x != nil {
+		return x.Telemetry
+	}
+	return nil
+}
+
+func (x *NodeDatabase) GetStatus() []*NodeStatusEntry {
+	if x != nil {
+		return x.Status
+	}
+	return nil
+}
+
+func (x *NodeDatabase) GetEnvironment() []*NodeEnvironmentEntry {
+	if x != nil {
+		return x.Environment
 	}
 	return nil
 }
@@ -593,7 +842,7 @@ type ChannelFile struct {
 
 func (x *ChannelFile) Reset() {
 	*x = ChannelFile{}
-	mi := &file_meshtastic_deviceonly_proto_msgTypes[5]
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -605,7 +854,7 @@ func (x *ChannelFile) String() string {
 func (*ChannelFile) ProtoMessage() {}
 
 func (x *ChannelFile) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_deviceonly_proto_msgTypes[5]
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -618,7 +867,7 @@ func (x *ChannelFile) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelFile.ProtoReflect.Descriptor instead.
 func (*ChannelFile) Descriptor() ([]byte, []int) {
-	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{5}
+	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ChannelFile) GetChannels() []*Channel {
@@ -656,7 +905,7 @@ type BackupPreferences struct {
 
 func (x *BackupPreferences) Reset() {
 	*x = BackupPreferences{}
-	mi := &file_meshtastic_deviceonly_proto_msgTypes[6]
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -668,7 +917,7 @@ func (x *BackupPreferences) String() string {
 func (*BackupPreferences) ProtoMessage() {}
 
 func (x *BackupPreferences) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_deviceonly_proto_msgTypes[6]
+	mi := &file_meshtastic_deviceonly_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -681,7 +930,7 @@ func (x *BackupPreferences) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BackupPreferences.ProtoReflect.Descriptor instead.
 func (*BackupPreferences) Descriptor() ([]byte, []int) {
-	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{6}
+	return file_meshtastic_deviceonly_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *BackupPreferences) GetVersion() uint32 {
@@ -731,7 +980,7 @@ var File_meshtastic_deviceonly_proto protoreflect.FileDescriptor
 const file_meshtastic_deviceonly_proto_rawDesc = "" +
 	"\n" +
 	"\x1bmeshtastic/deviceonly.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\x1ameshtastic/localonly.proto\x1a\x15meshtastic/mesh.proto\x1a\x1ameshtastic/telemetry.proto\x1a\fnanopb.proto\"\xc7\x01\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\x1ameshtastic/localonly.proto\x1a\x15meshtastic/mesh.proto\x1a\x1ameshtastic/telemetry.proto\x1a\fnanopb.proto\"\xee\x01\n" +
 	"\fPositionLite\x12\x1d\n" +
 	"\n" +
 	"latitude_i\x18\x01 \x01(\x0fR\tlatitudeI\x12\x1f\n" +
@@ -739,7 +988,8 @@ const file_meshtastic_deviceonly_proto_rawDesc = "" +
 	"longitudeI\x12\x1a\n" +
 	"\baltitude\x18\x03 \x01(\x05R\baltitude\x12\x12\n" +
 	"\x04time\x18\x04 \x01(\aR\x04time\x12G\n" +
-	"\x0flocation_source\x18\x05 \x01(\x0e2\x1e.meshtastic.Position.LocSourceR\x0elocationSource\"\xd6\x02\n" +
+	"\x0flocation_source\x18\x05 \x01(\x0e2\x1e.meshtastic.Position.LocSourceR\x0elocationSource\x12%\n" +
+	"\x0eprecision_bits\x18\x06 \x01(\rR\rprecisionBits\"\xd6\x02\n" +
 	"\bUserLite\x12\x1c\n" +
 	"\amacaddr\x18\x01 \x01(\fB\x02\x18\x01R\amacaddr\x12\x1b\n" +
 	"\tlong_name\x18\x02 \x01(\tR\blongName\x12\x1d\n" +
@@ -752,27 +1002,28 @@ const file_meshtastic_deviceonly_proto_rawDesc = "" +
 	"\n" +
 	"public_key\x18\a \x01(\fR\tpublicKey\x12,\n" +
 	"\x0fis_unmessagable\x18\t \x01(\bH\x00R\x0eisUnmessagable\x88\x01\x01B\x12\n" +
-	"\x10_is_unmessagable\"\xcf\x03\n" +
+	"\x10_is_unmessagable\"\x9b\x04\n" +
 	"\fNodeInfoLite\x12\x10\n" +
-	"\x03num\x18\x01 \x01(\rR\x03num\x12(\n" +
-	"\x04user\x18\x02 \x01(\v2\x14.meshtastic.UserLiteR\x04user\x124\n" +
-	"\bposition\x18\x03 \x01(\v2\x18.meshtastic.PositionLiteR\bposition\x12\x10\n" +
+	"\x03num\x18\x01 \x01(\rR\x03num\x12\x10\n" +
 	"\x03snr\x18\x04 \x01(\x02R\x03snr\x12\x1d\n" +
 	"\n" +
-	"last_heard\x18\x05 \x01(\aR\tlastHeard\x12@\n" +
-	"\x0edevice_metrics\x18\x06 \x01(\v2\x19.meshtastic.DeviceMetricsR\rdeviceMetrics\x12\x18\n" +
-	"\achannel\x18\a \x01(\rR\achannel\x12\x19\n" +
-	"\bvia_mqtt\x18\b \x01(\bR\aviaMqtt\x12 \n" +
-	"\thops_away\x18\t \x01(\rH\x00R\bhopsAway\x88\x01\x01\x12\x1f\n" +
-	"\vis_favorite\x18\n" +
-	" \x01(\bR\n" +
-	"isFavorite\x12\x1d\n" +
-	"\n" +
-	"is_ignored\x18\v \x01(\bR\tisIgnored\x12\x19\n" +
+	"last_heard\x18\x05 \x01(\aR\tlastHeard\x12\x18\n" +
+	"\achannel\x18\a \x01(\rR\achannel\x12 \n" +
+	"\thops_away\x18\t \x01(\rH\x00R\bhopsAway\x88\x01\x01\x12\x19\n" +
 	"\bnext_hop\x18\f \x01(\rR\anextHop\x12\x1a\n" +
-	"\bbitfield\x18\r \x01(\rR\bbitfieldB\f\n" +
+	"\bbitfield\x18\r \x01(\rR\bbitfield\x12\x1b\n" +
+	"\tlong_name\x18\x0e \x01(\tR\blongName\x12\x1d\n" +
 	"\n" +
-	"_hops_away\"\xd9\x03\n" +
+	"short_name\x18\x0f \x01(\tR\tshortName\x124\n" +
+	"\bhw_model\x18\x10 \x01(\x0e2\x19.meshtastic.HardwareModelR\ahwModel\x128\n" +
+	"\x04role\x18\x11 \x01(\x0e2$.meshtastic.Config.DeviceConfig.RoleR\x04role\x12\x1d\n" +
+	"\n" +
+	"public_key\x18\x12 \x01(\fR\tpublicKey\x12\x15\n" +
+	"\x06snr_q4\x18\x13 \x01(\x11R\x05snrQ4B\f\n" +
+	"\n" +
+	"_hops_awayJ\x04\b\x02\x10\x03J\x04\b\x03\x10\x04J\x04\b\x06\x10\aJ\x04\b\b\x10\tJ\x04\b\n" +
+	"\x10\vJ\x04\b\v\x10\fR\x04userR\bpositionR\x0edevice_metricsR\bvia_mqttR\vis_favoriteR\n" +
+	"is_ignored\"\xd9\x03\n" +
 	"\vDeviceState\x12/\n" +
 	"\amy_node\x18\x02 \x01(\v2\x16.meshtastic.MyNodeInfoR\x06myNode\x12&\n" +
 	"\x05owner\x18\x03 \x01(\v2\x10.meshtastic.UserR\x05owner\x12;\n" +
@@ -783,10 +1034,26 @@ const file_meshtastic_deviceonly_proto_rawDesc = "" +
 	"\rdid_gps_reset\x18\v \x01(\bB\x02\x18\x01R\vdidGpsReset\x127\n" +
 	"\vrx_waypoint\x18\f \x01(\v2\x16.meshtastic.MeshPacketR\n" +
 	"rxWaypoint\x12\\\n" +
-	"\x19node_remote_hardware_pins\x18\r \x03(\v2!.meshtastic.NodeRemoteHardwarePinR\x16nodeRemoteHardwarePins\"\x84\x01\n" +
+	"\x19node_remote_hardware_pins\x18\r \x03(\v2!.meshtastic.NodeRemoteHardwarePinR\x16nodeRemoteHardwarePins\"[\n" +
+	"\x11NodePositionEntry\x12\x10\n" +
+	"\x03num\x18\x01 \x01(\rR\x03num\x124\n" +
+	"\bposition\x18\x02 \x01(\v2\x18.meshtastic.PositionLiteR\bposition\"h\n" +
+	"\x12NodeTelemetryEntry\x12\x10\n" +
+	"\x03num\x18\x01 \x01(\rR\x03num\x12@\n" +
+	"\x0edevice_metrics\x18\x02 \x01(\v2\x19.meshtastic.DeviceMetricsR\rdeviceMetrics\"y\n" +
+	"\x14NodeEnvironmentEntry\x12\x10\n" +
+	"\x03num\x18\x01 \x01(\rR\x03num\x12O\n" +
+	"\x13environment_metrics\x18\x02 \x01(\v2\x1e.meshtastic.EnvironmentMetricsR\x12environmentMetrics\"V\n" +
+	"\x0fNodeStatusEntry\x12\x10\n" +
+	"\x03num\x18\x01 \x01(\rR\x03num\x121\n" +
+	"\x06status\x18\x02 \x01(\v2\x19.meshtastic.StatusMessageR\x06status\"\xbe\x04\n" +
 	"\fNodeDatabase\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\rR\aversion\x12Z\n" +
-	"\x05nodes\x18\x02 \x03(\v2\x18.meshtastic.NodeInfoLiteB*\x92?'\x92\x01$std::vector<meshtastic_NodeInfoLite>R\x05nodes\"X\n" +
+	"\x05nodes\x18\x02 \x03(\v2\x18.meshtastic.NodeInfoLiteB*\x92?'\x92\x01$std::vector<meshtastic_NodeInfoLite>R\x05nodes\x12l\n" +
+	"\tpositions\x18\x03 \x03(\v2\x1d.meshtastic.NodePositionEntryB/\x92?,\x92\x01)std::vector<meshtastic_NodePositionEntry>R\tpositions\x12n\n" +
+	"\ttelemetry\x18\x04 \x03(\v2\x1e.meshtastic.NodeTelemetryEntryB0\x92?-\x92\x01*std::vector<meshtastic_NodeTelemetryEntry>R\ttelemetry\x12b\n" +
+	"\x06status\x18\x05 \x03(\v2\x1b.meshtastic.NodeStatusEntryB-\x92?*\x92\x01'std::vector<meshtastic_NodeStatusEntry>R\x06status\x12v\n" +
+	"\venvironment\x18\x06 \x03(\v2 .meshtastic.NodeEnvironmentEntryB2\x92?/\x92\x01,std::vector<meshtastic_NodeEnvironmentEntry>R\venvironment\"X\n" +
 	"\vChannelFile\x12/\n" +
 	"\bchannels\x18\x01 \x03(\v2\x13.meshtastic.ChannelR\bchannels\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\rR\aversion\"\x9d\x02\n" +
@@ -812,51 +1079,64 @@ func file_meshtastic_deviceonly_proto_rawDescGZIP() []byte {
 	return file_meshtastic_deviceonly_proto_rawDescData
 }
 
-var file_meshtastic_deviceonly_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_meshtastic_deviceonly_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_meshtastic_deviceonly_proto_goTypes = []any{
 	(*PositionLite)(nil),          // 0: meshtastic.PositionLite
 	(*UserLite)(nil),              // 1: meshtastic.UserLite
 	(*NodeInfoLite)(nil),          // 2: meshtastic.NodeInfoLite
 	(*DeviceState)(nil),           // 3: meshtastic.DeviceState
-	(*NodeDatabase)(nil),          // 4: meshtastic.NodeDatabase
-	(*ChannelFile)(nil),           // 5: meshtastic.ChannelFile
-	(*BackupPreferences)(nil),     // 6: meshtastic.BackupPreferences
-	(Position_LocSource)(0),       // 7: meshtastic.Position.LocSource
-	(HardwareModel)(0),            // 8: meshtastic.HardwareModel
-	(Config_DeviceConfig_Role)(0), // 9: meshtastic.Config.DeviceConfig.Role
-	(*DeviceMetrics)(nil),         // 10: meshtastic.DeviceMetrics
-	(*MyNodeInfo)(nil),            // 11: meshtastic.MyNodeInfo
-	(*User)(nil),                  // 12: meshtastic.User
-	(*MeshPacket)(nil),            // 13: meshtastic.MeshPacket
-	(*NodeRemoteHardwarePin)(nil), // 14: meshtastic.NodeRemoteHardwarePin
-	(*Channel)(nil),               // 15: meshtastic.Channel
-	(*LocalConfig)(nil),           // 16: meshtastic.LocalConfig
-	(*LocalModuleConfig)(nil),     // 17: meshtastic.LocalModuleConfig
+	(*NodePositionEntry)(nil),     // 4: meshtastic.NodePositionEntry
+	(*NodeTelemetryEntry)(nil),    // 5: meshtastic.NodeTelemetryEntry
+	(*NodeEnvironmentEntry)(nil),  // 6: meshtastic.NodeEnvironmentEntry
+	(*NodeStatusEntry)(nil),       // 7: meshtastic.NodeStatusEntry
+	(*NodeDatabase)(nil),          // 8: meshtastic.NodeDatabase
+	(*ChannelFile)(nil),           // 9: meshtastic.ChannelFile
+	(*BackupPreferences)(nil),     // 10: meshtastic.BackupPreferences
+	(Position_LocSource)(0),       // 11: meshtastic.Position.LocSource
+	(HardwareModel)(0),            // 12: meshtastic.HardwareModel
+	(Config_DeviceConfig_Role)(0), // 13: meshtastic.Config.DeviceConfig.Role
+	(*MyNodeInfo)(nil),            // 14: meshtastic.MyNodeInfo
+	(*User)(nil),                  // 15: meshtastic.User
+	(*MeshPacket)(nil),            // 16: meshtastic.MeshPacket
+	(*NodeRemoteHardwarePin)(nil), // 17: meshtastic.NodeRemoteHardwarePin
+	(*DeviceMetrics)(nil),         // 18: meshtastic.DeviceMetrics
+	(*EnvironmentMetrics)(nil),    // 19: meshtastic.EnvironmentMetrics
+	(*StatusMessage)(nil),         // 20: meshtastic.StatusMessage
+	(*Channel)(nil),               // 21: meshtastic.Channel
+	(*LocalConfig)(nil),           // 22: meshtastic.LocalConfig
+	(*LocalModuleConfig)(nil),     // 23: meshtastic.LocalModuleConfig
 }
 var file_meshtastic_deviceonly_proto_depIdxs = []int32{
-	7,  // 0: meshtastic.PositionLite.location_source:type_name -> meshtastic.Position.LocSource
-	8,  // 1: meshtastic.UserLite.hw_model:type_name -> meshtastic.HardwareModel
-	9,  // 2: meshtastic.UserLite.role:type_name -> meshtastic.Config.DeviceConfig.Role
-	1,  // 3: meshtastic.NodeInfoLite.user:type_name -> meshtastic.UserLite
-	0,  // 4: meshtastic.NodeInfoLite.position:type_name -> meshtastic.PositionLite
-	10, // 5: meshtastic.NodeInfoLite.device_metrics:type_name -> meshtastic.DeviceMetrics
-	11, // 6: meshtastic.DeviceState.my_node:type_name -> meshtastic.MyNodeInfo
-	12, // 7: meshtastic.DeviceState.owner:type_name -> meshtastic.User
-	13, // 8: meshtastic.DeviceState.receive_queue:type_name -> meshtastic.MeshPacket
-	13, // 9: meshtastic.DeviceState.rx_text_message:type_name -> meshtastic.MeshPacket
-	13, // 10: meshtastic.DeviceState.rx_waypoint:type_name -> meshtastic.MeshPacket
-	14, // 11: meshtastic.DeviceState.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
-	2,  // 12: meshtastic.NodeDatabase.nodes:type_name -> meshtastic.NodeInfoLite
-	15, // 13: meshtastic.ChannelFile.channels:type_name -> meshtastic.Channel
-	16, // 14: meshtastic.BackupPreferences.config:type_name -> meshtastic.LocalConfig
-	17, // 15: meshtastic.BackupPreferences.module_config:type_name -> meshtastic.LocalModuleConfig
-	5,  // 16: meshtastic.BackupPreferences.channels:type_name -> meshtastic.ChannelFile
-	12, // 17: meshtastic.BackupPreferences.owner:type_name -> meshtastic.User
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	11, // 0: meshtastic.PositionLite.location_source:type_name -> meshtastic.Position.LocSource
+	12, // 1: meshtastic.UserLite.hw_model:type_name -> meshtastic.HardwareModel
+	13, // 2: meshtastic.UserLite.role:type_name -> meshtastic.Config.DeviceConfig.Role
+	12, // 3: meshtastic.NodeInfoLite.hw_model:type_name -> meshtastic.HardwareModel
+	13, // 4: meshtastic.NodeInfoLite.role:type_name -> meshtastic.Config.DeviceConfig.Role
+	14, // 5: meshtastic.DeviceState.my_node:type_name -> meshtastic.MyNodeInfo
+	15, // 6: meshtastic.DeviceState.owner:type_name -> meshtastic.User
+	16, // 7: meshtastic.DeviceState.receive_queue:type_name -> meshtastic.MeshPacket
+	16, // 8: meshtastic.DeviceState.rx_text_message:type_name -> meshtastic.MeshPacket
+	16, // 9: meshtastic.DeviceState.rx_waypoint:type_name -> meshtastic.MeshPacket
+	17, // 10: meshtastic.DeviceState.node_remote_hardware_pins:type_name -> meshtastic.NodeRemoteHardwarePin
+	0,  // 11: meshtastic.NodePositionEntry.position:type_name -> meshtastic.PositionLite
+	18, // 12: meshtastic.NodeTelemetryEntry.device_metrics:type_name -> meshtastic.DeviceMetrics
+	19, // 13: meshtastic.NodeEnvironmentEntry.environment_metrics:type_name -> meshtastic.EnvironmentMetrics
+	20, // 14: meshtastic.NodeStatusEntry.status:type_name -> meshtastic.StatusMessage
+	2,  // 15: meshtastic.NodeDatabase.nodes:type_name -> meshtastic.NodeInfoLite
+	4,  // 16: meshtastic.NodeDatabase.positions:type_name -> meshtastic.NodePositionEntry
+	5,  // 17: meshtastic.NodeDatabase.telemetry:type_name -> meshtastic.NodeTelemetryEntry
+	7,  // 18: meshtastic.NodeDatabase.status:type_name -> meshtastic.NodeStatusEntry
+	6,  // 19: meshtastic.NodeDatabase.environment:type_name -> meshtastic.NodeEnvironmentEntry
+	21, // 20: meshtastic.ChannelFile.channels:type_name -> meshtastic.Channel
+	22, // 21: meshtastic.BackupPreferences.config:type_name -> meshtastic.LocalConfig
+	23, // 22: meshtastic.BackupPreferences.module_config:type_name -> meshtastic.LocalModuleConfig
+	9,  // 23: meshtastic.BackupPreferences.channels:type_name -> meshtastic.ChannelFile
+	15, // 24: meshtastic.BackupPreferences.owner:type_name -> meshtastic.User
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_deviceonly_proto_init() }
@@ -878,7 +1158,7 @@ func file_meshtastic_deviceonly_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_deviceonly_proto_rawDesc), len(file_meshtastic_deviceonly_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

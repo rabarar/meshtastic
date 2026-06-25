@@ -1559,6 +1559,8 @@ const (
 	MeshPacket_TRANSPORT_MULTICAST_UDP MeshPacket_TransportMechanism = 6
 	// Arrived via API connection
 	MeshPacket_TRANSPORT_API MeshPacket_TransportMechanism = 7
+	// Arrived via Unicast UDP
+	MeshPacket_TRANSPORT_UNICAST_UDP MeshPacket_TransportMechanism = 8
 )
 
 // Enum value maps for MeshPacket_TransportMechanism.
@@ -1572,6 +1574,7 @@ var (
 		5: "TRANSPORT_MQTT",
 		6: "TRANSPORT_MULTICAST_UDP",
 		7: "TRANSPORT_API",
+		8: "TRANSPORT_UNICAST_UDP",
 	}
 	MeshPacket_TransportMechanism_value = map[string]int32{
 		"TRANSPORT_INTERNAL":      0,
@@ -1582,6 +1585,7 @@ var (
 		"TRANSPORT_MQTT":          5,
 		"TRANSPORT_MULTICAST_UDP": 6,
 		"TRANSPORT_API":           7,
+		"TRANSPORT_UNICAST_UDP":   8,
 	}
 )
 
@@ -1700,6 +1704,13 @@ const (
 	LockdownStatus_UNLOCKED LockdownStatus_State = 3
 	// Passphrase rejected. backoff_seconds is non-zero when rate-limited.
 	LockdownStatus_UNLOCK_FAILED LockdownStatus_State = 4
+	// Lockdown is supported by this firmware but not currently active
+	// (no passphrase has been provisioned, or it was disabled via
+	// AdminMessage.lockdown_auth.disable). The device is operating in
+	// normal, non-encrypted mode. Clients render the lockdown-mode
+	// toggle as OFF on receiving this. Distinct from NEEDS_PROVISION,
+	// which is only used during an in-progress enable flow.
+	LockdownStatus_DISABLED LockdownStatus_State = 5
 )
 
 // Enum value maps for LockdownStatus_State.
@@ -1710,6 +1721,7 @@ var (
 		2: "LOCKED",
 		3: "UNLOCKED",
 		4: "UNLOCK_FAILED",
+		5: "DISABLED",
 	}
 	LockdownStatus_State_value = map[string]int32{
 		"STATE_UNSPECIFIED": 0,
@@ -1717,6 +1729,7 @@ var (
 		"LOCKED":            2,
 		"UNLOCKED":          3,
 		"UNLOCK_FAILED":     4,
+		"DISABLED":          5,
 	}
 )
 
@@ -2042,6 +2055,9 @@ type User struct {
 	// node IDs "^all" (for broadcast), "^local" (for the locally connected node)
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// A full name for this user, i.e. "Kevin Hester"
+	// Limited to 24 bytes of UTF-8: longer names are accepted from senders
+	// built against the older 39-byte limit, but devices truncate them before
+	// storing or rebroadcasting. Clients should enforce 24 bytes in their UI.
 	LongName string `protobuf:"bytes,2,opt,name=long_name,json=longName,proto3" json:"long_name,omitempty"`
 	// A VERY short name, ideally two characters.
 	// Suitable for a tiny OLED screen
@@ -2374,9 +2390,11 @@ type Data struct {
 	// a message a heart or poop emoji.
 	Emoji uint32 `protobuf:"fixed32,8,opt,name=emoji,proto3" json:"emoji,omitempty"`
 	// Bitfield for extra flags. First use is to indicate that user approves the packet being uploaded to MQTT.
-	Bitfield      *uint32 `protobuf:"varint,9,opt,name=bitfield,proto3,oneof" json:"bitfield,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Bitfield *uint32 `protobuf:"varint,9,opt,name=bitfield,proto3,oneof" json:"bitfield,omitempty"`
+	// XEdDSA signature for the payload
+	XeddsaSignature []byte `protobuf:"bytes,10,opt,name=xeddsa_signature,json=xeddsaSignature,proto3" json:"xeddsa_signature,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Data) Reset() {
@@ -2470,6 +2488,13 @@ func (x *Data) GetBitfield() uint32 {
 		return *x.Bitfield
 	}
 	return 0
+}
+
+func (x *Data) GetXeddsaSignature() []byte {
+	if x != nil {
+		return x.XeddsaSignature
+	}
+	return nil
 }
 
 // The actual over-the-mesh message doing KeyVerification
@@ -3142,8 +3167,10 @@ type MeshPacket struct {
 	TxAfter uint32 `protobuf:"varint,20,opt,name=tx_after,json=txAfter,proto3" json:"tx_after,omitempty"`
 	// Indicates which transport mechanism this packet arrived over
 	TransportMechanism MeshPacket_TransportMechanism `protobuf:"varint,21,opt,name=transport_mechanism,json=transportMechanism,proto3,enum=meshtastic.MeshPacket_TransportMechanism" json:"transport_mechanism,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Indicates whether the packet has a valid signature
+	XeddsaSigned  bool `protobuf:"varint,22,opt,name=xeddsa_signed,json=xeddsaSigned,proto3" json:"xeddsa_signed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MeshPacket) Reset() {
@@ -3335,6 +3362,13 @@ func (x *MeshPacket) GetTransportMechanism() MeshPacket_TransportMechanism {
 	return MeshPacket_TRANSPORT_INTERNAL
 }
 
+func (x *MeshPacket) GetXeddsaSigned() bool {
+	if x != nil {
+		return x.XeddsaSigned
+	}
+	return false
+}
+
 type isMeshPacket_PayloadVariant interface {
 	isMeshPacket_PayloadVariant()
 }
@@ -3403,9 +3437,13 @@ type NodeInfo struct {
 	IsKeyManuallyVerified bool `protobuf:"varint,12,opt,name=is_key_manually_verified,json=isKeyManuallyVerified,proto3" json:"is_key_manually_verified,omitempty"`
 	// True if node has been muted
 	// Persistes between NodeDB internal clean ups
-	IsMuted       bool `protobuf:"varint,13,opt,name=is_muted,json=isMuted,proto3" json:"is_muted,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	IsMuted bool `protobuf:"varint,13,opt,name=is_muted,json=isMuted,proto3" json:"is_muted,omitempty"`
+	// True if node is signing its packets via XEdDSA
+	// Persists between NodeDB internal clean ups
+	// LSB 1 of the bitfield
+	HasXeddsaSigned bool `protobuf:"varint,14,opt,name=has_xeddsa_signed,json=hasXeddsaSigned,proto3" json:"has_xeddsa_signed,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *NodeInfo) Reset() {
@@ -3525,6 +3563,13 @@ func (x *NodeInfo) GetIsKeyManuallyVerified() bool {
 func (x *NodeInfo) GetIsMuted() bool {
 	if x != nil {
 		return x.IsMuted
+	}
+	return false
+}
+
+func (x *NodeInfo) GetHasXeddsaSigned() bool {
+	if x != nil {
+		return x.HasXeddsaSigned
 	}
 	return false
 }
@@ -3814,6 +3859,7 @@ type FromRadio struct {
 	//	*FromRadio_ClientNotification
 	//	*FromRadio_DeviceuiConfig
 	//	*FromRadio_LockdownStatus
+	//	*FromRadio_RegionPresets
 	PayloadVariant isFromRadio_PayloadVariant `protobuf_oneof:"payload_variant"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -4016,6 +4062,15 @@ func (x *FromRadio) GetLockdownStatus() *LockdownStatus {
 	return nil
 }
 
+func (x *FromRadio) GetRegionPresets() *LoRaRegionPresetMap {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*FromRadio_RegionPresets); ok {
+			return x.RegionPresets
+		}
+	}
+	return nil
+}
+
 type isFromRadio_PayloadVariant interface {
 	isFromRadio_PayloadVariant()
 }
@@ -4117,6 +4172,15 @@ type FromRadio_LockdownStatus struct {
 	LockdownStatus *LockdownStatus `protobuf:"bytes,18,opt,name=lockdown_status,json=lockdownStatus,proto3,oneof"`
 }
 
+type FromRadio_RegionPresets struct {
+	// Map of which modem presets are legal in each LoRa region. Sent once
+	// during the want_config handshake (right after `metadata`, before the
+	// first `channel`) so client UIs can prevent the user from selecting an
+	// illegal region+preset combination. A region that does not appear in
+	// any group carries no constraint info and should not be restricted.
+	RegionPresets *LoRaRegionPresetMap `protobuf:"bytes,19,opt,name=region_presets,json=regionPresets,proto3,oneof"`
+}
+
 func (*FromRadio_Packet) isFromRadio_PayloadVariant() {}
 
 func (*FromRadio_MyInfo) isFromRadio_PayloadVariant() {}
@@ -4150,6 +4214,8 @@ func (*FromRadio_ClientNotification) isFromRadio_PayloadVariant() {}
 func (*FromRadio_DeviceuiConfig) isFromRadio_PayloadVariant() {}
 
 func (*FromRadio_LockdownStatus) isFromRadio_PayloadVariant() {}
+
+func (*FromRadio_RegionPresets) isFromRadio_PayloadVariant() {}
 
 // Lockdown state report from firmware to client (for hardened builds
 // with MESHTASTIC_LOCKDOWN). Sent immediately after config_complete_id
@@ -5243,6 +5309,198 @@ func (x *DeviceMetadata) GetExcludedModules() uint32 {
 	return 0
 }
 
+// A distinct set of legal modem presets shared by one or more LoRa regions.
+// Regions that have an identical preset list / default / licensing reference
+// the same group (by index) via LoRaRegionPresetMap.region_groups. This keeps
+// the whole map small enough to fit in a single FromRadio packet, since most
+// regions share the one standard preset list.
+type LoRaPresetGroup struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The modem presets that are legal for every region referencing this group.
+	Presets []Config_LoRaConfig_ModemPreset `protobuf:"varint,1,rep,packed,name=presets,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset" json:"presets,omitempty"`
+	// The firmware's default modem preset for regions in this group.
+	// Always one of `presets`. Clients should select this when switching to one
+	// of these regions, or when the current preset is not legal in the new region.
+	DefaultPreset Config_LoRaConfig_ModemPreset `protobuf:"varint,2,opt,name=default_preset,json=defaultPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset" json:"default_preset,omitempty"`
+	// True if regions referencing this group are for licensed operators only
+	// (e.g. amateur / ham radio bands). Clients should warn or gate accordingly.
+	LicensedOnly  bool `protobuf:"varint,3,opt,name=licensed_only,json=licensedOnly,proto3" json:"licensed_only,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoRaPresetGroup) Reset() {
+	*x = LoRaPresetGroup{}
+	mi := &file_meshtastic_mesh_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoRaPresetGroup) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoRaPresetGroup) ProtoMessage() {}
+
+func (x *LoRaPresetGroup) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_mesh_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoRaPresetGroup.ProtoReflect.Descriptor instead.
+func (*LoRaPresetGroup) Descriptor() ([]byte, []int) {
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *LoRaPresetGroup) GetPresets() []Config_LoRaConfig_ModemPreset {
+	if x != nil {
+		return x.Presets
+	}
+	return nil
+}
+
+func (x *LoRaPresetGroup) GetDefaultPreset() Config_LoRaConfig_ModemPreset {
+	if x != nil {
+		return x.DefaultPreset
+	}
+	return Config_LoRaConfig_LONG_FAST
+}
+
+func (x *LoRaPresetGroup) GetLicensedOnly() bool {
+	if x != nil {
+		return x.LicensedOnly
+	}
+	return false
+}
+
+// Associates a single LoRa region with its preset group.
+type LoRaRegionPresets struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The LoRa region this entry describes.
+	Region Config_LoRaConfig_RegionCode `protobuf:"varint,1,opt,name=region,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"region,omitempty"`
+	// Index into LoRaRegionPresetMap.groups for the preset list that is legal
+	// in `region`.
+	GroupIndex    uint32 `protobuf:"varint,2,opt,name=group_index,json=groupIndex,proto3" json:"group_index,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoRaRegionPresets) Reset() {
+	*x = LoRaRegionPresets{}
+	mi := &file_meshtastic_mesh_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoRaRegionPresets) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoRaRegionPresets) ProtoMessage() {}
+
+func (x *LoRaRegionPresets) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_mesh_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoRaRegionPresets.ProtoReflect.Descriptor instead.
+func (*LoRaRegionPresets) Descriptor() ([]byte, []int) {
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *LoRaRegionPresets) GetRegion() Config_LoRaConfig_RegionCode {
+	if x != nil {
+		return x.Region
+	}
+	return Config_LoRaConfig_UNSET
+}
+
+func (x *LoRaRegionPresets) GetGroupIndex() uint32 {
+	if x != nil {
+		return x.GroupIndex
+	}
+	return 0
+}
+
+// Map describing which modem presets are valid for each LoRa region. Sent by
+// the firmware during the want_config handshake (as FromRadio.region_presets)
+// so that client UIs can prevent illegal region+preset selections.
+//
+// Delivery is grouped to save space: `groups` holds each distinct preset list,
+// and `region_groups` maps every known region to one of those groups by index.
+// A region that does NOT appear in `region_groups` carries no constraint
+// information and should not be restricted by the client (e.g. firmware that
+// predates this message, or a region with no firmware table entry). Clients
+// must also tolerate this whole message being absent.
+type LoRaRegionPresetMap struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// One entry per distinct (preset-list, default, licensing) combination.
+	// Referenced by index from `region_groups`.
+	Groups []*LoRaPresetGroup `protobuf:"bytes,1,rep,name=groups,proto3" json:"groups,omitempty"`
+	// One entry per known LoRa region, pointing at its preset group.
+	RegionGroups  []*LoRaRegionPresets `protobuf:"bytes,2,rep,name=region_groups,json=regionGroups,proto3" json:"region_groups,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoRaRegionPresetMap) Reset() {
+	*x = LoRaRegionPresetMap{}
+	mi := &file_meshtastic_mesh_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoRaRegionPresetMap) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoRaRegionPresetMap) ProtoMessage() {}
+
+func (x *LoRaRegionPresetMap) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_mesh_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoRaRegionPresetMap.ProtoReflect.Descriptor instead.
+func (*LoRaRegionPresetMap) Descriptor() ([]byte, []int) {
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *LoRaRegionPresetMap) GetGroups() []*LoRaPresetGroup {
+	if x != nil {
+		return x.Groups
+	}
+	return nil
+}
+
+func (x *LoRaRegionPresetMap) GetRegionGroups() []*LoRaRegionPresets {
+	if x != nil {
+		return x.RegionGroups
+	}
+	return nil
+}
+
 // A heartbeat message is sent to the node from the client to keep the connection alive.
 // This is currently only needed to keep serial connections alive, but can be used by any PhoneAPI.
 type Heartbeat struct {
@@ -5255,7 +5513,7 @@ type Heartbeat struct {
 
 func (x *Heartbeat) Reset() {
 	*x = Heartbeat{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[30]
+	mi := &file_meshtastic_mesh_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5267,7 +5525,7 @@ func (x *Heartbeat) String() string {
 func (*Heartbeat) ProtoMessage() {}
 
 func (x *Heartbeat) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[30]
+	mi := &file_meshtastic_mesh_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5280,7 +5538,7 @@ func (x *Heartbeat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Heartbeat.ProtoReflect.Descriptor instead.
 func (*Heartbeat) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{30}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *Heartbeat) GetNonce() uint32 {
@@ -5303,7 +5561,7 @@ type NodeRemoteHardwarePin struct {
 
 func (x *NodeRemoteHardwarePin) Reset() {
 	*x = NodeRemoteHardwarePin{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[31]
+	mi := &file_meshtastic_mesh_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5315,7 +5573,7 @@ func (x *NodeRemoteHardwarePin) String() string {
 func (*NodeRemoteHardwarePin) ProtoMessage() {}
 
 func (x *NodeRemoteHardwarePin) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[31]
+	mi := &file_meshtastic_mesh_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5328,7 +5586,7 @@ func (x *NodeRemoteHardwarePin) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeRemoteHardwarePin.ProtoReflect.Descriptor instead.
 func (*NodeRemoteHardwarePin) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{31}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *NodeRemoteHardwarePin) GetNodeNum() uint32 {
@@ -5361,7 +5619,7 @@ type ChunkedPayload struct {
 
 func (x *ChunkedPayload) Reset() {
 	*x = ChunkedPayload{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[32]
+	mi := &file_meshtastic_mesh_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5373,7 +5631,7 @@ func (x *ChunkedPayload) String() string {
 func (*ChunkedPayload) ProtoMessage() {}
 
 func (x *ChunkedPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[32]
+	mi := &file_meshtastic_mesh_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5386,7 +5644,7 @@ func (x *ChunkedPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChunkedPayload.ProtoReflect.Descriptor instead.
 func (*ChunkedPayload) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{32}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *ChunkedPayload) GetPayloadId() uint32 {
@@ -5427,7 +5685,7 @@ type ResendChunks struct {
 
 func (x *ResendChunks) Reset() {
 	*x = ResendChunks{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[33]
+	mi := &file_meshtastic_mesh_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5439,7 +5697,7 @@ func (x *ResendChunks) String() string {
 func (*ResendChunks) ProtoMessage() {}
 
 func (x *ResendChunks) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[33]
+	mi := &file_meshtastic_mesh_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5452,7 +5710,7 @@ func (x *ResendChunks) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResendChunks.ProtoReflect.Descriptor instead.
 func (*ResendChunks) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{33}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ResendChunks) GetChunks() []uint32 {
@@ -5479,7 +5737,7 @@ type ChunkedPayloadResponse struct {
 
 func (x *ChunkedPayloadResponse) Reset() {
 	*x = ChunkedPayloadResponse{}
-	mi := &file_meshtastic_mesh_proto_msgTypes[34]
+	mi := &file_meshtastic_mesh_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5491,7 +5749,7 @@ func (x *ChunkedPayloadResponse) String() string {
 func (*ChunkedPayloadResponse) ProtoMessage() {}
 
 func (x *ChunkedPayloadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_mesh_proto_msgTypes[34]
+	mi := &file_meshtastic_mesh_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5504,7 +5762,7 @@ func (x *ChunkedPayloadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChunkedPayloadResponse.ProtoReflect.Descriptor instead.
 func (*ChunkedPayloadResponse) Descriptor() ([]byte, []int) {
-	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{34}
+	return file_meshtastic_mesh_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ChunkedPayloadResponse) GetPayloadId() uint32 {
@@ -5677,7 +5935,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x1dADMIN_PUBLIC_KEY_UNAUTHORIZED\x10%\x12\x17\n" +
 	"\x13RATE_LIMIT_EXCEEDED\x10&\x12\x1c\n" +
 	"\x18PKI_SEND_FAIL_PUBLIC_KEY\x10'B\t\n" +
-	"\avariant\"\x9e\x02\n" +
+	"\avariant\"\xc9\x02\n" +
 	"\x04Data\x12-\n" +
 	"\aportnum\x18\x01 \x01(\x0e2\x13.meshtastic.PortNumR\aportnum\x12\x18\n" +
 	"\apayload\x18\x02 \x01(\fR\apayload\x12#\n" +
@@ -5688,7 +5946,9 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"request_id\x18\x06 \x01(\aR\trequestId\x12\x19\n" +
 	"\breply_id\x18\a \x01(\aR\areplyId\x12\x14\n" +
 	"\x05emoji\x18\b \x01(\aR\x05emoji\x12\x1f\n" +
-	"\bbitfield\x18\t \x01(\rH\x00R\bbitfield\x88\x01\x01B\v\n" +
+	"\bbitfield\x18\t \x01(\rH\x00R\bbitfield\x88\x01\x01\x12)\n" +
+	"\x10xeddsa_signature\x18\n" +
+	" \x01(\fR\x0fxeddsaSignatureB\v\n" +
 	"\t_bitfield\"S\n" +
 	"\x0fKeyVerification\x12\x14\n" +
 	"\x05nonce\x18\x01 \x01(\x04R\x05nonce\x12\x14\n" +
@@ -5764,7 +6024,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x04data\x18\x02 \x01(\fH\x00R\x04data\x12\x14\n" +
 	"\x04text\x18\x03 \x01(\tH\x00R\x04text\x12\x1a\n" +
 	"\bretained\x18\x04 \x01(\bR\bretainedB\x11\n" +
-	"\x0fpayload_variant\"\xfa\b\n" +
+	"\x0fpayload_variant\"\xba\t\n" +
 	"\n" +
 	"MeshPacket\x12\x12\n" +
 	"\x04from\x18\x01 \x01(\aR\x04from\x12\x0e\n" +
@@ -5790,7 +6050,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\n" +
 	"relay_node\x18\x13 \x01(\rR\trelayNode\x12\x19\n" +
 	"\btx_after\x18\x14 \x01(\rR\atxAfter\x12Z\n" +
-	"\x13transport_mechanism\x18\x15 \x01(\x0e2).meshtastic.MeshPacket.TransportMechanismR\x12transportMechanism\"~\n" +
+	"\x13transport_mechanism\x18\x15 \x01(\x0e2).meshtastic.MeshPacket.TransportMechanismR\x12transportMechanism\x12#\n" +
+	"\rxeddsa_signed\x18\x16 \x01(\bR\fxeddsaSigned\"~\n" +
 	"\bPriority\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\a\n" +
 	"\x03MIN\x10\x01\x12\x0e\n" +
@@ -5807,7 +6068,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\aDelayed\x12\f\n" +
 	"\bNO_DELAY\x10\x00\x12\x15\n" +
 	"\x11DELAYED_BROADCAST\x10\x01\x12\x12\n" +
-	"\x0eDELAYED_DIRECT\x10\x02\"\xcf\x01\n" +
+	"\x0eDELAYED_DIRECT\x10\x02\"\xea\x01\n" +
 	"\x12TransportMechanism\x12\x16\n" +
 	"\x12TRANSPORT_INTERNAL\x10\x00\x12\x12\n" +
 	"\x0eTRANSPORT_LORA\x10\x01\x12\x17\n" +
@@ -5816,8 +6077,9 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x13TRANSPORT_LORA_ALT3\x10\x04\x12\x12\n" +
 	"\x0eTRANSPORT_MQTT\x10\x05\x12\x1b\n" +
 	"\x17TRANSPORT_MULTICAST_UDP\x10\x06\x12\x11\n" +
-	"\rTRANSPORT_API\x10\aB\x11\n" +
-	"\x0fpayload_variant\"\xe0\x03\n" +
+	"\rTRANSPORT_API\x10\a\x12\x19\n" +
+	"\x15TRANSPORT_UNICAST_UDP\x10\bB\x11\n" +
+	"\x0fpayload_variant\"\x8c\x04\n" +
 	"\bNodeInfo\x12\x10\n" +
 	"\x03num\x18\x01 \x01(\rR\x03num\x12$\n" +
 	"\x04user\x18\x02 \x01(\v2\x10.meshtastic.UserR\x04user\x120\n" +
@@ -5835,7 +6097,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\n" +
 	"is_ignored\x18\v \x01(\bR\tisIgnored\x127\n" +
 	"\x18is_key_manually_verified\x18\f \x01(\bR\x15isKeyManuallyVerified\x12\x19\n" +
-	"\bis_muted\x18\r \x01(\bR\aisMutedB\f\n" +
+	"\bis_muted\x18\r \x01(\bR\aisMuted\x12*\n" +
+	"\x11has_xeddsa_signed\x18\x0e \x01(\bR\x0fhasXeddsaSignedB\f\n" +
 	"\n" +
 	"_hops_away\"\x98\x02\n" +
 	"\n" +
@@ -5865,7 +6128,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x03res\x18\x01 \x01(\x05R\x03res\x12\x12\n" +
 	"\x04free\x18\x02 \x01(\rR\x04free\x12\x16\n" +
 	"\x06maxlen\x18\x03 \x01(\rR\x06maxlen\x12$\n" +
-	"\x0emesh_packet_id\x18\x04 \x01(\rR\fmeshPacketId\"\x8f\b\n" +
+	"\x0emesh_packet_id\x18\x04 \x01(\rR\fmeshPacketId\"\xd9\b\n" +
 	"\tFromRadio\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x120\n" +
 	"\x06packet\x18\x02 \x01(\v2\x16.meshtastic.MeshPacketH\x00R\x06packet\x121\n" +
@@ -5886,22 +6149,24 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\bfileInfo\x18\x0f \x01(\v2\x14.meshtastic.FileInfoH\x00R\bfileInfo\x12P\n" +
 	"\x12clientNotification\x18\x10 \x01(\v2\x1e.meshtastic.ClientNotificationH\x00R\x12clientNotification\x12D\n" +
 	"\x0edeviceuiConfig\x18\x11 \x01(\v2\x1a.meshtastic.DeviceUIConfigH\x00R\x0edeviceuiConfig\x12E\n" +
-	"\x0flockdown_status\x18\x12 \x01(\v2\x1a.meshtastic.LockdownStatusH\x00R\x0elockdownStatusB\x11\n" +
-	"\x0fpayload_variant\"\xc9\x02\n" +
+	"\x0flockdown_status\x18\x12 \x01(\v2\x1a.meshtastic.LockdownStatusH\x00R\x0elockdownStatus\x12H\n" +
+	"\x0eregion_presets\x18\x13 \x01(\v2\x1f.meshtastic.LoRaRegionPresetMapH\x00R\rregionPresetsB\x11\n" +
+	"\x0fpayload_variant\"\xd7\x02\n" +
 	"\x0eLockdownStatus\x126\n" +
 	"\x05state\x18\x01 \x01(\x0e2 .meshtastic.LockdownStatus.StateR\x05state\x12\x1f\n" +
 	"\vlock_reason\x18\x02 \x01(\tR\n" +
 	"lockReason\x12'\n" +
 	"\x0fboots_remaining\x18\x03 \x01(\rR\x0ebootsRemaining\x12*\n" +
 	"\x11valid_until_epoch\x18\x04 \x01(\rR\x0fvalidUntilEpoch\x12'\n" +
-	"\x0fbackoff_seconds\x18\x05 \x01(\rR\x0ebackoffSeconds\"`\n" +
+	"\x0fbackoff_seconds\x18\x05 \x01(\rR\x0ebackoffSeconds\"n\n" +
 	"\x05State\x12\x15\n" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fNEEDS_PROVISION\x10\x01\x12\n" +
 	"\n" +
 	"\x06LOCKED\x10\x02\x12\f\n" +
 	"\bUNLOCKED\x10\x03\x12\x11\n" +
-	"\rUNLOCK_FAILED\x10\x04\"\x8e\x05\n" +
+	"\rUNLOCK_FAILED\x10\x04\x12\f\n" +
+	"\bDISABLED\x10\x05\"\x8e\x05\n" +
 	"\x12ClientNotification\x12\x1e\n" +
 	"\breply_id\x18\x01 \x01(\rH\x01R\areplyId\x88\x01\x01\x12\x12\n" +
 	"\x04time\x18\x02 \x01(\aR\x04time\x121\n" +
@@ -5970,7 +6235,18 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x11hasRemoteHardware\x18\n" +
 	" \x01(\bR\x11hasRemoteHardware\x12\x16\n" +
 	"\x06hasPKC\x18\v \x01(\bR\x06hasPKC\x12)\n" +
-	"\x10excluded_modules\x18\f \x01(\rR\x0fexcludedModules\"!\n" +
+	"\x10excluded_modules\x18\f \x01(\rR\x0fexcludedModules\"\xcd\x01\n" +
+	"\x0fLoRaPresetGroup\x12C\n" +
+	"\apresets\x18\x01 \x03(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetR\apresets\x12P\n" +
+	"\x0edefault_preset\x18\x02 \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetR\rdefaultPreset\x12#\n" +
+	"\rlicensed_only\x18\x03 \x01(\bR\flicensedOnly\"v\n" +
+	"\x11LoRaRegionPresets\x12@\n" +
+	"\x06region\x18\x01 \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\x06region\x12\x1f\n" +
+	"\vgroup_index\x18\x02 \x01(\rR\n" +
+	"groupIndex\"\x8e\x01\n" +
+	"\x13LoRaRegionPresetMap\x123\n" +
+	"\x06groups\x18\x01 \x03(\v2\x1b.meshtastic.LoRaPresetGroupR\x06groups\x12B\n" +
+	"\rregion_groups\x18\x02 \x03(\v2\x1d.meshtastic.LoRaRegionPresetsR\fregionGroups\"!\n" +
 	"\tHeartbeat\x12\x14\n" +
 	"\x05nonce\x18\x01 \x01(\rR\x05nonce\"c\n" +
 	"\x15NodeRemoteHardwarePin\x12\x19\n" +
@@ -6213,7 +6489,7 @@ func file_meshtastic_mesh_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_mesh_proto_enumTypes = make([]protoimpl.EnumInfo, 15)
-var file_meshtastic_mesh_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_meshtastic_mesh_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_meshtastic_mesh_proto_goTypes = []any{
 	(HardwareModel)(0),                        // 0: meshtastic.HardwareModel
 	(Constants)(0),                            // 1: meshtastic.Constants
@@ -6260,30 +6536,35 @@ var file_meshtastic_mesh_proto_goTypes = []any{
 	(*NeighborInfo)(nil),                      // 42: meshtastic.NeighborInfo
 	(*Neighbor)(nil),                          // 43: meshtastic.Neighbor
 	(*DeviceMetadata)(nil),                    // 44: meshtastic.DeviceMetadata
-	(*Heartbeat)(nil),                         // 45: meshtastic.Heartbeat
-	(*NodeRemoteHardwarePin)(nil),             // 46: meshtastic.NodeRemoteHardwarePin
-	(*ChunkedPayload)(nil),                    // 47: meshtastic.ChunkedPayload
-	(*ResendChunks)(nil),                      // 48: meshtastic.resend_chunks
-	(*ChunkedPayloadResponse)(nil),            // 49: meshtastic.ChunkedPayloadResponse
-	(Config_DeviceConfig_Role)(0),             // 50: meshtastic.Config.DeviceConfig.Role
-	(PortNum)(0),                              // 51: meshtastic.PortNum
-	(*DeviceMetrics)(nil),                     // 52: meshtastic.DeviceMetrics
-	(*Config)(nil),                            // 53: meshtastic.Config
-	(*ModuleConfig)(nil),                      // 54: meshtastic.ModuleConfig
-	(*Channel)(nil),                           // 55: meshtastic.Channel
-	(*XModem)(nil),                            // 56: meshtastic.XModem
-	(*DeviceUIConfig)(nil),                    // 57: meshtastic.DeviceUIConfig
-	(*RemoteHardwarePin)(nil),                 // 58: meshtastic.RemoteHardwarePin
+	(*LoRaPresetGroup)(nil),                   // 45: meshtastic.LoRaPresetGroup
+	(*LoRaRegionPresets)(nil),                 // 46: meshtastic.LoRaRegionPresets
+	(*LoRaRegionPresetMap)(nil),               // 47: meshtastic.LoRaRegionPresetMap
+	(*Heartbeat)(nil),                         // 48: meshtastic.Heartbeat
+	(*NodeRemoteHardwarePin)(nil),             // 49: meshtastic.NodeRemoteHardwarePin
+	(*ChunkedPayload)(nil),                    // 50: meshtastic.ChunkedPayload
+	(*ResendChunks)(nil),                      // 51: meshtastic.resend_chunks
+	(*ChunkedPayloadResponse)(nil),            // 52: meshtastic.ChunkedPayloadResponse
+	(Config_DeviceConfig_Role)(0),             // 53: meshtastic.Config.DeviceConfig.Role
+	(PortNum)(0),                              // 54: meshtastic.PortNum
+	(*DeviceMetrics)(nil),                     // 55: meshtastic.DeviceMetrics
+	(*Config)(nil),                            // 56: meshtastic.Config
+	(*ModuleConfig)(nil),                      // 57: meshtastic.ModuleConfig
+	(*Channel)(nil),                           // 58: meshtastic.Channel
+	(*XModem)(nil),                            // 59: meshtastic.XModem
+	(*DeviceUIConfig)(nil),                    // 60: meshtastic.DeviceUIConfig
+	(Config_LoRaConfig_ModemPreset)(0),        // 61: meshtastic.Config.LoRaConfig.ModemPreset
+	(Config_LoRaConfig_RegionCode)(0),         // 62: meshtastic.Config.LoRaConfig.RegionCode
+	(*RemoteHardwarePin)(nil),                 // 63: meshtastic.RemoteHardwarePin
 }
 var file_meshtastic_mesh_proto_depIdxs = []int32{
 	5,  // 0: meshtastic.Position.location_source:type_name -> meshtastic.Position.LocSource
 	6,  // 1: meshtastic.Position.altitude_source:type_name -> meshtastic.Position.AltSource
 	0,  // 2: meshtastic.User.hw_model:type_name -> meshtastic.HardwareModel
-	50, // 3: meshtastic.User.role:type_name -> meshtastic.Config.DeviceConfig.Role
+	53, // 3: meshtastic.User.role:type_name -> meshtastic.Config.DeviceConfig.Role
 	17, // 4: meshtastic.Routing.route_request:type_name -> meshtastic.RouteDiscovery
 	17, // 5: meshtastic.Routing.route_reply:type_name -> meshtastic.RouteDiscovery
 	7,  // 6: meshtastic.Routing.error_reason:type_name -> meshtastic.Routing.Error
-	51, // 7: meshtastic.Data.portnum:type_name -> meshtastic.PortNum
+	54, // 7: meshtastic.Data.portnum:type_name -> meshtastic.PortNum
 	8,  // 8: meshtastic.StoreForwardPlusPlus.sfpp_message_type:type_name -> meshtastic.StoreForwardPlusPlus.SFPP_message_type
 	9,  // 9: meshtastic.RemoteShell.op:type_name -> meshtastic.RemoteShell.OpCode
 	19, // 10: meshtastic.MeshPacket.decoded:type_name -> meshtastic.Data
@@ -6292,46 +6573,52 @@ var file_meshtastic_mesh_proto_depIdxs = []int32{
 	12, // 13: meshtastic.MeshPacket.transport_mechanism:type_name -> meshtastic.MeshPacket.TransportMechanism
 	16, // 14: meshtastic.NodeInfo.user:type_name -> meshtastic.User
 	15, // 15: meshtastic.NodeInfo.position:type_name -> meshtastic.Position
-	52, // 16: meshtastic.NodeInfo.device_metrics:type_name -> meshtastic.DeviceMetrics
+	55, // 16: meshtastic.NodeInfo.device_metrics:type_name -> meshtastic.DeviceMetrics
 	3,  // 17: meshtastic.MyNodeInfo.firmware_edition:type_name -> meshtastic.FirmwareEdition
 	13, // 18: meshtastic.LogRecord.level:type_name -> meshtastic.LogRecord.Level
 	26, // 19: meshtastic.FromRadio.packet:type_name -> meshtastic.MeshPacket
 	28, // 20: meshtastic.FromRadio.my_info:type_name -> meshtastic.MyNodeInfo
 	27, // 21: meshtastic.FromRadio.node_info:type_name -> meshtastic.NodeInfo
-	53, // 22: meshtastic.FromRadio.config:type_name -> meshtastic.Config
+	56, // 22: meshtastic.FromRadio.config:type_name -> meshtastic.Config
 	29, // 23: meshtastic.FromRadio.log_record:type_name -> meshtastic.LogRecord
-	54, // 24: meshtastic.FromRadio.moduleConfig:type_name -> meshtastic.ModuleConfig
-	55, // 25: meshtastic.FromRadio.channel:type_name -> meshtastic.Channel
+	57, // 24: meshtastic.FromRadio.moduleConfig:type_name -> meshtastic.ModuleConfig
+	58, // 25: meshtastic.FromRadio.channel:type_name -> meshtastic.Channel
 	30, // 26: meshtastic.FromRadio.queueStatus:type_name -> meshtastic.QueueStatus
-	56, // 27: meshtastic.FromRadio.xmodemPacket:type_name -> meshtastic.XModem
+	59, // 27: meshtastic.FromRadio.xmodemPacket:type_name -> meshtastic.XModem
 	44, // 28: meshtastic.FromRadio.metadata:type_name -> meshtastic.DeviceMetadata
 	25, // 29: meshtastic.FromRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
 	39, // 30: meshtastic.FromRadio.fileInfo:type_name -> meshtastic.FileInfo
 	33, // 31: meshtastic.FromRadio.clientNotification:type_name -> meshtastic.ClientNotification
-	57, // 32: meshtastic.FromRadio.deviceuiConfig:type_name -> meshtastic.DeviceUIConfig
+	60, // 32: meshtastic.FromRadio.deviceuiConfig:type_name -> meshtastic.DeviceUIConfig
 	32, // 33: meshtastic.FromRadio.lockdown_status:type_name -> meshtastic.LockdownStatus
-	14, // 34: meshtastic.LockdownStatus.state:type_name -> meshtastic.LockdownStatus.State
-	13, // 35: meshtastic.ClientNotification.level:type_name -> meshtastic.LogRecord.Level
-	34, // 36: meshtastic.ClientNotification.key_verification_number_inform:type_name -> meshtastic.KeyVerificationNumberInform
-	35, // 37: meshtastic.ClientNotification.key_verification_number_request:type_name -> meshtastic.KeyVerificationNumberRequest
-	36, // 38: meshtastic.ClientNotification.key_verification_final:type_name -> meshtastic.KeyVerificationFinal
-	37, // 39: meshtastic.ClientNotification.duplicated_public_key:type_name -> meshtastic.DuplicatedPublicKey
-	38, // 40: meshtastic.ClientNotification.low_entropy_key:type_name -> meshtastic.LowEntropyKey
-	26, // 41: meshtastic.ToRadio.packet:type_name -> meshtastic.MeshPacket
-	56, // 42: meshtastic.ToRadio.xmodemPacket:type_name -> meshtastic.XModem
-	25, // 43: meshtastic.ToRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
-	45, // 44: meshtastic.ToRadio.heartbeat:type_name -> meshtastic.Heartbeat
-	51, // 45: meshtastic.Compressed.portnum:type_name -> meshtastic.PortNum
-	43, // 46: meshtastic.NeighborInfo.neighbors:type_name -> meshtastic.Neighbor
-	50, // 47: meshtastic.DeviceMetadata.role:type_name -> meshtastic.Config.DeviceConfig.Role
-	0,  // 48: meshtastic.DeviceMetadata.hw_model:type_name -> meshtastic.HardwareModel
-	58, // 49: meshtastic.NodeRemoteHardwarePin.pin:type_name -> meshtastic.RemoteHardwarePin
-	48, // 50: meshtastic.ChunkedPayloadResponse.resend_chunks:type_name -> meshtastic.resend_chunks
-	51, // [51:51] is the sub-list for method output_type
-	51, // [51:51] is the sub-list for method input_type
-	51, // [51:51] is the sub-list for extension type_name
-	51, // [51:51] is the sub-list for extension extendee
-	0,  // [0:51] is the sub-list for field type_name
+	47, // 34: meshtastic.FromRadio.region_presets:type_name -> meshtastic.LoRaRegionPresetMap
+	14, // 35: meshtastic.LockdownStatus.state:type_name -> meshtastic.LockdownStatus.State
+	13, // 36: meshtastic.ClientNotification.level:type_name -> meshtastic.LogRecord.Level
+	34, // 37: meshtastic.ClientNotification.key_verification_number_inform:type_name -> meshtastic.KeyVerificationNumberInform
+	35, // 38: meshtastic.ClientNotification.key_verification_number_request:type_name -> meshtastic.KeyVerificationNumberRequest
+	36, // 39: meshtastic.ClientNotification.key_verification_final:type_name -> meshtastic.KeyVerificationFinal
+	37, // 40: meshtastic.ClientNotification.duplicated_public_key:type_name -> meshtastic.DuplicatedPublicKey
+	38, // 41: meshtastic.ClientNotification.low_entropy_key:type_name -> meshtastic.LowEntropyKey
+	26, // 42: meshtastic.ToRadio.packet:type_name -> meshtastic.MeshPacket
+	59, // 43: meshtastic.ToRadio.xmodemPacket:type_name -> meshtastic.XModem
+	25, // 44: meshtastic.ToRadio.mqttClientProxyMessage:type_name -> meshtastic.MqttClientProxyMessage
+	48, // 45: meshtastic.ToRadio.heartbeat:type_name -> meshtastic.Heartbeat
+	54, // 46: meshtastic.Compressed.portnum:type_name -> meshtastic.PortNum
+	43, // 47: meshtastic.NeighborInfo.neighbors:type_name -> meshtastic.Neighbor
+	53, // 48: meshtastic.DeviceMetadata.role:type_name -> meshtastic.Config.DeviceConfig.Role
+	0,  // 49: meshtastic.DeviceMetadata.hw_model:type_name -> meshtastic.HardwareModel
+	61, // 50: meshtastic.LoRaPresetGroup.presets:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
+	61, // 51: meshtastic.LoRaPresetGroup.default_preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
+	62, // 52: meshtastic.LoRaRegionPresets.region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
+	45, // 53: meshtastic.LoRaRegionPresetMap.groups:type_name -> meshtastic.LoRaPresetGroup
+	46, // 54: meshtastic.LoRaRegionPresetMap.region_groups:type_name -> meshtastic.LoRaRegionPresets
+	63, // 55: meshtastic.NodeRemoteHardwarePin.pin:type_name -> meshtastic.RemoteHardwarePin
+	51, // 56: meshtastic.ChunkedPayloadResponse.resend_chunks:type_name -> meshtastic.resend_chunks
+	57, // [57:57] is the sub-list for method output_type
+	57, // [57:57] is the sub-list for method input_type
+	57, // [57:57] is the sub-list for extension type_name
+	57, // [57:57] is the sub-list for extension extendee
+	0,  // [0:57] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_mesh_proto_init() }
@@ -6382,6 +6669,7 @@ func file_meshtastic_mesh_proto_init() {
 		(*FromRadio_ClientNotification)(nil),
 		(*FromRadio_DeviceuiConfig)(nil),
 		(*FromRadio_LockdownStatus)(nil),
+		(*FromRadio_RegionPresets)(nil),
 	}
 	file_meshtastic_mesh_proto_msgTypes[18].OneofWrappers = []any{
 		(*ClientNotification_KeyVerificationNumberInform)(nil),
@@ -6398,7 +6686,7 @@ func file_meshtastic_mesh_proto_init() {
 		(*ToRadio_MqttClientProxyMessage)(nil),
 		(*ToRadio_Heartbeat)(nil),
 	}
-	file_meshtastic_mesh_proto_msgTypes[34].OneofWrappers = []any{
+	file_meshtastic_mesh_proto_msgTypes[37].OneofWrappers = []any{
 		(*ChunkedPayloadResponse_RequestTransfer)(nil),
 		(*ChunkedPayloadResponse_AcceptTransfer)(nil),
 		(*ChunkedPayloadResponse_ResendChunks)(nil),
@@ -6409,7 +6697,7 @@ func file_meshtastic_mesh_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_mesh_proto_rawDesc), len(file_meshtastic_mesh_proto_rawDesc)),
 			NumEnums:      15,
-			NumMessages:   35,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

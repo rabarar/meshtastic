@@ -1473,7 +1473,64 @@ type LockdownAuth struct {
 	// If true, ignore passphrase fields, immediately revoke all
 	// connection-level admin authorization, and reboot the device into
 	// the locked state. Always honoured regardless of current lock state.
-	LockNow       bool `protobuf:"varint,4,opt,name=lock_now,json=lockNow,proto3" json:"lock_now,omitempty"`
+	LockNow bool `protobuf:"varint,4,opt,name=lock_now,json=lockNow,proto3" json:"lock_now,omitempty"`
+	// Optional per-boot uptime cap on the unlocked session, in seconds.
+	// 0 = unlimited (token-only enforcement, suitable for unattended
+	// tower / infrastructure nodes).
+	//
+	// When non-zero, the firmware arms an uptime timer at unlock. On
+	// each expiry, while there is still boot-count budget, the firmware
+	// decrements the on-flash boot count in place, revokes per-
+	// connection admin auth (clients must re-authenticate to see
+	// content), re-engages the screen lock, and re-arms the timer
+	// without rebooting. Mesh routing keeps running across session
+	// boundaries; only when the boot-count budget reaches zero does
+	// the device hard-lock and reboot.
+	//
+	// Total exposure ceiling = ((resolved boot count) + 1) * max_session_seconds.
+	// The +1 accounts for the initial passphrase-unlocked session
+	// itself, since boots_remaining is the number of subsequent
+	// session rolls (each consuming one boot from the rollback ledger).
+	// The resolved boot count is the value the firmware writes into the
+	// token at unlock time: the client-supplied boots_remaining when
+	// non-zero, otherwise the firmware default (TOKEN_DEFAULT_BOOTS).
+	// Note that boots_remaining == 0 in this message means "use firmware
+	// default", NOT "zero boots" — a client computing the ceiling for
+	// display should mirror that resolution rather than multiplying the
+	// raw request value.
+	//
+	// The cap is persisted in the token, so it survives token-based
+	// auto-unlock across reboots. Explicit operator Lock Now still
+	// deletes the token and forces passphrase re-entry.
+	//
+	// Uses millis() (CPU uptime), not wall-clock time, so the cap is
+	// immune to GPS spoofing, RTC backup-battery removal, and Faraday
+	// cage isolation — none of those move the uptime counter. The only
+	// way to reset the session clock is a reboot, which costs a boot
+	// from the on-flash, HMAC-bound counter.
+	MaxSessionSeconds uint32 `protobuf:"varint,5,opt,name=max_session_seconds,json=maxSessionSeconds,proto3" json:"max_session_seconds,omitempty"`
+	// Disable lockdown mode. Requires a valid passphrase in the same
+	// message (the device must prove the operator owns it before
+	// reverting at-rest encryption). On success the firmware decrypts
+	// every stored config / channel / nodedb file back to plaintext,
+	// removes the wrapped DEK, unlock token, monotonic-counter, and
+	// backoff files, and reboots out of lockdown.
+	//
+	// This is the inverse of the provision/unlock path: it is how the
+	// client app's "lockdown mode" toggle returns a device to normal
+	// operation.
+	//
+	// NOT reversed by this operation: APPROTECT. Once the debug port
+	// lockout has been burned (on silicon where it is effective) it is
+	// permanent — disabling lockdown decrypts your data and removes the
+	// access gates, but the SWD/JTAG port stays locked for the life of
+	// the device (recoverable only via a full chip erase over a debug
+	// probe, which destroys all data). Clients should make this
+	// irreversibility clear at the moment lockdown is first enabled.
+	//
+	// When true the passphrase field is still required; boots_remaining,
+	// valid_until_epoch, max_session_seconds, and lock_now are ignored.
+	Disable       bool `protobuf:"varint,6,opt,name=disable,proto3" json:"disable,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1536,6 +1593,20 @@ func (x *LockdownAuth) GetLockNow() bool {
 	return false
 }
 
+func (x *LockdownAuth) GetMaxSessionSeconds() uint32 {
+	if x != nil {
+		return x.MaxSessionSeconds
+	}
+	return 0
+}
+
+func (x *LockdownAuth) GetDisable() bool {
+	if x != nil {
+		return x.Disable
+	}
+	return false
+}
+
 // Parameters for setting up Meshtastic for ameteur radio usage
 type HamParameters struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1548,7 +1619,10 @@ type HamParameters struct {
 	// Ensure your radio is capable of operating of the selected frequency before setting this.
 	Frequency float32 `protobuf:"fixed32,3,opt,name=frequency,proto3" json:"frequency,omitempty"`
 	// Optional short name of user
-	ShortName     string `protobuf:"bytes,4,opt,name=short_name,json=shortName,proto3" json:"short_name,omitempty"`
+	ShortName string `protobuf:"bytes,4,opt,name=short_name,json=shortName,proto3" json:"short_name,omitempty"`
+	// Optional long name of user
+	// Appended to callsign
+	LongName      string `protobuf:"bytes,5,opt,name=long_name,json=longName,proto3" json:"long_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1607,6 +1681,13 @@ func (x *HamParameters) GetFrequency() float32 {
 func (x *HamParameters) GetShortName() string {
 	if x != nil {
 		return x.ShortName
+	}
+	return ""
+}
+
+func (x *HamParameters) GetLongName() string {
+	if x != nil {
+		return x.LongName
 	}
 	return ""
 }
@@ -2407,20 +2488,23 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x0eBackupLocation\x12\t\n" +
 	"\x05FLASH\x10\x00\x12\x06\n" +
 	"\x02SD\x10\x01B\x11\n" +
-	"\x0fpayload_variant\"\x9e\x01\n" +
+	"\x0fpayload_variant\"\xe8\x01\n" +
 	"\fLockdownAuth\x12\x1e\n" +
 	"\n" +
 	"passphrase\x18\x01 \x01(\fR\n" +
 	"passphrase\x12'\n" +
 	"\x0fboots_remaining\x18\x02 \x01(\rR\x0ebootsRemaining\x12*\n" +
 	"\x11valid_until_epoch\x18\x03 \x01(\rR\x0fvalidUntilEpoch\x12\x19\n" +
-	"\block_now\x18\x04 \x01(\bR\alockNow\"\x84\x01\n" +
+	"\block_now\x18\x04 \x01(\bR\alockNow\x12.\n" +
+	"\x13max_session_seconds\x18\x05 \x01(\rR\x11maxSessionSeconds\x12\x18\n" +
+	"\adisable\x18\x06 \x01(\bR\adisable\"\xa1\x01\n" +
 	"\rHamParameters\x12\x1b\n" +
 	"\tcall_sign\x18\x01 \x01(\tR\bcallSign\x12\x19\n" +
 	"\btx_power\x18\x02 \x01(\x05R\atxPower\x12\x1c\n" +
 	"\tfrequency\x18\x03 \x01(\x02R\tfrequency\x12\x1d\n" +
 	"\n" +
-	"short_name\x18\x04 \x01(\tR\tshortName\"~\n" +
+	"short_name\x18\x04 \x01(\tR\tshortName\x12\x1b\n" +
+	"\tlong_name\x18\x05 \x01(\tR\blongName\"~\n" +
 	"\x1eNodeRemoteHardwarePinsResponse\x12\\\n" +
 	"\x19node_remote_hardware_pins\x18\x01 \x03(\v2!.meshtastic.NodeRemoteHardwarePinR\x16nodeRemoteHardwarePins\"\xa2\x01\n" +
 	"\rSharedContact\x12\x19\n" +

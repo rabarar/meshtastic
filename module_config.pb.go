@@ -1475,36 +1475,25 @@ func (x *ModuleConfig_PaxcounterConfig) GetBleThreshold() int32 {
 // Provides packet inspection and traffic shaping to help reduce channel utilization
 type ModuleConfig_TrafficManagementConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Master enable for traffic management module
-	Enabled bool `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	// Enable position deduplication to drop redundant position broadcasts
-	PositionDedupEnabled bool `protobuf:"varint,2,opt,name=position_dedup_enabled,json=positionDedupEnabled,proto3" json:"position_dedup_enabled,omitempty"`
-	// Number of bits of precision for position deduplication (0-32)
-	PositionPrecisionBits uint32 `protobuf:"varint,3,opt,name=position_precision_bits,json=positionPrecisionBits,proto3" json:"position_precision_bits,omitempty"`
-	// Minimum interval in seconds between position updates from the same node
+	// Minimum interval in seconds between position updates from the same node.
+	// A non-zero value implicitly enables the suppression window; 0 disables it.
 	PositionMinIntervalSecs uint32 `protobuf:"varint,4,opt,name=position_min_interval_secs,json=positionMinIntervalSecs,proto3" json:"position_min_interval_secs,omitempty"`
-	// Enable direct response to NodeInfo requests from local cache
-	NodeinfoDirectResponse bool `protobuf:"varint,5,opt,name=nodeinfo_direct_response,json=nodeinfoDirectResponse,proto3" json:"nodeinfo_direct_response,omitempty"`
-	// Minimum hop distance from requestor before responding to NodeInfo requests
+	// Maximum hop distance from the requestor at which direct NodeInfo responses
+	// are served from the local cache. A non-zero value implicitly enables direct
+	// response; 0 disables it.
 	NodeinfoDirectResponseMaxHops uint32 `protobuf:"varint,6,opt,name=nodeinfo_direct_response_max_hops,json=nodeinfoDirectResponseMaxHops,proto3" json:"nodeinfo_direct_response_max_hops,omitempty"`
-	// Enable per-node rate limiting to throttle chatty nodes
-	RateLimitEnabled bool `protobuf:"varint,7,opt,name=rate_limit_enabled,json=rateLimitEnabled,proto3" json:"rate_limit_enabled,omitempty"`
-	// Time window in seconds for rate limiting calculations
+	// Time window in seconds for per-node rate limiting.
+	// A non-zero value implicitly enables rate limiting; 0 disables it.
 	RateLimitWindowSecs uint32 `protobuf:"varint,8,opt,name=rate_limit_window_secs,json=rateLimitWindowSecs,proto3" json:"rate_limit_window_secs,omitempty"`
-	// Maximum packets allowed per node within the rate limit window
+	// Maximum packets allowed per node within the rate limit window.
+	// A non-zero value implicitly enables rate limiting; 0 disables it.
 	RateLimitMaxPackets uint32 `protobuf:"varint,9,opt,name=rate_limit_max_packets,json=rateLimitMaxPackets,proto3" json:"rate_limit_max_packets,omitempty"`
-	// Enable dropping of unknown/undecryptable packets per rate_limit_window_secs
-	DropUnknownEnabled bool `protobuf:"varint,10,opt,name=drop_unknown_enabled,json=dropUnknownEnabled,proto3" json:"drop_unknown_enabled,omitempty"`
-	// Number of unknown packets before dropping from a node
+	// Maximum unknown/undecryptable packets per rate window before the source
+	// is dropped. A non-zero value implicitly enables unknown-packet filtering;
+	// 0 disables it.
 	UnknownPacketThreshold uint32 `protobuf:"varint,11,opt,name=unknown_packet_threshold,json=unknownPacketThreshold,proto3" json:"unknown_packet_threshold,omitempty"`
-	// Set hop_limit to 0 for relayed telemetry broadcasts (own packets unaffected)
-	ExhaustHopTelemetry bool `protobuf:"varint,12,opt,name=exhaust_hop_telemetry,json=exhaustHopTelemetry,proto3" json:"exhaust_hop_telemetry,omitempty"`
-	// Set hop_limit to 0 for relayed position broadcasts (own packets unaffected)
-	ExhaustHopPosition bool `protobuf:"varint,13,opt,name=exhaust_hop_position,json=exhaustHopPosition,proto3" json:"exhaust_hop_position,omitempty"`
-	// Preserve hop_limit for router-to-router traffic
-	RouterPreserveHops bool `protobuf:"varint,14,opt,name=router_preserve_hops,json=routerPreserveHops,proto3" json:"router_preserve_hops,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *ModuleConfig_TrafficManagementConfig) Reset() {
@@ -1537,27 +1526,6 @@ func (*ModuleConfig_TrafficManagementConfig) Descriptor() ([]byte, []int) {
 	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 7}
 }
 
-func (x *ModuleConfig_TrafficManagementConfig) GetEnabled() bool {
-	if x != nil {
-		return x.Enabled
-	}
-	return false
-}
-
-func (x *ModuleConfig_TrafficManagementConfig) GetPositionDedupEnabled() bool {
-	if x != nil {
-		return x.PositionDedupEnabled
-	}
-	return false
-}
-
-func (x *ModuleConfig_TrafficManagementConfig) GetPositionPrecisionBits() uint32 {
-	if x != nil {
-		return x.PositionPrecisionBits
-	}
-	return 0
-}
-
 func (x *ModuleConfig_TrafficManagementConfig) GetPositionMinIntervalSecs() uint32 {
 	if x != nil {
 		return x.PositionMinIntervalSecs
@@ -1565,25 +1533,11 @@ func (x *ModuleConfig_TrafficManagementConfig) GetPositionMinIntervalSecs() uint
 	return 0
 }
 
-func (x *ModuleConfig_TrafficManagementConfig) GetNodeinfoDirectResponse() bool {
-	if x != nil {
-		return x.NodeinfoDirectResponse
-	}
-	return false
-}
-
 func (x *ModuleConfig_TrafficManagementConfig) GetNodeinfoDirectResponseMaxHops() uint32 {
 	if x != nil {
 		return x.NodeinfoDirectResponseMaxHops
 	}
 	return 0
-}
-
-func (x *ModuleConfig_TrafficManagementConfig) GetRateLimitEnabled() bool {
-	if x != nil {
-		return x.RateLimitEnabled
-	}
-	return false
 }
 
 func (x *ModuleConfig_TrafficManagementConfig) GetRateLimitWindowSecs() uint32 {
@@ -1600,39 +1554,11 @@ func (x *ModuleConfig_TrafficManagementConfig) GetRateLimitMaxPackets() uint32 {
 	return 0
 }
 
-func (x *ModuleConfig_TrafficManagementConfig) GetDropUnknownEnabled() bool {
-	if x != nil {
-		return x.DropUnknownEnabled
-	}
-	return false
-}
-
 func (x *ModuleConfig_TrafficManagementConfig) GetUnknownPacketThreshold() uint32 {
 	if x != nil {
 		return x.UnknownPacketThreshold
 	}
 	return 0
-}
-
-func (x *ModuleConfig_TrafficManagementConfig) GetExhaustHopTelemetry() bool {
-	if x != nil {
-		return x.ExhaustHopTelemetry
-	}
-	return false
-}
-
-func (x *ModuleConfig_TrafficManagementConfig) GetExhaustHopPosition() bool {
-	if x != nil {
-		return x.ExhaustHopPosition
-	}
-	return false
-}
-
-func (x *ModuleConfig_TrafficManagementConfig) GetRouterPreserveHops() bool {
-	if x != nil {
-		return x.RouterPreserveHops
-	}
-	return false
 }
 
 // Serial Config
@@ -2609,7 +2535,7 @@ var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\x1a\x15meshtastic/atak.proto\"\x91=\n" +
+	"meshtastic\x1a\x15meshtastic/atak.proto\"\xce;\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2701,23 +2627,14 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12<\n" +
 	"\x1apaxcounter_update_interval\x18\x02 \x01(\rR\x18paxcounterUpdateInterval\x12%\n" +
 	"\x0ewifi_threshold\x18\x03 \x01(\x05R\rwifiThreshold\x12#\n" +
-	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xfe\x05\n" +
-	"\x17TrafficManagementConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x124\n" +
-	"\x16position_dedup_enabled\x18\x02 \x01(\bR\x14positionDedupEnabled\x126\n" +
-	"\x17position_precision_bits\x18\x03 \x01(\rR\x15positionPrecisionBits\x12;\n" +
-	"\x1aposition_min_interval_secs\x18\x04 \x01(\rR\x17positionMinIntervalSecs\x128\n" +
-	"\x18nodeinfo_direct_response\x18\x05 \x01(\bR\x16nodeinfoDirectResponse\x12H\n" +
-	"!nodeinfo_direct_response_max_hops\x18\x06 \x01(\rR\x1dnodeinfoDirectResponseMaxHops\x12,\n" +
-	"\x12rate_limit_enabled\x18\a \x01(\bR\x10rateLimitEnabled\x123\n" +
+	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xbb\x04\n" +
+	"\x17TrafficManagementConfig\x12;\n" +
+	"\x1aposition_min_interval_secs\x18\x04 \x01(\rR\x17positionMinIntervalSecs\x12H\n" +
+	"!nodeinfo_direct_response_max_hops\x18\x06 \x01(\rR\x1dnodeinfoDirectResponseMaxHops\x123\n" +
 	"\x16rate_limit_window_secs\x18\b \x01(\rR\x13rateLimitWindowSecs\x123\n" +
-	"\x16rate_limit_max_packets\x18\t \x01(\rR\x13rateLimitMaxPackets\x120\n" +
-	"\x14drop_unknown_enabled\x18\n" +
-	" \x01(\bR\x12dropUnknownEnabled\x128\n" +
-	"\x18unknown_packet_threshold\x18\v \x01(\rR\x16unknownPacketThreshold\x122\n" +
-	"\x15exhaust_hop_telemetry\x18\f \x01(\bR\x13exhaustHopTelemetry\x120\n" +
-	"\x14exhaust_hop_position\x18\r \x01(\bR\x12exhaustHopPosition\x120\n" +
-	"\x14router_preserve_hops\x18\x0e \x01(\bR\x12routerPreserveHops\x1a\xec\x05\n" +
+	"\x16rate_limit_max_packets\x18\t \x01(\rR\x13rateLimitMaxPackets\x128\n" +
+	"\x18unknown_packet_threshold\x18\v \x01(\rR\x16unknownPacketThresholdJ\x04\b\x01\x10\x02J\x04\b\x02\x10\x03J\x04\b\x03\x10\x04J\x04\b\x05\x10\x06J\x04\b\a\x10\bJ\x04\b\n" +
+	"\x10\vJ\x04\b\f\x10\rJ\x04\b\r\x10\x0eJ\x04\b\x0e\x10\x0fR\aenabledR\x16position_dedup_enabledR\x17position_precision_bitsR\x18nodeinfo_direct_responseR\x12rate_limit_enabledR\x14drop_unknown_enabledR\x15exhaust_hop_telemetryR\x14exhaust_hop_positionR\x14router_preserve_hops\x1a\xec\x05\n" +
 	"\fSerialConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x12\n" +
 	"\x04echo\x18\x02 \x01(\bR\x04echo\x12\x10\n" +
