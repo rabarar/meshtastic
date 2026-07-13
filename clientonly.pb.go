@@ -41,8 +41,12 @@ type DeviceProfile struct {
 	Ringtone *string `protobuf:"bytes,7,opt,name=ringtone,proto3,oneof" json:"ringtone,omitempty"`
 	// Predefined messages for CannedMessage
 	CannedMessages *string `protobuf:"bytes,8,opt,name=canned_messages,json=cannedMessages,proto3,oneof" json:"canned_messages,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Is the node unmessagable
+	IsUnmessagable *bool `protobuf:"varint,9,opt,name=is_unmessagable,json=isUnmessagable,proto3,oneof" json:"is_unmessagable,omitempty"`
+	// Is this node in licensed user mode
+	IsLicensed    *bool `protobuf:"varint,10,opt,name=is_licensed,json=isLicensed,proto3,oneof" json:"is_licensed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeviceProfile) Reset() {
@@ -131,12 +135,26 @@ func (x *DeviceProfile) GetCannedMessages() string {
 	return ""
 }
 
+func (x *DeviceProfile) GetIsUnmessagable() bool {
+	if x != nil && x.IsUnmessagable != nil {
+		return *x.IsUnmessagable
+	}
+	return false
+}
+
+func (x *DeviceProfile) GetIsLicensed() bool {
+	if x != nil && x.IsLicensed != nil {
+		return *x.IsLicensed
+	}
+	return false
+}
+
 var File_meshtastic_clientonly_proto protoreflect.FileDescriptor
 
 const file_meshtastic_clientonly_proto_rawDesc = "" +
 	"\n" +
 	"\x1bmeshtastic/clientonly.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/localonly.proto\x1a\x15meshtastic/mesh.proto\"\x89\x04\n" +
+	"meshtastic\x1a\x1ameshtastic/localonly.proto\x1a\x15meshtastic/mesh.proto\"\x81\x05\n" +
 	"\rDeviceProfile\x12 \n" +
 	"\tlong_name\x18\x01 \x01(\tH\x00R\blongName\x88\x01\x01\x12\"\n" +
 	"\n" +
@@ -147,7 +165,11 @@ const file_meshtastic_clientonly_proto_rawDesc = "" +
 	"\rmodule_config\x18\x05 \x01(\v2\x1d.meshtastic.LocalModuleConfigH\x04R\fmoduleConfig\x88\x01\x01\x12@\n" +
 	"\x0efixed_position\x18\x06 \x01(\v2\x14.meshtastic.PositionH\x05R\rfixedPosition\x88\x01\x01\x12\x1f\n" +
 	"\bringtone\x18\a \x01(\tH\x06R\bringtone\x88\x01\x01\x12,\n" +
-	"\x0fcanned_messages\x18\b \x01(\tH\aR\x0ecannedMessages\x88\x01\x01B\f\n" +
+	"\x0fcanned_messages\x18\b \x01(\tH\aR\x0ecannedMessages\x88\x01\x01\x12,\n" +
+	"\x0fis_unmessagable\x18\t \x01(\bH\bR\x0eisUnmessagable\x88\x01\x01\x12$\n" +
+	"\vis_licensed\x18\n" +
+	" \x01(\bH\tR\n" +
+	"isLicensed\x88\x01\x01B\f\n" +
 	"\n" +
 	"_long_nameB\r\n" +
 	"\v_short_nameB\x0e\n" +
@@ -156,7 +178,9 @@ const file_meshtastic_clientonly_proto_rawDesc = "" +
 	"\x0e_module_configB\x11\n" +
 	"\x0f_fixed_positionB\v\n" +
 	"\t_ringtoneB\x12\n" +
-	"\x10_canned_messagesBg\n" +
+	"\x10_canned_messagesB\x12\n" +
+	"\x10_is_unmessagableB\x0e\n" +
+	"\f_is_licensedBg\n" +
 	"\x14org.meshtastic.protoB\x10ClientOnlyProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (

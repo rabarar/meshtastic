@@ -133,6 +133,8 @@ const (
 	TelemetrySensorType_MMC5983MA TelemetrySensorType = 52
 	// ICM-42607-P 6‑Axis IMU
 	TelemetrySensorType_ICM42607P TelemetrySensorType = 53
+	// SPA06 pressure and temperature
+	TelemetrySensorType_SPA06 TelemetrySensorType = 54
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -192,6 +194,7 @@ var (
 		51: "DS248X",
 		52: "MMC5983MA",
 		53: "ICM42607P",
+		54: "SPA06",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -248,6 +251,7 @@ var (
 		"DS248X":        51,
 		"MMC5983MA":     52,
 		"ICM42607P":     53,
+		"SPA06":         54,
 	}
 )
 
@@ -2106,7 +2110,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0fvoc_state_array\x18\x06 \x01(\x06H\x02R\rvocStateArray\x88\x01\x01B\x11\n" +
 	"\x0f_voc_state_timeB\x12\n" +
 	"\x10_voc_state_validB\x12\n" +
-	"\x10_voc_state_array*\xdc\x05\n" +
+	"\x10_voc_state_array*\xe7\x05\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -2174,7 +2178,8 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"\x06DS248X\x103\x12\r\n" +
 	"\tMMC5983MA\x104\x12\r\n" +
-	"\tICM42607P\x105Bf\n" +
+	"\tICM42607P\x105\x12\t\n" +
+	"\x05SPA06\x106Bf\n" +
 	"\x14org.meshtastic.protoB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (

@@ -1089,6 +1089,10 @@ const (
 	// Only compatible with SX127x and SX126x chipsets.
 	// Comparable link budget and data rate to LONG_MODERATE.
 	Config_LoRaConfig_TINY_SLOW Config_LoRaConfig_ModemPreset = 15
+	// Medium Range - Turbo
+	// This preset performs similarly to MEDIUM_FAST, but with 500kHz bandwidth.
+	// It is not legal to use in all regions due to this wider bandwidth.
+	Config_LoRaConfig_MEDIUM_TURBO Config_LoRaConfig_ModemPreset = 16
 )
 
 // Enum value maps for Config_LoRaConfig_ModemPreset.
@@ -1110,6 +1114,7 @@ var (
 		13: "NARROW_SLOW",
 		14: "TINY_FAST",
 		15: "TINY_SLOW",
+		16: "MEDIUM_TURBO",
 	}
 	Config_LoRaConfig_ModemPreset_value = map[string]int32{
 		"LONG_FAST":      0,
@@ -1128,6 +1133,7 @@ var (
 		"NARROW_SLOW":    13,
 		"TINY_FAST":      14,
 		"TINY_SLOW":      15,
+		"MEDIUM_TURBO":   16,
 	}
 )
 
@@ -2760,7 +2766,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\xf27\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x848\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2946,7 +2952,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x12DEGREES_0_INVERTED\x10\x04\x12\x17\n" +
 	"\x13DEGREES_90_INVERTED\x10\x05\x12\x18\n" +
 	"\x14DEGREES_180_INVERTED\x10\x06\x12\x18\n" +
-	"\x14DEGREES_270_INVERTED\x10\a\x1a\x8a\r\n" +
+	"\x14DEGREES_270_INVERTED\x10\a\x1a\x9c\r\n" +
 	"\n" +
 	"LoRaConfig\x12\x1d\n" +
 	"\n" +
@@ -3035,7 +3041,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\tITU2_70CM\x10#\x12\r\n" +
 	"\tITU3_70CM\x10$\x12\x0e\n" +
 	"\n" +
-	"ITU2_125CM\x10%\"\x9b\x02\n" +
+	"ITU2_125CM\x10%\"\xad\x02\n" +
 	"\vModemPreset\x12\r\n" +
 	"\tLONG_FAST\x10\x00\x12\x11\n" +
 	"\tLONG_SLOW\x10\x01\x1a\x02\b\x01\x12\x16\n" +
@@ -3056,7 +3062,8 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\vNARROW_FAST\x10\f\x12\x0f\n" +
 	"\vNARROW_SLOW\x10\r\x12\r\n" +
 	"\tTINY_FAST\x10\x0e\x12\r\n" +
-	"\tTINY_SLOW\x10\x0f\":\n" +
+	"\tTINY_SLOW\x10\x0f\x12\x10\n" +
+	"\fMEDIUM_TURBO\x10\x10\":\n" +
 	"\fFEM_LNA_Mode\x12\f\n" +
 	"\bDISABLED\x10\x00\x12\v\n" +
 	"\aENABLED\x10\x01\x12\x0f\n" +

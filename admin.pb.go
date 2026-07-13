@@ -191,6 +191,8 @@ const (
 	AdminMessage_TRAFFICMANAGEMENT_CONFIG AdminMessage_ModuleConfigType = 14
 	// TAK module config
 	AdminMessage_TAK_CONFIG AdminMessage_ModuleConfigType = 15
+	// Mesh Beacon module config
+	AdminMessage_MESHBEACON_CONFIG AdminMessage_ModuleConfigType = 16
 )
 
 // Enum value maps for AdminMessage_ModuleConfigType.
@@ -212,6 +214,7 @@ var (
 		13: "STATUSMESSAGE_CONFIG",
 		14: "TRAFFICMANAGEMENT_CONFIG",
 		15: "TAK_CONFIG",
+		16: "MESHBEACON_CONFIG",
 	}
 	AdminMessage_ModuleConfigType_value = map[string]int32{
 		"MQTT_CONFIG":              0,
@@ -230,6 +233,7 @@ var (
 		"STATUSMESSAGE_CONFIG":     13,
 		"TRAFFICMANAGEMENT_CONFIG": 14,
 		"TAK_CONFIG":               15,
+		"MESHBEACON_CONFIG":        16,
 	}
 )
 
@@ -2377,7 +2381,7 @@ var File_meshtastic_admin_proto protoreflect.FileDescriptor
 const file_meshtastic_admin_proto_rawDesc = "" +
 	"\n" +
 	"\x16meshtastic/admin.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\xf9$\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\"meshtastic/connection_status.proto\x1a\x1ameshtastic/device_ui.proto\x1a\x15meshtastic/mesh.proto\x1a\x1emeshtastic/module_config.proto\"\x90%\n" +
 	"\fAdminMessage\x12'\n" +
 	"\x0fsession_passkey\x18e \x01(\fR\x0esessionPasskey\x120\n" +
 	"\x13get_channel_request\x18\x01 \x01(\rH\x00R\x11getChannelRequest\x12G\n" +
@@ -2465,7 +2469,7 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x10BLUETOOTH_CONFIG\x10\x06\x12\x13\n" +
 	"\x0fSECURITY_CONFIG\x10\a\x12\x15\n" +
 	"\x11SESSIONKEY_CONFIG\x10\b\x12\x13\n" +
-	"\x0fDEVICEUI_CONFIG\x10\t\"\x83\x03\n" +
+	"\x0fDEVICEUI_CONFIG\x10\t\"\x9a\x03\n" +
 	"\x10ModuleConfigType\x12\x0f\n" +
 	"\vMQTT_CONFIG\x10\x00\x12\x11\n" +
 	"\rSERIAL_CONFIG\x10\x01\x12\x13\n" +
@@ -2484,7 +2488,8 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x14STATUSMESSAGE_CONFIG\x10\r\x12\x1c\n" +
 	"\x18TRAFFICMANAGEMENT_CONFIG\x10\x0e\x12\x0e\n" +
 	"\n" +
-	"TAK_CONFIG\x10\x0f\"#\n" +
+	"TAK_CONFIG\x10\x0f\x12\x15\n" +
+	"\x11MESHBEACON_CONFIG\x10\x10\"#\n" +
 	"\x0eBackupLocation\x12\t\n" +
 	"\x05FLASH\x10\x00\x12\x06\n" +
 	"\x02SD\x10\x01B\x11\n" +

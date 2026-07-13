@@ -450,6 +450,68 @@ func (ModuleConfig_CannedMessageConfig_InputEventChar) EnumDescriptor() ([]byte,
 	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 13, 0}
 }
 
+// Boolean options for the beacon module, packed into the `flags` bitfield below.
+// OR the FLAG_* values together; a flag is on when its bit is set.
+type ModuleConfig_MeshBeaconConfig_Flags int32
+
+const (
+	// No options enabled.
+	ModuleConfig_MeshBeaconConfig_FLAG_NONE ModuleConfig_MeshBeaconConfig_Flags = 0
+	// Enable receiving MESH_BEACON_APP packets from other nodes.
+	// The text portion is delivered to the local message inbox.
+	// Offered channel/preset are stored for the client app to act on.
+	ModuleConfig_MeshBeaconConfig_FLAG_LISTEN_ENABLED ModuleConfig_MeshBeaconConfig_Flags = 1
+	// Enable periodically broadcasting MESH_BEACON_APP packets from this node.
+	ModuleConfig_MeshBeaconConfig_FLAG_BROADCAST_ENABLED ModuleConfig_MeshBeaconConfig_Flags = 2
+	// When both text and offer content are present, split the beacon into a separate
+	// MESH_BEACON_APP (offer only) and TEXT_MESSAGE_APP (text only) packet, so firmware
+	// that only decodes TEXT_MESSAGE_APP still receives the human-readable text.
+	ModuleConfig_MeshBeaconConfig_FLAG_LEGACY_SPLIT ModuleConfig_MeshBeaconConfig_Flags = 4
+)
+
+// Enum value maps for ModuleConfig_MeshBeaconConfig_Flags.
+var (
+	ModuleConfig_MeshBeaconConfig_Flags_name = map[int32]string{
+		0: "FLAG_NONE",
+		1: "FLAG_LISTEN_ENABLED",
+		2: "FLAG_BROADCAST_ENABLED",
+		4: "FLAG_LEGACY_SPLIT",
+	}
+	ModuleConfig_MeshBeaconConfig_Flags_value = map[string]int32{
+		"FLAG_NONE":              0,
+		"FLAG_LISTEN_ENABLED":    1,
+		"FLAG_BROADCAST_ENABLED": 2,
+		"FLAG_LEGACY_SPLIT":      4,
+	}
+)
+
+func (x ModuleConfig_MeshBeaconConfig_Flags) Enum() *ModuleConfig_MeshBeaconConfig_Flags {
+	p := new(ModuleConfig_MeshBeaconConfig_Flags)
+	*p = x
+	return p
+}
+
+func (x ModuleConfig_MeshBeaconConfig_Flags) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ModuleConfig_MeshBeaconConfig_Flags) Descriptor() protoreflect.EnumDescriptor {
+	return file_meshtastic_module_config_proto_enumTypes[6].Descriptor()
+}
+
+func (ModuleConfig_MeshBeaconConfig_Flags) Type() protoreflect.EnumType {
+	return &file_meshtastic_module_config_proto_enumTypes[6]
+}
+
+func (x ModuleConfig_MeshBeaconConfig_Flags) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ModuleConfig_MeshBeaconConfig_Flags.Descriptor instead.
+func (ModuleConfig_MeshBeaconConfig_Flags) EnumDescriptor() ([]byte, []int) {
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 16, 0}
+}
+
 // Module Config
 type ModuleConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -473,6 +535,7 @@ type ModuleConfig struct {
 	//	*ModuleConfig_Statusmessage
 	//	*ModuleConfig_TrafficManagement
 	//	*ModuleConfig_Tak
+	//	*ModuleConfig_MeshBeacon
 	PayloadVariant isModuleConfig_PayloadVariant `protobuf_oneof:"payload_variant"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -659,6 +722,15 @@ func (x *ModuleConfig) GetTak() *ModuleConfig_TAKConfig {
 	return nil
 }
 
+func (x *ModuleConfig) GetMeshBeacon() *ModuleConfig_MeshBeaconConfig {
+	if x != nil {
+		if x, ok := x.PayloadVariant.(*ModuleConfig_MeshBeacon); ok {
+			return x.MeshBeacon
+		}
+	}
+	return nil
+}
+
 type isModuleConfig_PayloadVariant interface {
 	isModuleConfig_PayloadVariant()
 }
@@ -743,6 +815,11 @@ type ModuleConfig_Tak struct {
 	Tak *ModuleConfig_TAKConfig `protobuf:"bytes,16,opt,name=tak,proto3,oneof"`
 }
 
+type ModuleConfig_MeshBeacon struct {
+	// MeshBeacon module config
+	MeshBeacon *ModuleConfig_MeshBeaconConfig `protobuf:"bytes,17,opt,name=mesh_beacon,json=meshBeacon,proto3,oneof"`
+}
+
 func (*ModuleConfig_Mqtt) isModuleConfig_PayloadVariant() {}
 
 func (*ModuleConfig_Serial) isModuleConfig_PayloadVariant() {}
@@ -774,6 +851,8 @@ func (*ModuleConfig_Statusmessage) isModuleConfig_PayloadVariant() {}
 func (*ModuleConfig_TrafficManagement) isModuleConfig_PayloadVariant() {}
 
 func (*ModuleConfig_Tak) isModuleConfig_PayloadVariant() {}
+
+func (*ModuleConfig_MeshBeacon) isModuleConfig_PayloadVariant() {}
 
 // A GPIO pin definition for remote hardware module
 type RemoteHardwarePin struct {
@@ -2473,6 +2552,159 @@ func (x *ModuleConfig_StatusMessageConfig) GetNodeStatus() string {
 	return ""
 }
 
+// MeshBeacon module config
+type ModuleConfig_MeshBeaconConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Bitwise-OR of Flags values (listen / broadcast / legacy-split toggles).
+	Flags uint32 `protobuf:"varint,1,opt,name=flags,proto3" json:"flags,omitempty"`
+	// Optional: node ID to send beacon messages AS.
+	// When set, the `from` field of outgoing beacon packets is set to this node ID,
+	// making beacons appear to originate from that node.
+	// When unset (0), beacons are sent as the local node.
+	// A remote admin can only set this field to their own node ID.
+	BroadcastSendAsNode uint32 `protobuf:"varint,3,opt,name=broadcast_send_as_node,json=broadcastSendAsNode,proto3" json:"broadcast_send_as_node,omitempty"`
+	// Message to include in each beacon broadcast. Max 100 bytes enforced by firmware.
+	BroadcastMessage string `protobuf:"bytes,4,opt,name=broadcast_message,json=broadcastMessage,proto3" json:"broadcast_message,omitempty"`
+	// Optional channel (name + PSK) to advertise in the MeshBeacon offer_channel field.
+	BroadcastOfferChannel *ChannelSettings `protobuf:"bytes,5,opt,name=broadcast_offer_channel,json=broadcastOfferChannel,proto3" json:"broadcast_offer_channel,omitempty"`
+	// Optional region to advertise in the MeshBeacon offer_region field.
+	BroadcastOfferRegion Config_LoRaConfig_RegionCode `protobuf:"varint,6,opt,name=broadcast_offer_region,json=broadcastOfferRegion,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"broadcast_offer_region,omitempty"`
+	// Optional modem preset to advertise in the MeshBeacon offer_preset field.
+	BroadcastOfferPreset *Config_LoRaConfig_ModemPreset `protobuf:"varint,7,opt,name=broadcast_offer_preset,json=broadcastOfferPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset,oneof" json:"broadcast_offer_preset,omitempty"`
+	// Single-target TX channel: channel settings (name + PSK) to send beacons on.
+	// If unset, beacons go out on the primary channel. Used only when broadcast_targets is empty.
+	// NOTE: the single-target path embeds the ChannelSettings inline here, whereas a
+	// broadcast_targets entry references a channel-table slot by channel_index instead — see
+	// BroadcastTarget. The two paths are equal, first-class options; only this representation differs.
+	BroadcastOnChannel *ChannelSettings `protobuf:"bytes,8,opt,name=broadcast_on_channel,json=broadcastOnChannel,proto3" json:"broadcast_on_channel,omitempty"`
+	// Region to use when sending beacons on broadcast_on_preset.
+	BroadcastOnRegion Config_LoRaConfig_RegionCode `protobuf:"varint,9,opt,name=broadcast_on_region,json=broadcastOnRegion,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"broadcast_on_region,omitempty"`
+	// Modem preset to use when sending beacons.
+	// If different from current config, the radio is temporarily switched for TX.
+	BroadcastOnPreset *Config_LoRaConfig_ModemPreset `protobuf:"varint,10,opt,name=broadcast_on_preset,json=broadcastOnPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset,oneof" json:"broadcast_on_preset,omitempty"`
+	// How often to broadcast, in seconds. Min 3600 (1 h), default 3600.
+	BroadcastIntervalSecs uint32 `protobuf:"varint,11,opt,name=broadcast_interval_secs,json=broadcastIntervalSecs,proto3" json:"broadcast_interval_secs,omitempty"`
+	// Multi-target broadcast list.
+	// When non-empty the broadcaster transmits one beacon copy per entry in sequence,
+	// each temporarily switching the radio to that entry's preset/region/channel.
+	// When empty, the broadcaster uses the scalar broadcast_on_preset / broadcast_on_region /
+	// broadcast_on_channel fields instead (the single-target path).
+	// Single- and multi-target are equal, first-class options — neither is preferred or
+	// deprecated. They differ only in how the TX channel is named: broadcast_on_channel embeds a
+	// ChannelSettings inline, while a target references an existing channel-table slot by
+	// channel_index (see BroadcastTarget).
+	BroadcastTargets []*ModuleConfig_MeshBeaconConfig_BroadcastTarget `protobuf:"bytes,13,rep,name=broadcast_targets,json=broadcastTargets,proto3" json:"broadcast_targets,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) Reset() {
+	*x = ModuleConfig_MeshBeaconConfig{}
+	mi := &file_meshtastic_module_config_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModuleConfig_MeshBeaconConfig) ProtoMessage() {}
+
+func (x *ModuleConfig_MeshBeaconConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_module_config_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModuleConfig_MeshBeaconConfig.ProtoReflect.Descriptor instead.
+func (*ModuleConfig_MeshBeaconConfig) Descriptor() ([]byte, []int) {
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 16}
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetFlags() uint32 {
+	if x != nil {
+		return x.Flags
+	}
+	return 0
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastSendAsNode() uint32 {
+	if x != nil {
+		return x.BroadcastSendAsNode
+	}
+	return 0
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastMessage() string {
+	if x != nil {
+		return x.BroadcastMessage
+	}
+	return ""
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOfferChannel() *ChannelSettings {
+	if x != nil {
+		return x.BroadcastOfferChannel
+	}
+	return nil
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOfferRegion() Config_LoRaConfig_RegionCode {
+	if x != nil {
+		return x.BroadcastOfferRegion
+	}
+	return Config_LoRaConfig_UNSET
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOfferPreset() Config_LoRaConfig_ModemPreset {
+	if x != nil && x.BroadcastOfferPreset != nil {
+		return *x.BroadcastOfferPreset
+	}
+	return Config_LoRaConfig_LONG_FAST
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOnChannel() *ChannelSettings {
+	if x != nil {
+		return x.BroadcastOnChannel
+	}
+	return nil
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOnRegion() Config_LoRaConfig_RegionCode {
+	if x != nil {
+		return x.BroadcastOnRegion
+	}
+	return Config_LoRaConfig_UNSET
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOnPreset() Config_LoRaConfig_ModemPreset {
+	if x != nil && x.BroadcastOnPreset != nil {
+		return *x.BroadcastOnPreset
+	}
+	return Config_LoRaConfig_LONG_FAST
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastIntervalSecs() uint32 {
+	if x != nil {
+		return x.BroadcastIntervalSecs
+	}
+	return 0
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastTargets() []*ModuleConfig_MeshBeaconConfig_BroadcastTarget {
+	if x != nil {
+		return x.BroadcastTargets
+	}
+	return nil
+}
+
 // TAK team/role configuration
 type ModuleConfig_TAKConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -2488,7 +2720,7 @@ type ModuleConfig_TAKConfig struct {
 
 func (x *ModuleConfig_TAKConfig) Reset() {
 	*x = ModuleConfig_TAKConfig{}
-	mi := &file_meshtastic_module_config_proto_msgTypes[18]
+	mi := &file_meshtastic_module_config_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2500,7 +2732,7 @@ func (x *ModuleConfig_TAKConfig) String() string {
 func (*ModuleConfig_TAKConfig) ProtoMessage() {}
 
 func (x *ModuleConfig_TAKConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_module_config_proto_msgTypes[18]
+	mi := &file_meshtastic_module_config_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2513,7 +2745,7 @@ func (x *ModuleConfig_TAKConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ModuleConfig_TAKConfig.ProtoReflect.Descriptor instead.
 func (*ModuleConfig_TAKConfig) Descriptor() ([]byte, []int) {
-	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 16}
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 17}
 }
 
 func (x *ModuleConfig_TAKConfig) GetTeam() Team {
@@ -2530,12 +2762,81 @@ func (x *ModuleConfig_TAKConfig) GetRole() MemberRole {
 	return MemberRole_Unspecifed
 }
 
+// One entry in the multi-target broadcast list.
+// The broadcaster transmits one beacon copy per entry, each on its own radio settings.
+type ModuleConfig_MeshBeaconConfig_BroadcastTarget struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Modem preset to use for this target.
+	// Falls back to the running config preset if unset.
+	Preset *Config_LoRaConfig_ModemPreset `protobuf:"varint,1,opt,name=preset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset,oneof" json:"preset,omitempty"`
+	// Region to use for this target. UNSET means use the running config region.
+	Region Config_LoRaConfig_RegionCode `protobuf:"varint,2,opt,name=region,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"region,omitempty"`
+	// Index into the device's channel table (0..MAX_NUM_CHANNELS-1) of the channel to
+	// transmit this target's beacon on. The referenced channel must already be configured
+	// on the node (its key is needed to encrypt). If unset, the default channel for the
+	// preset is used.
+	ChannelIndex  *uint32 `protobuf:"varint,4,opt,name=channel_index,json=channelIndex,proto3,oneof" json:"channel_index,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ModuleConfig_MeshBeaconConfig_BroadcastTarget) Reset() {
+	*x = ModuleConfig_MeshBeaconConfig_BroadcastTarget{}
+	mi := &file_meshtastic_module_config_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModuleConfig_MeshBeaconConfig_BroadcastTarget) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModuleConfig_MeshBeaconConfig_BroadcastTarget) ProtoMessage() {}
+
+func (x *ModuleConfig_MeshBeaconConfig_BroadcastTarget) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_module_config_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModuleConfig_MeshBeaconConfig_BroadcastTarget.ProtoReflect.Descriptor instead.
+func (*ModuleConfig_MeshBeaconConfig_BroadcastTarget) Descriptor() ([]byte, []int) {
+	return file_meshtastic_module_config_proto_rawDescGZIP(), []int{0, 16, 0}
+}
+
+func (x *ModuleConfig_MeshBeaconConfig_BroadcastTarget) GetPreset() Config_LoRaConfig_ModemPreset {
+	if x != nil && x.Preset != nil {
+		return *x.Preset
+	}
+	return Config_LoRaConfig_LONG_FAST
+}
+
+func (x *ModuleConfig_MeshBeaconConfig_BroadcastTarget) GetRegion() Config_LoRaConfig_RegionCode {
+	if x != nil {
+		return x.Region
+	}
+	return Config_LoRaConfig_UNSET
+}
+
+func (x *ModuleConfig_MeshBeaconConfig_BroadcastTarget) GetChannelIndex() uint32 {
+	if x != nil && x.ChannelIndex != nil {
+		return *x.ChannelIndex
+	}
+	return 0
+}
+
 var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\x1a\x15meshtastic/atak.proto\"\xce;\n" +
+	"meshtastic\x1a\x15meshtastic/atak.proto\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\"\xe9E\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2556,7 +2857,9 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"paxcounter\x12T\n" +
 	"\rstatusmessage\x18\x0e \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigH\x00R\rstatusmessage\x12a\n" +
 	"\x12traffic_management\x18\x0f \x01(\v20.meshtastic.ModuleConfig.TrafficManagementConfigH\x00R\x11trafficManagement\x126\n" +
-	"\x03tak\x18\x10 \x01(\v2\".meshtastic.ModuleConfig.TAKConfigH\x00R\x03tak\x1a\xca\x03\n" +
+	"\x03tak\x18\x10 \x01(\v2\".meshtastic.ModuleConfig.TAKConfigH\x00R\x03tak\x12L\n" +
+	"\vmesh_beacon\x18\x11 \x01(\v2).meshtastic.ModuleConfig.MeshBeaconConfigH\x00R\n" +
+	"meshBeacon\x1a\xca\x03\n" +
 	"\n" +
 	"MQTTConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x18\n" +
@@ -2760,7 +3063,33 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x04blue\x18\x05 \x01(\rR\x04blue\x1a6\n" +
 	"\x13StatusMessageConfig\x12\x1f\n" +
 	"\vnode_status\x18\x01 \x01(\tR\n" +
-	"nodeStatus\x1a]\n" +
+	"nodeStatus\x1a\xca\t\n" +
+	"\x10MeshBeaconConfig\x12\x14\n" +
+	"\x05flags\x18\x01 \x01(\rR\x05flags\x123\n" +
+	"\x16broadcast_send_as_node\x18\x03 \x01(\rR\x13broadcastSendAsNode\x12+\n" +
+	"\x11broadcast_message\x18\x04 \x01(\tR\x10broadcastMessage\x12S\n" +
+	"\x17broadcast_offer_channel\x18\x05 \x01(\v2\x1b.meshtastic.ChannelSettingsR\x15broadcastOfferChannel\x12^\n" +
+	"\x16broadcast_offer_region\x18\x06 \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\x14broadcastOfferRegion\x12d\n" +
+	"\x16broadcast_offer_preset\x18\a \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x00R\x14broadcastOfferPreset\x88\x01\x01\x12M\n" +
+	"\x14broadcast_on_channel\x18\b \x01(\v2\x1b.meshtastic.ChannelSettingsR\x12broadcastOnChannel\x12X\n" +
+	"\x13broadcast_on_region\x18\t \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\x11broadcastOnRegion\x12^\n" +
+	"\x13broadcast_on_preset\x18\n" +
+	" \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x01R\x11broadcastOnPreset\x88\x01\x01\x126\n" +
+	"\x17broadcast_interval_secs\x18\v \x01(\rR\x15broadcastIntervalSecs\x12f\n" +
+	"\x11broadcast_targets\x18\r \x03(\v29.meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTargetR\x10broadcastTargets\x1a\xe2\x01\n" +
+	"\x0fBroadcastTarget\x12F\n" +
+	"\x06preset\x18\x01 \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x00R\x06preset\x88\x01\x01\x12@\n" +
+	"\x06region\x18\x02 \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\x06region\x12(\n" +
+	"\rchannel_index\x18\x04 \x01(\rH\x01R\fchannelIndex\x88\x01\x01B\t\n" +
+	"\a_presetB\x10\n" +
+	"\x0e_channel_index\"b\n" +
+	"\x05Flags\x12\r\n" +
+	"\tFLAG_NONE\x10\x00\x12\x17\n" +
+	"\x13FLAG_LISTEN_ENABLED\x10\x01\x12\x1a\n" +
+	"\x16FLAG_BROADCAST_ENABLED\x10\x02\x12\x15\n" +
+	"\x11FLAG_LEGACY_SPLIT\x10\x04B\x19\n" +
+	"\x17_broadcast_offer_presetB\x16\n" +
+	"\x14_broadcast_on_preset\x1a]\n" +
 	"\tTAKConfig\x12$\n" +
 	"\x04team\x18\x01 \x01(\x0e2\x10.meshtastic.TeamR\x04team\x12*\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x16.meshtastic.MemberRoleR\x04roleB\x11\n" +
@@ -2787,71 +3116,87 @@ func file_meshtastic_module_config_proto_rawDescGZIP() []byte {
 	return file_meshtastic_module_config_proto_rawDescData
 }
 
-var file_meshtastic_module_config_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_meshtastic_module_config_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_meshtastic_module_config_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
+var file_meshtastic_module_config_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_meshtastic_module_config_proto_goTypes = []any{
-	(RemoteHardwarePinType)(0),                           // 0: meshtastic.RemoteHardwarePinType
-	(ModuleConfig_DetectionSensorConfig_TriggerType)(0),  // 1: meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
-	(ModuleConfig_AudioConfig_Audio_Baud)(0),             // 2: meshtastic.ModuleConfig.AudioConfig.Audio_Baud
-	(ModuleConfig_SerialConfig_Serial_Baud)(0),           // 3: meshtastic.ModuleConfig.SerialConfig.Serial_Baud
-	(ModuleConfig_SerialConfig_Serial_Mode)(0),           // 4: meshtastic.ModuleConfig.SerialConfig.Serial_Mode
-	(ModuleConfig_CannedMessageConfig_InputEventChar)(0), // 5: meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	(*ModuleConfig)(nil),                                 // 6: meshtastic.ModuleConfig
-	(*RemoteHardwarePin)(nil),                            // 7: meshtastic.RemoteHardwarePin
-	(*ModuleConfig_MQTTConfig)(nil),                      // 8: meshtastic.ModuleConfig.MQTTConfig
-	(*ModuleConfig_MapReportSettings)(nil),               // 9: meshtastic.ModuleConfig.MapReportSettings
-	(*ModuleConfig_RemoteHardwareConfig)(nil),            // 10: meshtastic.ModuleConfig.RemoteHardwareConfig
-	(*ModuleConfig_NeighborInfoConfig)(nil),              // 11: meshtastic.ModuleConfig.NeighborInfoConfig
-	(*ModuleConfig_DetectionSensorConfig)(nil),           // 12: meshtastic.ModuleConfig.DetectionSensorConfig
-	(*ModuleConfig_AudioConfig)(nil),                     // 13: meshtastic.ModuleConfig.AudioConfig
-	(*ModuleConfig_PaxcounterConfig)(nil),                // 14: meshtastic.ModuleConfig.PaxcounterConfig
-	(*ModuleConfig_TrafficManagementConfig)(nil),         // 15: meshtastic.ModuleConfig.TrafficManagementConfig
-	(*ModuleConfig_SerialConfig)(nil),                    // 16: meshtastic.ModuleConfig.SerialConfig
-	(*ModuleConfig_ExternalNotificationConfig)(nil),      // 17: meshtastic.ModuleConfig.ExternalNotificationConfig
-	(*ModuleConfig_StoreForwardConfig)(nil),              // 18: meshtastic.ModuleConfig.StoreForwardConfig
-	(*ModuleConfig_RangeTestConfig)(nil),                 // 19: meshtastic.ModuleConfig.RangeTestConfig
-	(*ModuleConfig_TelemetryConfig)(nil),                 // 20: meshtastic.ModuleConfig.TelemetryConfig
-	(*ModuleConfig_CannedMessageConfig)(nil),             // 21: meshtastic.ModuleConfig.CannedMessageConfig
-	(*ModuleConfig_AmbientLightingConfig)(nil),           // 22: meshtastic.ModuleConfig.AmbientLightingConfig
-	(*ModuleConfig_StatusMessageConfig)(nil),             // 23: meshtastic.ModuleConfig.StatusMessageConfig
-	(*ModuleConfig_TAKConfig)(nil),                       // 24: meshtastic.ModuleConfig.TAKConfig
-	(Team)(0),                                            // 25: meshtastic.Team
-	(MemberRole)(0),                                      // 26: meshtastic.MemberRole
+	(RemoteHardwarePinType)(0),                            // 0: meshtastic.RemoteHardwarePinType
+	(ModuleConfig_DetectionSensorConfig_TriggerType)(0),   // 1: meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
+	(ModuleConfig_AudioConfig_Audio_Baud)(0),              // 2: meshtastic.ModuleConfig.AudioConfig.Audio_Baud
+	(ModuleConfig_SerialConfig_Serial_Baud)(0),            // 3: meshtastic.ModuleConfig.SerialConfig.Serial_Baud
+	(ModuleConfig_SerialConfig_Serial_Mode)(0),            // 4: meshtastic.ModuleConfig.SerialConfig.Serial_Mode
+	(ModuleConfig_CannedMessageConfig_InputEventChar)(0),  // 5: meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	(ModuleConfig_MeshBeaconConfig_Flags)(0),              // 6: meshtastic.ModuleConfig.MeshBeaconConfig.Flags
+	(*ModuleConfig)(nil),                                  // 7: meshtastic.ModuleConfig
+	(*RemoteHardwarePin)(nil),                             // 8: meshtastic.RemoteHardwarePin
+	(*ModuleConfig_MQTTConfig)(nil),                       // 9: meshtastic.ModuleConfig.MQTTConfig
+	(*ModuleConfig_MapReportSettings)(nil),                // 10: meshtastic.ModuleConfig.MapReportSettings
+	(*ModuleConfig_RemoteHardwareConfig)(nil),             // 11: meshtastic.ModuleConfig.RemoteHardwareConfig
+	(*ModuleConfig_NeighborInfoConfig)(nil),               // 12: meshtastic.ModuleConfig.NeighborInfoConfig
+	(*ModuleConfig_DetectionSensorConfig)(nil),            // 13: meshtastic.ModuleConfig.DetectionSensorConfig
+	(*ModuleConfig_AudioConfig)(nil),                      // 14: meshtastic.ModuleConfig.AudioConfig
+	(*ModuleConfig_PaxcounterConfig)(nil),                 // 15: meshtastic.ModuleConfig.PaxcounterConfig
+	(*ModuleConfig_TrafficManagementConfig)(nil),          // 16: meshtastic.ModuleConfig.TrafficManagementConfig
+	(*ModuleConfig_SerialConfig)(nil),                     // 17: meshtastic.ModuleConfig.SerialConfig
+	(*ModuleConfig_ExternalNotificationConfig)(nil),       // 18: meshtastic.ModuleConfig.ExternalNotificationConfig
+	(*ModuleConfig_StoreForwardConfig)(nil),               // 19: meshtastic.ModuleConfig.StoreForwardConfig
+	(*ModuleConfig_RangeTestConfig)(nil),                  // 20: meshtastic.ModuleConfig.RangeTestConfig
+	(*ModuleConfig_TelemetryConfig)(nil),                  // 21: meshtastic.ModuleConfig.TelemetryConfig
+	(*ModuleConfig_CannedMessageConfig)(nil),              // 22: meshtastic.ModuleConfig.CannedMessageConfig
+	(*ModuleConfig_AmbientLightingConfig)(nil),            // 23: meshtastic.ModuleConfig.AmbientLightingConfig
+	(*ModuleConfig_StatusMessageConfig)(nil),              // 24: meshtastic.ModuleConfig.StatusMessageConfig
+	(*ModuleConfig_MeshBeaconConfig)(nil),                 // 25: meshtastic.ModuleConfig.MeshBeaconConfig
+	(*ModuleConfig_TAKConfig)(nil),                        // 26: meshtastic.ModuleConfig.TAKConfig
+	(*ModuleConfig_MeshBeaconConfig_BroadcastTarget)(nil), // 27: meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget
+	(*ChannelSettings)(nil),                               // 28: meshtastic.ChannelSettings
+	(Config_LoRaConfig_RegionCode)(0),                     // 29: meshtastic.Config.LoRaConfig.RegionCode
+	(Config_LoRaConfig_ModemPreset)(0),                    // 30: meshtastic.Config.LoRaConfig.ModemPreset
+	(Team)(0),                                             // 31: meshtastic.Team
+	(MemberRole)(0),                                       // 32: meshtastic.MemberRole
 }
 var file_meshtastic_module_config_proto_depIdxs = []int32{
-	8,  // 0: meshtastic.ModuleConfig.mqtt:type_name -> meshtastic.ModuleConfig.MQTTConfig
-	16, // 1: meshtastic.ModuleConfig.serial:type_name -> meshtastic.ModuleConfig.SerialConfig
-	17, // 2: meshtastic.ModuleConfig.external_notification:type_name -> meshtastic.ModuleConfig.ExternalNotificationConfig
-	18, // 3: meshtastic.ModuleConfig.store_forward:type_name -> meshtastic.ModuleConfig.StoreForwardConfig
-	19, // 4: meshtastic.ModuleConfig.range_test:type_name -> meshtastic.ModuleConfig.RangeTestConfig
-	20, // 5: meshtastic.ModuleConfig.telemetry:type_name -> meshtastic.ModuleConfig.TelemetryConfig
-	21, // 6: meshtastic.ModuleConfig.canned_message:type_name -> meshtastic.ModuleConfig.CannedMessageConfig
-	13, // 7: meshtastic.ModuleConfig.audio:type_name -> meshtastic.ModuleConfig.AudioConfig
-	10, // 8: meshtastic.ModuleConfig.remote_hardware:type_name -> meshtastic.ModuleConfig.RemoteHardwareConfig
-	11, // 9: meshtastic.ModuleConfig.neighbor_info:type_name -> meshtastic.ModuleConfig.NeighborInfoConfig
-	22, // 10: meshtastic.ModuleConfig.ambient_lighting:type_name -> meshtastic.ModuleConfig.AmbientLightingConfig
-	12, // 11: meshtastic.ModuleConfig.detection_sensor:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig
-	14, // 12: meshtastic.ModuleConfig.paxcounter:type_name -> meshtastic.ModuleConfig.PaxcounterConfig
-	23, // 13: meshtastic.ModuleConfig.statusmessage:type_name -> meshtastic.ModuleConfig.StatusMessageConfig
-	15, // 14: meshtastic.ModuleConfig.traffic_management:type_name -> meshtastic.ModuleConfig.TrafficManagementConfig
-	24, // 15: meshtastic.ModuleConfig.tak:type_name -> meshtastic.ModuleConfig.TAKConfig
-	0,  // 16: meshtastic.RemoteHardwarePin.type:type_name -> meshtastic.RemoteHardwarePinType
-	9,  // 17: meshtastic.ModuleConfig.MQTTConfig.map_report_settings:type_name -> meshtastic.ModuleConfig.MapReportSettings
-	7,  // 18: meshtastic.ModuleConfig.RemoteHardwareConfig.available_pins:type_name -> meshtastic.RemoteHardwarePin
-	1,  // 19: meshtastic.ModuleConfig.DetectionSensorConfig.detection_trigger_type:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
-	2,  // 20: meshtastic.ModuleConfig.AudioConfig.bitrate:type_name -> meshtastic.ModuleConfig.AudioConfig.Audio_Baud
-	3,  // 21: meshtastic.ModuleConfig.SerialConfig.baud:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Baud
-	4,  // 22: meshtastic.ModuleConfig.SerialConfig.mode:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Mode
-	5,  // 23: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_cw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	5,  // 24: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_ccw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	5,  // 25: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_press:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
-	25, // 26: meshtastic.ModuleConfig.TAKConfig.team:type_name -> meshtastic.Team
-	26, // 27: meshtastic.ModuleConfig.TAKConfig.role:type_name -> meshtastic.MemberRole
-	28, // [28:28] is the sub-list for method output_type
-	28, // [28:28] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	9,  // 0: meshtastic.ModuleConfig.mqtt:type_name -> meshtastic.ModuleConfig.MQTTConfig
+	17, // 1: meshtastic.ModuleConfig.serial:type_name -> meshtastic.ModuleConfig.SerialConfig
+	18, // 2: meshtastic.ModuleConfig.external_notification:type_name -> meshtastic.ModuleConfig.ExternalNotificationConfig
+	19, // 3: meshtastic.ModuleConfig.store_forward:type_name -> meshtastic.ModuleConfig.StoreForwardConfig
+	20, // 4: meshtastic.ModuleConfig.range_test:type_name -> meshtastic.ModuleConfig.RangeTestConfig
+	21, // 5: meshtastic.ModuleConfig.telemetry:type_name -> meshtastic.ModuleConfig.TelemetryConfig
+	22, // 6: meshtastic.ModuleConfig.canned_message:type_name -> meshtastic.ModuleConfig.CannedMessageConfig
+	14, // 7: meshtastic.ModuleConfig.audio:type_name -> meshtastic.ModuleConfig.AudioConfig
+	11, // 8: meshtastic.ModuleConfig.remote_hardware:type_name -> meshtastic.ModuleConfig.RemoteHardwareConfig
+	12, // 9: meshtastic.ModuleConfig.neighbor_info:type_name -> meshtastic.ModuleConfig.NeighborInfoConfig
+	23, // 10: meshtastic.ModuleConfig.ambient_lighting:type_name -> meshtastic.ModuleConfig.AmbientLightingConfig
+	13, // 11: meshtastic.ModuleConfig.detection_sensor:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig
+	15, // 12: meshtastic.ModuleConfig.paxcounter:type_name -> meshtastic.ModuleConfig.PaxcounterConfig
+	24, // 13: meshtastic.ModuleConfig.statusmessage:type_name -> meshtastic.ModuleConfig.StatusMessageConfig
+	16, // 14: meshtastic.ModuleConfig.traffic_management:type_name -> meshtastic.ModuleConfig.TrafficManagementConfig
+	26, // 15: meshtastic.ModuleConfig.tak:type_name -> meshtastic.ModuleConfig.TAKConfig
+	25, // 16: meshtastic.ModuleConfig.mesh_beacon:type_name -> meshtastic.ModuleConfig.MeshBeaconConfig
+	0,  // 17: meshtastic.RemoteHardwarePin.type:type_name -> meshtastic.RemoteHardwarePinType
+	10, // 18: meshtastic.ModuleConfig.MQTTConfig.map_report_settings:type_name -> meshtastic.ModuleConfig.MapReportSettings
+	8,  // 19: meshtastic.ModuleConfig.RemoteHardwareConfig.available_pins:type_name -> meshtastic.RemoteHardwarePin
+	1,  // 20: meshtastic.ModuleConfig.DetectionSensorConfig.detection_trigger_type:type_name -> meshtastic.ModuleConfig.DetectionSensorConfig.TriggerType
+	2,  // 21: meshtastic.ModuleConfig.AudioConfig.bitrate:type_name -> meshtastic.ModuleConfig.AudioConfig.Audio_Baud
+	3,  // 22: meshtastic.ModuleConfig.SerialConfig.baud:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Baud
+	4,  // 23: meshtastic.ModuleConfig.SerialConfig.mode:type_name -> meshtastic.ModuleConfig.SerialConfig.Serial_Mode
+	5,  // 24: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_cw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	5,  // 25: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_ccw:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	5,  // 26: meshtastic.ModuleConfig.CannedMessageConfig.inputbroker_event_press:type_name -> meshtastic.ModuleConfig.CannedMessageConfig.InputEventChar
+	28, // 27: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_offer_channel:type_name -> meshtastic.ChannelSettings
+	29, // 28: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_offer_region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
+	30, // 29: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_offer_preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
+	28, // 30: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_on_channel:type_name -> meshtastic.ChannelSettings
+	29, // 31: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_on_region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
+	30, // 32: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_on_preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
+	27, // 33: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_targets:type_name -> meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget
+	31, // 34: meshtastic.ModuleConfig.TAKConfig.team:type_name -> meshtastic.Team
+	32, // 35: meshtastic.ModuleConfig.TAKConfig.role:type_name -> meshtastic.MemberRole
+	30, // 36: meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget.preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
+	29, // 37: meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget.region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
+	38, // [38:38] is the sub-list for method output_type
+	38, // [38:38] is the sub-list for method input_type
+	38, // [38:38] is the sub-list for extension type_name
+	38, // [38:38] is the sub-list for extension extendee
+	0,  // [0:38] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_module_config_proto_init() }
@@ -2860,6 +3205,8 @@ func file_meshtastic_module_config_proto_init() {
 		return
 	}
 	file_meshtastic_atak_proto_init()
+	file_meshtastic_channel_proto_init()
+	file_meshtastic_config_proto_init()
 	file_meshtastic_module_config_proto_msgTypes[0].OneofWrappers = []any{
 		(*ModuleConfig_Mqtt)(nil),
 		(*ModuleConfig_Serial)(nil),
@@ -2877,14 +3224,17 @@ func file_meshtastic_module_config_proto_init() {
 		(*ModuleConfig_Statusmessage)(nil),
 		(*ModuleConfig_TrafficManagement)(nil),
 		(*ModuleConfig_Tak)(nil),
+		(*ModuleConfig_MeshBeacon)(nil),
 	}
+	file_meshtastic_module_config_proto_msgTypes[18].OneofWrappers = []any{}
+	file_meshtastic_module_config_proto_msgTypes[20].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_module_config_proto_rawDesc), len(file_meshtastic_module_config_proto_rawDesc)),
-			NumEnums:      6,
-			NumMessages:   19,
+			NumEnums:      7,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -111,6 +111,11 @@ const (
 	// This module allows setting an extra string of status for a node.
 	// Broadcasts on change and on a timer, possibly once a day.
 	PortNum_NODE_STATUS_APP PortNum = 36
+	// Beacon module broadcast packets.
+	// ENCODING: protobuf
+	// Periodically broadcast by nodes in beacon mode; received by nodes with MeshBeaconConfig.FLAG_LISTEN_ENABLED.
+	// Carries a text message plus optional channel/preset offers for client apps.
+	PortNum_MESH_BEACON_APP PortNum = 37
 	// Provides a hardware serial interface to send and receive from the Meshtastic network.
 	// Connect to the RX/TX pins of a device with 38400 8N1. Packets received from the Meshtastic
 	// network is forwarded to the RX pin while sending a packet to TX will go out to the Mesh network.
@@ -169,6 +174,10 @@ const (
 	// Portnum for payloads from the official Meshtastic ATAK plugin using
 	// TAKPacketV2 with zstd dictionary compression.
 	PortNum_ATAK_PLUGIN_V2 PortNum = 78
+	// signed firmware updates over lora.
+	//
+	// ENCODING: binary (ota-common transport frames)
+	PortNum_LORA_OTA_APP PortNum = 79
 	// GroupAlarm integration
 	// Used for transporting GroupAlarm-related messages between Meshtastic nodes
 	// and companion applications/services.
@@ -206,6 +215,7 @@ var (
 		34:  "PAXCOUNTER_APP",
 		35:  "STORE_FORWARD_PLUSPLUS_APP",
 		36:  "NODE_STATUS_APP",
+		37:  "MESH_BEACON_APP",
 		64:  "SERIAL_APP",
 		65:  "STORE_FORWARD_APP",
 		66:  "RANGE_TEST_APP",
@@ -221,6 +231,7 @@ var (
 		76:  "RETICULUM_TUNNEL_APP",
 		77:  "CAYENNE_APP",
 		78:  "ATAK_PLUGIN_V2",
+		79:  "LORA_OTA_APP",
 		112: "GROUPALARM_APP",
 		256: "PRIVATE_APP",
 		257: "ATAK_FORWARDER",
@@ -246,6 +257,7 @@ var (
 		"PAXCOUNTER_APP":              34,
 		"STORE_FORWARD_PLUSPLUS_APP":  35,
 		"NODE_STATUS_APP":             36,
+		"MESH_BEACON_APP":             37,
 		"SERIAL_APP":                  64,
 		"STORE_FORWARD_APP":           65,
 		"RANGE_TEST_APP":              66,
@@ -261,6 +273,7 @@ var (
 		"RETICULUM_TUNNEL_APP":        76,
 		"CAYENNE_APP":                 77,
 		"ATAK_PLUGIN_V2":              78,
+		"LORA_OTA_APP":                79,
 		"GROUPALARM_APP":              112,
 		"PRIVATE_APP":                 256,
 		"ATAK_FORWARDER":              257,
@@ -300,7 +313,7 @@ var File_meshtastic_portnums_proto protoreflect.FileDescriptor
 const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\n" +
 	"\x19meshtastic/portnums.proto\x12\n" +
-	"meshtastic*\xfd\x05\n" +
+	"meshtastic*\xa4\x06\n" +
 	"\aPortNum\x12\x0f\n" +
 	"\vUNKNOWN_APP\x10\x00\x12\x14\n" +
 	"\x10TEXT_MESSAGE_APP\x10\x01\x12\x17\n" +
@@ -321,7 +334,8 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\rIP_TUNNEL_APP\x10!\x12\x12\n" +
 	"\x0ePAXCOUNTER_APP\x10\"\x12\x1e\n" +
 	"\x1aSTORE_FORWARD_PLUSPLUS_APP\x10#\x12\x13\n" +
-	"\x0fNODE_STATUS_APP\x10$\x12\x0e\n" +
+	"\x0fNODE_STATUS_APP\x10$\x12\x13\n" +
+	"\x0fMESH_BEACON_APP\x10%\x12\x0e\n" +
 	"\n" +
 	"SERIAL_APP\x10@\x12\x15\n" +
 	"\x11STORE_FORWARD_APP\x10A\x12\x12\n" +
@@ -337,7 +351,8 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\x0eLORAWAN_BRIDGE\x10K\x12\x18\n" +
 	"\x14RETICULUM_TUNNEL_APP\x10L\x12\x0f\n" +
 	"\vCAYENNE_APP\x10M\x12\x12\n" +
-	"\x0eATAK_PLUGIN_V2\x10N\x12\x12\n" +
+	"\x0eATAK_PLUGIN_V2\x10N\x12\x10\n" +
+	"\fLORA_OTA_APP\x10O\x12\x12\n" +
 	"\x0eGROUPALARM_APP\x10p\x12\x10\n" +
 	"\vPRIVATE_APP\x10\x80\x02\x12\x13\n" +
 	"\x0eATAK_FORWARDER\x10\x81\x02\x12\b\n" +

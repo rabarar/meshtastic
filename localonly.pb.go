@@ -174,6 +174,8 @@ type LocalModuleConfig struct {
 	TrafficManagement *ModuleConfig_TrafficManagementConfig `protobuf:"bytes,16,opt,name=traffic_management,json=trafficManagement,proto3" json:"traffic_management,omitempty"`
 	// TAK Config
 	Tak *ModuleConfig_TAKConfig `protobuf:"bytes,17,opt,name=tak,proto3" json:"tak,omitempty"`
+	// MeshBeacon Config
+	MeshBeacon *ModuleConfig_MeshBeaconConfig `protobuf:"bytes,18,opt,name=mesh_beacon,json=meshBeacon,proto3" json:"mesh_beacon,omitempty"`
 	// A version integer used to invalidate old save files when we make
 	// incompatible changes This integer is set at build time and is private to
 	// NodeDB.cpp in the device code.
@@ -324,6 +326,13 @@ func (x *LocalModuleConfig) GetTak() *ModuleConfig_TAKConfig {
 	return nil
 }
 
+func (x *LocalModuleConfig) GetMeshBeacon() *ModuleConfig_MeshBeaconConfig {
+	if x != nil {
+		return x.MeshBeacon
+	}
+	return nil
+}
+
 func (x *LocalModuleConfig) GetVersion() uint32 {
 	if x != nil {
 		return x.Version
@@ -346,7 +355,7 @@ const file_meshtastic_localonly_proto_rawDesc = "" +
 	"\x04lora\x18\x06 \x01(\v2\x1d.meshtastic.Config.LoRaConfigR\x04lora\x12@\n" +
 	"\tbluetooth\x18\a \x01(\v2\".meshtastic.Config.BluetoothConfigR\tbluetooth\x12\x18\n" +
 	"\aversion\x18\b \x01(\rR\aversion\x12=\n" +
-	"\bsecurity\x18\t \x01(\v2!.meshtastic.Config.SecurityConfigR\bsecurity\"\x99\n" +
+	"\bsecurity\x18\t \x01(\v2!.meshtastic.Config.SecurityConfigR\bsecurity\"\xe5\n" +
 	"\n" +
 	"\x11LocalModuleConfig\x127\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigR\x04mqtt\x12=\n" +
@@ -368,7 +377,9 @@ const file_meshtastic_localonly_proto_rawDesc = "" +
 	"paxcounter\x12R\n" +
 	"\rstatusmessage\x18\x0f \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigR\rstatusmessage\x12_\n" +
 	"\x12traffic_management\x18\x10 \x01(\v20.meshtastic.ModuleConfig.TrafficManagementConfigR\x11trafficManagement\x124\n" +
-	"\x03tak\x18\x11 \x01(\v2\".meshtastic.ModuleConfig.TAKConfigR\x03tak\x12\x18\n" +
+	"\x03tak\x18\x11 \x01(\v2\".meshtastic.ModuleConfig.TAKConfigR\x03tak\x12J\n" +
+	"\vmesh_beacon\x18\x12 \x01(\v2).meshtastic.ModuleConfig.MeshBeaconConfigR\n" +
+	"meshBeacon\x12\x18\n" +
 	"\aversion\x18\b \x01(\rR\aversionBf\n" +
 	"\x14org.meshtastic.protoB\x0fLocalOnlyProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
@@ -412,6 +423,7 @@ var file_meshtastic_localonly_proto_goTypes = []any{
 	(*ModuleConfig_StatusMessageConfig)(nil),        // 23: meshtastic.ModuleConfig.StatusMessageConfig
 	(*ModuleConfig_TrafficManagementConfig)(nil),    // 24: meshtastic.ModuleConfig.TrafficManagementConfig
 	(*ModuleConfig_TAKConfig)(nil),                  // 25: meshtastic.ModuleConfig.TAKConfig
+	(*ModuleConfig_MeshBeaconConfig)(nil),           // 26: meshtastic.ModuleConfig.MeshBeaconConfig
 }
 var file_meshtastic_localonly_proto_depIdxs = []int32{
 	2,  // 0: meshtastic.LocalConfig.device:type_name -> meshtastic.Config.DeviceConfig
@@ -438,11 +450,12 @@ var file_meshtastic_localonly_proto_depIdxs = []int32{
 	23, // 21: meshtastic.LocalModuleConfig.statusmessage:type_name -> meshtastic.ModuleConfig.StatusMessageConfig
 	24, // 22: meshtastic.LocalModuleConfig.traffic_management:type_name -> meshtastic.ModuleConfig.TrafficManagementConfig
 	25, // 23: meshtastic.LocalModuleConfig.tak:type_name -> meshtastic.ModuleConfig.TAKConfig
-	24, // [24:24] is the sub-list for method output_type
-	24, // [24:24] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	26, // 24: meshtastic.LocalModuleConfig.mesh_beacon:type_name -> meshtastic.ModuleConfig.MeshBeaconConfig
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_localonly_proto_init() }
