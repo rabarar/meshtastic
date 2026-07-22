@@ -862,6 +862,8 @@ const (
 	// Ukraine 433mhz
 	Config_LoRaConfig_UA_433 Config_LoRaConfig_RegionCode = 14
 	// Ukraine 868mhz
+	//
+	// Deprecated: Marked as deprecated in meshtastic/config.proto.
 	Config_LoRaConfig_UA_868 Config_LoRaConfig_RegionCode = 15
 	// Malaysia 433mhz
 	Config_LoRaConfig_MY_433 Config_LoRaConfig_RegionCode = 16
@@ -1266,6 +1268,62 @@ func (x Config_BluetoothConfig_PairingMode) Number() protoreflect.EnumNumber {
 // Deprecated: Use Config_BluetoothConfig_PairingMode.Descriptor instead.
 func (Config_BluetoothConfig_PairingMode) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_config_proto_rawDescGZIP(), []int{0, 6, 0}
+}
+
+// Controls how the device authenticates remotely received mesh packets.
+type Config_SecurityConfig_PacketSignaturePolicy int32
+
+const (
+	// Accept unsigned packets for maximum compatibility while still rejecting malformed or invalid signatures.
+	// This is the default to avoid legacy nodes dropping signed packets during rebroadcast.
+	Config_SecurityConfig_PACKET_SIGNATURE_POLICY_COMPATIBLE Config_SecurityConfig_PacketSignaturePolicy = 0
+	// Prefer authenticated packets while retaining compatibility with unsigned packets from nodes not known to sign.
+	// Rejects unsigned, signable broadcasts from nodes that have previously signed.
+	Config_SecurityConfig_PACKET_SIGNATURE_POLICY_BALANCED Config_SecurityConfig_PacketSignaturePolicy = 1
+	// Accept only packets authenticated by a verified XEdDSA signature or successful PKI decryption.
+	// Unsigned, malformed, invalid, or unverifiable packets are ignored.
+	Config_SecurityConfig_PACKET_SIGNATURE_POLICY_STRICT Config_SecurityConfig_PacketSignaturePolicy = 2
+)
+
+// Enum value maps for Config_SecurityConfig_PacketSignaturePolicy.
+var (
+	Config_SecurityConfig_PacketSignaturePolicy_name = map[int32]string{
+		0: "PACKET_SIGNATURE_POLICY_COMPATIBLE",
+		1: "PACKET_SIGNATURE_POLICY_BALANCED",
+		2: "PACKET_SIGNATURE_POLICY_STRICT",
+	}
+	Config_SecurityConfig_PacketSignaturePolicy_value = map[string]int32{
+		"PACKET_SIGNATURE_POLICY_COMPATIBLE": 0,
+		"PACKET_SIGNATURE_POLICY_BALANCED":   1,
+		"PACKET_SIGNATURE_POLICY_STRICT":     2,
+	}
+)
+
+func (x Config_SecurityConfig_PacketSignaturePolicy) Enum() *Config_SecurityConfig_PacketSignaturePolicy {
+	p := new(Config_SecurityConfig_PacketSignaturePolicy)
+	*p = x
+	return p
+}
+
+func (x Config_SecurityConfig_PacketSignaturePolicy) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Config_SecurityConfig_PacketSignaturePolicy) Descriptor() protoreflect.EnumDescriptor {
+	return file_meshtastic_config_proto_enumTypes[16].Descriptor()
+}
+
+func (Config_SecurityConfig_PacketSignaturePolicy) Type() protoreflect.EnumType {
+	return &file_meshtastic_config_proto_enumTypes[16]
+}
+
+func (x Config_SecurityConfig_PacketSignaturePolicy) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Config_SecurityConfig_PacketSignaturePolicy.Descriptor instead.
+func (Config_SecurityConfig_PacketSignaturePolicy) EnumDescriptor() ([]byte, []int) {
+	return file_meshtastic_config_proto_rawDescGZIP(), []int{0, 7, 0}
 }
 
 type Config struct {
@@ -2569,8 +2627,10 @@ type Config_SecurityConfig struct {
 	DebugLogApiEnabled bool `protobuf:"varint,6,opt,name=debug_log_api_enabled,json=debugLogApiEnabled,proto3" json:"debug_log_api_enabled,omitempty"`
 	// Allow incoming device control over the insecure legacy admin channel.
 	AdminChannelEnabled bool `protobuf:"varint,8,opt,name=admin_channel_enabled,json=adminChannelEnabled,proto3" json:"admin_channel_enabled,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Determines the packet signature policy applied to remotely received mesh packets.
+	PacketSignaturePolicy Config_SecurityConfig_PacketSignaturePolicy `protobuf:"varint,9,opt,name=packet_signature_policy,json=packetSignaturePolicy,proto3,enum=meshtastic.Config_SecurityConfig_PacketSignaturePolicy" json:"packet_signature_policy,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *Config_SecurityConfig) Reset() {
@@ -2650,6 +2710,13 @@ func (x *Config_SecurityConfig) GetAdminChannelEnabled() bool {
 		return x.AdminChannelEnabled
 	}
 	return false
+}
+
+func (x *Config_SecurityConfig) GetPacketSignaturePolicy() Config_SecurityConfig_PacketSignaturePolicy {
+	if x != nil {
+		return x.PacketSignaturePolicy
+	}
+	return Config_SecurityConfig_PACKET_SIGNATURE_POLICY_COMPATIBLE
 }
 
 // Blank config request, strictly for getting the session key
@@ -2766,7 +2833,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x848\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x85:\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2952,7 +3019,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x12DEGREES_0_INVERTED\x10\x04\x12\x17\n" +
 	"\x13DEGREES_90_INVERTED\x10\x05\x12\x18\n" +
 	"\x14DEGREES_180_INVERTED\x10\x06\x12\x18\n" +
-	"\x14DEGREES_270_INVERTED\x10\a\x1a\x9c\r\n" +
+	"\x14DEGREES_270_INVERTED\x10\a\x1a\xa0\r\n" +
 	"\n" +
 	"LoRaConfig\x12\x1d\n" +
 	"\n" +
@@ -2981,7 +3048,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\x12L\n" +
 	"\ffem_lna_mode\x18j \x01(\x0e2*.meshtastic.Config.LoRaConfig.FEM_LNA_ModeR\n" +
 	"femLnaMode\x12&\n" +
-	"\x0fserial_hal_only\x18k \x01(\bR\rserialHalOnly\"\xc4\x03\n" +
+	"\x0fserial_hal_only\x18k \x01(\bR\rserialHalOnly\"\xc8\x03\n" +
 	"\n" +
 	"RegionCode\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\x06\n" +
@@ -3003,9 +3070,8 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"\x02TH\x10\f\x12\v\n" +
 	"\aLORA_24\x10\r\x12\n" +
 	"\n" +
-	"\x06UA_433\x10\x0e\x12\n" +
-	"\n" +
-	"\x06UA_868\x10\x0f\x12\n" +
+	"\x06UA_433\x10\x0e\x12\x0e\n" +
+	"\x06UA_868\x10\x0f\x1a\x02\b\x01\x12\n" +
 	"\n" +
 	"\x06MY_433\x10\x10\x12\n" +
 	"\n" +
@@ -3077,7 +3143,7 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"RANDOM_PIN\x10\x00\x12\r\n" +
 	"\tFIXED_PIN\x10\x01\x12\n" +
 	"\n" +
-	"\x06NO_PIN\x10\x02\x1a\x9a\x02\n" +
+	"\x06NO_PIN\x10\x02\x1a\x97\x04\n" +
 	"\x0eSecurityConfig\x12\x1d\n" +
 	"\n" +
 	"public_key\x18\x01 \x01(\fR\tpublicKey\x12\x1f\n" +
@@ -3088,7 +3154,12 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"is_managed\x18\x04 \x01(\bR\tisManaged\x12%\n" +
 	"\x0eserial_enabled\x18\x05 \x01(\bR\rserialEnabled\x121\n" +
 	"\x15debug_log_api_enabled\x18\x06 \x01(\bR\x12debugLogApiEnabled\x122\n" +
-	"\x15admin_channel_enabled\x18\b \x01(\bR\x13adminChannelEnabled\x1a\x12\n" +
+	"\x15admin_channel_enabled\x18\b \x01(\bR\x13adminChannelEnabled\x12o\n" +
+	"\x17packet_signature_policy\x18\t \x01(\x0e27.meshtastic.Config.SecurityConfig.PacketSignaturePolicyR\x15packetSignaturePolicy\"\x89\x01\n" +
+	"\x15PacketSignaturePolicy\x12&\n" +
+	"\"PACKET_SIGNATURE_POLICY_COMPATIBLE\x10\x00\x12$\n" +
+	" PACKET_SIGNATURE_POLICY_BALANCED\x10\x01\x12\"\n" +
+	"\x1ePACKET_SIGNATURE_POLICY_STRICT\x10\x02\x1a\x12\n" +
 	"\x10SessionkeyConfigB\x11\n" +
 	"\x0fpayload_variantBc\n" +
 	"\x14org.meshtastic.protoB\fConfigProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
@@ -3105,7 +3176,7 @@ func file_meshtastic_config_proto_rawDescGZIP() []byte {
 	return file_meshtastic_config_proto_rawDescData
 }
 
-var file_meshtastic_config_proto_enumTypes = make([]protoimpl.EnumInfo, 16)
+var file_meshtastic_config_proto_enumTypes = make([]protoimpl.EnumInfo, 17)
 var file_meshtastic_config_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_meshtastic_config_proto_goTypes = []any{
 	(Config_DeviceConfig_Role)(0),                           // 0: meshtastic.Config.DeviceConfig.Role
@@ -3124,36 +3195,37 @@ var file_meshtastic_config_proto_goTypes = []any{
 	(Config_LoRaConfig_ModemPreset)(0),                      // 13: meshtastic.Config.LoRaConfig.ModemPreset
 	(Config_LoRaConfig_FEM_LNA_Mode)(0),                     // 14: meshtastic.Config.LoRaConfig.FEM_LNA_Mode
 	(Config_BluetoothConfig_PairingMode)(0),                 // 15: meshtastic.Config.BluetoothConfig.PairingMode
-	(*Config)(nil),                                          // 16: meshtastic.Config
-	(*Config_DeviceConfig)(nil),                             // 17: meshtastic.Config.DeviceConfig
-	(*Config_PositionConfig)(nil),                           // 18: meshtastic.Config.PositionConfig
-	(*Config_PowerConfig)(nil),                              // 19: meshtastic.Config.PowerConfig
-	(*Config_NetworkConfig)(nil),                            // 20: meshtastic.Config.NetworkConfig
-	(*Config_DisplayConfig)(nil),                            // 21: meshtastic.Config.DisplayConfig
-	(*Config_LoRaConfig)(nil),                               // 22: meshtastic.Config.LoRaConfig
-	(*Config_BluetoothConfig)(nil),                          // 23: meshtastic.Config.BluetoothConfig
-	(*Config_SecurityConfig)(nil),                           // 24: meshtastic.Config.SecurityConfig
-	(*Config_SessionkeyConfig)(nil),                         // 25: meshtastic.Config.SessionkeyConfig
-	(*Config_NetworkConfig_IpV4Config)(nil),                 // 26: meshtastic.Config.NetworkConfig.IpV4Config
-	(*DeviceUIConfig)(nil),                                  // 27: meshtastic.DeviceUIConfig
+	(Config_SecurityConfig_PacketSignaturePolicy)(0),        // 16: meshtastic.Config.SecurityConfig.PacketSignaturePolicy
+	(*Config)(nil),                          // 17: meshtastic.Config
+	(*Config_DeviceConfig)(nil),             // 18: meshtastic.Config.DeviceConfig
+	(*Config_PositionConfig)(nil),           // 19: meshtastic.Config.PositionConfig
+	(*Config_PowerConfig)(nil),              // 20: meshtastic.Config.PowerConfig
+	(*Config_NetworkConfig)(nil),            // 21: meshtastic.Config.NetworkConfig
+	(*Config_DisplayConfig)(nil),            // 22: meshtastic.Config.DisplayConfig
+	(*Config_LoRaConfig)(nil),               // 23: meshtastic.Config.LoRaConfig
+	(*Config_BluetoothConfig)(nil),          // 24: meshtastic.Config.BluetoothConfig
+	(*Config_SecurityConfig)(nil),           // 25: meshtastic.Config.SecurityConfig
+	(*Config_SessionkeyConfig)(nil),         // 26: meshtastic.Config.SessionkeyConfig
+	(*Config_NetworkConfig_IpV4Config)(nil), // 27: meshtastic.Config.NetworkConfig.IpV4Config
+	(*DeviceUIConfig)(nil),                  // 28: meshtastic.DeviceUIConfig
 }
 var file_meshtastic_config_proto_depIdxs = []int32{
-	17, // 0: meshtastic.Config.device:type_name -> meshtastic.Config.DeviceConfig
-	18, // 1: meshtastic.Config.position:type_name -> meshtastic.Config.PositionConfig
-	19, // 2: meshtastic.Config.power:type_name -> meshtastic.Config.PowerConfig
-	20, // 3: meshtastic.Config.network:type_name -> meshtastic.Config.NetworkConfig
-	21, // 4: meshtastic.Config.display:type_name -> meshtastic.Config.DisplayConfig
-	22, // 5: meshtastic.Config.lora:type_name -> meshtastic.Config.LoRaConfig
-	23, // 6: meshtastic.Config.bluetooth:type_name -> meshtastic.Config.BluetoothConfig
-	24, // 7: meshtastic.Config.security:type_name -> meshtastic.Config.SecurityConfig
-	25, // 8: meshtastic.Config.sessionkey:type_name -> meshtastic.Config.SessionkeyConfig
-	27, // 9: meshtastic.Config.device_ui:type_name -> meshtastic.DeviceUIConfig
+	18, // 0: meshtastic.Config.device:type_name -> meshtastic.Config.DeviceConfig
+	19, // 1: meshtastic.Config.position:type_name -> meshtastic.Config.PositionConfig
+	20, // 2: meshtastic.Config.power:type_name -> meshtastic.Config.PowerConfig
+	21, // 3: meshtastic.Config.network:type_name -> meshtastic.Config.NetworkConfig
+	22, // 4: meshtastic.Config.display:type_name -> meshtastic.Config.DisplayConfig
+	23, // 5: meshtastic.Config.lora:type_name -> meshtastic.Config.LoRaConfig
+	24, // 6: meshtastic.Config.bluetooth:type_name -> meshtastic.Config.BluetoothConfig
+	25, // 7: meshtastic.Config.security:type_name -> meshtastic.Config.SecurityConfig
+	26, // 8: meshtastic.Config.sessionkey:type_name -> meshtastic.Config.SessionkeyConfig
+	28, // 9: meshtastic.Config.device_ui:type_name -> meshtastic.DeviceUIConfig
 	0,  // 10: meshtastic.Config.DeviceConfig.role:type_name -> meshtastic.Config.DeviceConfig.Role
 	1,  // 11: meshtastic.Config.DeviceConfig.rebroadcast_mode:type_name -> meshtastic.Config.DeviceConfig.RebroadcastMode
 	2,  // 12: meshtastic.Config.DeviceConfig.buzzer_mode:type_name -> meshtastic.Config.DeviceConfig.BuzzerMode
 	4,  // 13: meshtastic.Config.PositionConfig.gps_mode:type_name -> meshtastic.Config.PositionConfig.GpsMode
 	5,  // 14: meshtastic.Config.NetworkConfig.address_mode:type_name -> meshtastic.Config.NetworkConfig.AddressMode
-	26, // 15: meshtastic.Config.NetworkConfig.ipv4_config:type_name -> meshtastic.Config.NetworkConfig.IpV4Config
+	27, // 15: meshtastic.Config.NetworkConfig.ipv4_config:type_name -> meshtastic.Config.NetworkConfig.IpV4Config
 	7,  // 16: meshtastic.Config.DisplayConfig.gps_format:type_name -> meshtastic.Config.DisplayConfig.DeprecatedGpsCoordinateFormat
 	8,  // 17: meshtastic.Config.DisplayConfig.units:type_name -> meshtastic.Config.DisplayConfig.DisplayUnits
 	9,  // 18: meshtastic.Config.DisplayConfig.oled:type_name -> meshtastic.Config.DisplayConfig.OledType
@@ -3163,11 +3235,12 @@ var file_meshtastic_config_proto_depIdxs = []int32{
 	12, // 22: meshtastic.Config.LoRaConfig.region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
 	14, // 23: meshtastic.Config.LoRaConfig.fem_lna_mode:type_name -> meshtastic.Config.LoRaConfig.FEM_LNA_Mode
 	15, // 24: meshtastic.Config.BluetoothConfig.mode:type_name -> meshtastic.Config.BluetoothConfig.PairingMode
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	16, // 25: meshtastic.Config.SecurityConfig.packet_signature_policy:type_name -> meshtastic.Config.SecurityConfig.PacketSignaturePolicy
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_config_proto_init() }
@@ -3193,7 +3266,7 @@ func file_meshtastic_config_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_config_proto_rawDesc), len(file_meshtastic_config_proto_rawDesc)),
-			NumEnums:      16,
+			NumEnums:      17,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,

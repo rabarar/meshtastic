@@ -202,6 +202,59 @@ func (FileStatus) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_interdevice_proto_rawDescGZIP(), []int{2}
 }
 
+// What to do with the SD card of the co-processor
+type SdCommand int32
+
+const (
+	SdCommand_SD_COMMAND_UNSPECIFIED SdCommand = 0
+	SdCommand_SD_MOUNT               SdCommand = 1 // mount a card that is in the slot, also after an eject
+	SdCommand_SD_EJECT               SdCommand = 2 // flush and release the card so it can be pulled safely
+	SdCommand_SD_FORMAT              SdCommand = 3 // wipe the card and put a fresh FAT on it, then mount it
+)
+
+// Enum value maps for SdCommand.
+var (
+	SdCommand_name = map[int32]string{
+		0: "SD_COMMAND_UNSPECIFIED",
+		1: "SD_MOUNT",
+		2: "SD_EJECT",
+		3: "SD_FORMAT",
+	}
+	SdCommand_value = map[string]int32{
+		"SD_COMMAND_UNSPECIFIED": 0,
+		"SD_MOUNT":               1,
+		"SD_EJECT":               2,
+		"SD_FORMAT":              3,
+	}
+)
+
+func (x SdCommand) Enum() *SdCommand {
+	p := new(SdCommand)
+	*p = x
+	return p
+}
+
+func (x SdCommand) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SdCommand) Descriptor() protoreflect.EnumDescriptor {
+	return file_meshtastic_interdevice_proto_enumTypes[3].Descriptor()
+}
+
+func (SdCommand) Type() protoreflect.EnumType {
+	return &file_meshtastic_interdevice_proto_enumTypes[3]
+}
+
+func (x SdCommand) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SdCommand.Descriptor instead.
+func (SdCommand) EnumDescriptor() ([]byte, []int) {
+	return file_meshtastic_interdevice_proto_rawDescGZIP(), []int{3}
+}
+
 type SdCardInfo_CardType int32
 
 const (
@@ -244,11 +297,11 @@ func (x SdCardInfo_CardType) String() string {
 }
 
 func (SdCardInfo_CardType) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_interdevice_proto_enumTypes[3].Descriptor()
+	return file_meshtastic_interdevice_proto_enumTypes[4].Descriptor()
 }
 
 func (SdCardInfo_CardType) Type() protoreflect.EnumType {
-	return &file_meshtastic_interdevice_proto_enumTypes[3]
+	return &file_meshtastic_interdevice_proto_enumTypes[4]
 }
 
 func (x SdCardInfo_CardType) Number() protoreflect.EnumNumber {
@@ -296,11 +349,11 @@ func (x SdCardInfo_FatType) String() string {
 }
 
 func (SdCardInfo_FatType) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_interdevice_proto_enumTypes[4].Descriptor()
+	return file_meshtastic_interdevice_proto_enumTypes[5].Descriptor()
 }
 
 func (SdCardInfo_FatType) Type() protoreflect.EnumType {
-	return &file_meshtastic_interdevice_proto_enumTypes[4]
+	return &file_meshtastic_interdevice_proto_enumTypes[5]
 }
 
 func (x SdCardInfo_FatType) Number() protoreflect.EnumNumber {
@@ -353,11 +406,11 @@ func (x I2CResult_Status) String() string {
 }
 
 func (I2CResult_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_meshtastic_interdevice_proto_enumTypes[5].Descriptor()
+	return file_meshtastic_interdevice_proto_enumTypes[6].Descriptor()
 }
 
 func (I2CResult_Status) Type() protoreflect.EnumType {
-	return &file_meshtastic_interdevice_proto_enumTypes[5]
+	return &file_meshtastic_interdevice_proto_enumTypes[6]
 }
 
 func (x I2CResult_Status) Number() protoreflect.EnumNumber {
@@ -647,7 +700,10 @@ type SdCardInfo struct {
 	// The co-processor is mounting a card right now, so whether one is
 	// present is not decided yet. Ask again rather than concluding the slot
 	// is empty.
-	Busy          bool `protobuf:"varint,8,opt,name=busy,proto3" json:"busy,omitempty"`
+	Busy bool `protobuf:"varint,8,opt,name=busy,proto3" json:"busy,omitempty"`
+	// A card answers in the slot but carries no filesystem that could be
+	// mounted (present is false then). Formatting it makes it usable.
+	Unformatted   bool `protobuf:"varint,9,opt,name=unformatted,proto3" json:"unformatted,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -738,6 +794,13 @@ func (x *SdCardInfo) GetBusy() bool {
 	return false
 }
 
+func (x *SdCardInfo) GetUnformatted() bool {
+	if x != nil {
+		return x.Unformatted
+	}
+	return false
+}
+
 // Result of an I2CTransaction
 type I2CResult struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -814,6 +877,7 @@ type InterdeviceMessage struct {
 	//	*InterdeviceMessage_Ping
 	//	*InterdeviceMessage_Pong
 	//	*InterdeviceMessage_Nack
+	//	*InterdeviceMessage_SdCommand
 	Data          isInterdeviceMessage_Data `protobuf_oneof:"data"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -980,6 +1044,15 @@ func (x *InterdeviceMessage) GetNack() bool {
 	return false
 }
 
+func (x *InterdeviceMessage) GetSdCommand() SdCommand {
+	if x != nil {
+		if x, ok := x.Data.(*InterdeviceMessage_SdCommand); ok {
+			return x.SdCommand
+		}
+	}
+	return SdCommand_SD_COMMAND_UNSPECIFIED
+}
+
 type isInterdeviceMessage_Data interface {
 	isInterdeviceMessage_Data()
 }
@@ -1045,6 +1118,14 @@ type InterdeviceMessage_Nack struct {
 	Nack bool `protobuf:"varint,13,opt,name=nack,proto3,oneof"`
 }
 
+type InterdeviceMessage_SdCommand struct {
+	// Request: mount the card, or release it so it can be pulled safely. The
+	// co-processor answers with sd_info. Without an eject the card is mounted
+	// on its own and kept mounted; after one it stays released until a mount
+	// is asked for.
+	SdCommand SdCommand `protobuf:"varint,14,opt,name=sd_command,json=sdCommand,proto3,enum=meshtastic.SdCommand,oneof"`
+}
+
 func (*InterdeviceMessage_Nmea) isInterdeviceMessage_Data() {}
 
 func (*InterdeviceMessage_Beep) isInterdeviceMessage_Data() {}
@@ -1070,6 +1151,8 @@ func (*InterdeviceMessage_Ping) isInterdeviceMessage_Data() {}
 func (*InterdeviceMessage_Pong) isInterdeviceMessage_Data() {}
 
 func (*InterdeviceMessage_Nack) isInterdeviceMessage_Data() {}
+
+func (*InterdeviceMessage_SdCommand) isInterdeviceMessage_Data() {}
 
 var File_meshtastic_interdevice_proto protoreflect.FileDescriptor
 
@@ -1098,7 +1181,7 @@ const file_meshtastic_interdevice_proto_rawDesc = "" +
 	"\aaddress\x18\x01 \x01(\rR\aaddress\x12\x1d\n" +
 	"\n" +
 	"write_data\x18\x02 \x01(\fR\twriteData\x12\x19\n" +
-	"\bread_len\x18\x03 \x01(\rR\areadLen\"\xb9\x03\n" +
+	"\bread_len\x18\x03 \x01(\rR\areadLen\"\xdb\x03\n" +
 	"\n" +
 	"SdCardInfo\x12\x18\n" +
 	"\apresent\x18\x01 \x01(\bR\apresent\x12<\n" +
@@ -1111,7 +1194,8 @@ const file_meshtastic_interdevice_proto_rawDesc = "" +
 	"free_bytes\x18\x06 \x01(\x04R\tfreeBytes\x12\x1f\n" +
 	"\vstats_valid\x18\a \x01(\bR\n" +
 	"statsValid\x12\x12\n" +
-	"\x04busy\x18\b \x01(\bR\x04busy\"K\n" +
+	"\x04busy\x18\b \x01(\bR\x04busy\x12 \n" +
+	"\vunformatted\x18\t \x01(\bR\vunformatted\"K\n" +
 	"\bCardType\x12\b\n" +
 	"\x04NONE\x10\x00\x12\a\n" +
 	"\x03MMC\x10\x01\x12\x06\n" +
@@ -1132,7 +1216,7 @@ const file_meshtastic_interdevice_proto_rawDesc = "" +
 	"\x02OK\x10\x01\x12\x10\n" +
 	"\fNACK_ADDRESS\x10\x02\x12\r\n" +
 	"\tNACK_DATA\x10\x03\x12\t\n" +
-	"\x05ERROR\x10\x04\"\x83\x05\n" +
+	"\x05ERROR\x10\x04\"\xbb\x05\n" +
 	"\x12InterdeviceMessage\x12\x0e\n" +
 	"\x02id\x18\x0f \x01(\rR\x02id\x12\x14\n" +
 	"\x04nmea\x18\x01 \x01(\tH\x00R\x04nmea\x12\x14\n" +
@@ -1149,7 +1233,9 @@ const file_meshtastic_interdevice_proto_rawDesc = "" +
 	" \x01(\v2\x16.meshtastic.SdCardInfoH\x00R\x06sdInfo\x124\n" +
 	"\x04ping\x18\v \x01(\x0e2\x1e.meshtastic.InterdeviceVersionH\x00R\x04ping\x124\n" +
 	"\x04pong\x18\f \x01(\x0e2\x1e.meshtastic.InterdeviceVersionH\x00R\x04pong\x12\x14\n" +
-	"\x04nack\x18\r \x01(\bH\x00R\x04nackB\x06\n" +
+	"\x04nack\x18\r \x01(\bH\x00R\x04nack\x126\n" +
+	"\n" +
+	"sd_command\x18\x0e \x01(\x0e2\x15.meshtastic.SdCommandH\x00R\tsdCommandB\x06\n" +
 	"\x04data*Z\n" +
 	"\x12InterdeviceVersion\x12#\n" +
 	"\x1fINTERDEVICE_VERSION_UNSPECIFIED\x10\x00\x12\x1f\n" +
@@ -1169,7 +1255,12 @@ const file_meshtastic_interdevice_proto_rawDesc = "" +
 	"\x0eFILE_NOT_FOUND\x10\x04\x12\x18\n" +
 	"\x14FILE_OFFSET_CONFLICT\x10\x05\x12\x11\n" +
 	"\rFILE_IO_ERROR\x10\x06\x12\x13\n" +
-	"\x0fFILE_NOT_A_FILE\x10\aBh\n" +
+	"\x0fFILE_NOT_A_FILE\x10\a*R\n" +
+	"\tSdCommand\x12\x1a\n" +
+	"\x16SD_COMMAND_UNSPECIFIED\x10\x00\x12\f\n" +
+	"\bSD_MOUNT\x10\x01\x12\f\n" +
+	"\bSD_EJECT\x10\x02\x12\r\n" +
+	"\tSD_FORMAT\x10\x03Bh\n" +
 	"\x14org.meshtastic.protoB\x11InterdeviceProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
@@ -1184,41 +1275,43 @@ func file_meshtastic_interdevice_proto_rawDescGZIP() []byte {
 	return file_meshtastic_interdevice_proto_rawDescData
 }
 
-var file_meshtastic_interdevice_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_meshtastic_interdevice_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
 var file_meshtastic_interdevice_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_meshtastic_interdevice_proto_goTypes = []any{
 	(InterdeviceVersion)(0),    // 0: meshtastic.InterdeviceVersion
 	(FileOperation)(0),         // 1: meshtastic.FileOperation
 	(FileStatus)(0),            // 2: meshtastic.FileStatus
-	(SdCardInfo_CardType)(0),   // 3: meshtastic.SdCardInfo.CardType
-	(SdCardInfo_FatType)(0),    // 4: meshtastic.SdCardInfo.FatType
-	(I2CResult_Status)(0),      // 5: meshtastic.I2CResult.Status
-	(*FileTransfer)(nil),       // 6: meshtastic.FileTransfer
-	(*DirectoryListing)(nil),   // 7: meshtastic.DirectoryListing
-	(*I2CTransaction)(nil),     // 8: meshtastic.I2CTransaction
-	(*SdCardInfo)(nil),         // 9: meshtastic.SdCardInfo
-	(*I2CResult)(nil),          // 10: meshtastic.I2CResult
-	(*InterdeviceMessage)(nil), // 11: meshtastic.InterdeviceMessage
+	(SdCommand)(0),             // 3: meshtastic.SdCommand
+	(SdCardInfo_CardType)(0),   // 4: meshtastic.SdCardInfo.CardType
+	(SdCardInfo_FatType)(0),    // 5: meshtastic.SdCardInfo.FatType
+	(I2CResult_Status)(0),      // 6: meshtastic.I2CResult.Status
+	(*FileTransfer)(nil),       // 7: meshtastic.FileTransfer
+	(*DirectoryListing)(nil),   // 8: meshtastic.DirectoryListing
+	(*I2CTransaction)(nil),     // 9: meshtastic.I2CTransaction
+	(*SdCardInfo)(nil),         // 10: meshtastic.SdCardInfo
+	(*I2CResult)(nil),          // 11: meshtastic.I2CResult
+	(*InterdeviceMessage)(nil), // 12: meshtastic.InterdeviceMessage
 }
 var file_meshtastic_interdevice_proto_depIdxs = []int32{
 	1,  // 0: meshtastic.FileTransfer.operation:type_name -> meshtastic.FileOperation
 	2,  // 1: meshtastic.FileTransfer.status:type_name -> meshtastic.FileStatus
 	2,  // 2: meshtastic.DirectoryListing.status:type_name -> meshtastic.FileStatus
-	3,  // 3: meshtastic.SdCardInfo.card_type:type_name -> meshtastic.SdCardInfo.CardType
-	4,  // 4: meshtastic.SdCardInfo.fat_type:type_name -> meshtastic.SdCardInfo.FatType
-	5,  // 5: meshtastic.I2CResult.status:type_name -> meshtastic.I2CResult.Status
-	8,  // 6: meshtastic.InterdeviceMessage.i2c_transaction:type_name -> meshtastic.I2CTransaction
-	10, // 7: meshtastic.InterdeviceMessage.i2c_result:type_name -> meshtastic.I2CResult
-	6,  // 8: meshtastic.InterdeviceMessage.file_transfer:type_name -> meshtastic.FileTransfer
-	7,  // 9: meshtastic.InterdeviceMessage.directory_listing:type_name -> meshtastic.DirectoryListing
-	9,  // 10: meshtastic.InterdeviceMessage.sd_info:type_name -> meshtastic.SdCardInfo
+	4,  // 3: meshtastic.SdCardInfo.card_type:type_name -> meshtastic.SdCardInfo.CardType
+	5,  // 4: meshtastic.SdCardInfo.fat_type:type_name -> meshtastic.SdCardInfo.FatType
+	6,  // 5: meshtastic.I2CResult.status:type_name -> meshtastic.I2CResult.Status
+	9,  // 6: meshtastic.InterdeviceMessage.i2c_transaction:type_name -> meshtastic.I2CTransaction
+	11, // 7: meshtastic.InterdeviceMessage.i2c_result:type_name -> meshtastic.I2CResult
+	7,  // 8: meshtastic.InterdeviceMessage.file_transfer:type_name -> meshtastic.FileTransfer
+	8,  // 9: meshtastic.InterdeviceMessage.directory_listing:type_name -> meshtastic.DirectoryListing
+	10, // 10: meshtastic.InterdeviceMessage.sd_info:type_name -> meshtastic.SdCardInfo
 	0,  // 11: meshtastic.InterdeviceMessage.ping:type_name -> meshtastic.InterdeviceVersion
 	0,  // 12: meshtastic.InterdeviceMessage.pong:type_name -> meshtastic.InterdeviceVersion
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	3,  // 13: meshtastic.InterdeviceMessage.sd_command:type_name -> meshtastic.SdCommand
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_interdevice_proto_init() }
@@ -1240,13 +1333,14 @@ func file_meshtastic_interdevice_proto_init() {
 		(*InterdeviceMessage_Ping)(nil),
 		(*InterdeviceMessage_Pong)(nil),
 		(*InterdeviceMessage_Nack)(nil),
+		(*InterdeviceMessage_SdCommand)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_interdevice_proto_rawDesc), len(file_meshtastic_interdevice_proto_rawDesc)),
-			NumEnums:      6,
+			NumEnums:      7,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,

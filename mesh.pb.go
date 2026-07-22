@@ -852,6 +852,8 @@ const (
 	FirmwareEdition_BURNING_MAN FirmwareEdition = 18
 	// Hamvention, the Dayton amateur radio convention
 	FirmwareEdition_HAMVENTION FirmwareEdition = 19
+	// FAB, the international Fab Lab digital fabrication conference
+	FirmwareEdition_FAB FirmwareEdition = 20
 	// Placeholder for DIY and unofficial events
 	FirmwareEdition_DIY_EDITION FirmwareEdition = 127
 )
@@ -865,6 +867,7 @@ var (
 		17:  "DEFCON",
 		18:  "BURNING_MAN",
 		19:  "HAMVENTION",
+		20:  "FAB",
 		127: "DIY_EDITION",
 	}
 	FirmwareEdition_value = map[string]int32{
@@ -874,6 +877,7 @@ var (
 		"DEFCON":        17,
 		"BURNING_MAN":   18,
 		"HAMVENTION":    19,
+		"FAB":           20,
 		"DIY_EDITION":   127,
 	}
 )
@@ -5334,8 +5338,11 @@ type DeviceMetadata struct {
 	// Bit field of boolean for excluded modules
 	// (bitwise OR of ExcludedModules)
 	ExcludedModules uint32 `protobuf:"varint,12,opt,name=excluded_modules,json=excludedModules,proto3" json:"excluded_modules,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Indicates whether this firmware build includes XEdDSA packet signature verification.
+	// This is a read-only capability and must be false when XEdDSA is not compiled in.
+	HasXeddsa     bool `protobuf:"varint,14,opt,name=has_xeddsa,json=hasXeddsa,proto3" json:"has_xeddsa,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeviceMetadata) Reset() {
@@ -5450,6 +5457,13 @@ func (x *DeviceMetadata) GetExcludedModules() uint32 {
 		return x.ExcludedModules
 	}
 	return 0
+}
+
+func (x *DeviceMetadata) GetHasXeddsa() bool {
+	if x != nil {
+		return x.HasXeddsa
+	}
+	return false
 }
 
 // A distinct set of legal modem presets shared by one or more LoRa regions.
@@ -6376,7 +6390,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x03snr\x18\x02 \x01(\x02R\x03snr\x12 \n" +
 	"\flast_rx_time\x18\x03 \x01(\aR\n" +
 	"lastRxTime\x12?\n" +
-	"\x1cnode_broadcast_interval_secs\x18\x04 \x01(\rR\x19nodeBroadcastIntervalSecs\"\xf7\x03\n" +
+	"\x1cnode_broadcast_interval_secs\x18\x04 \x01(\rR\x19nodeBroadcastIntervalSecs\"\x96\x04\n" +
 	"\x0eDeviceMetadata\x12)\n" +
 	"\x10firmware_version\x18\x01 \x01(\tR\x0ffirmwareVersion\x120\n" +
 	"\x14device_state_version\x18\x02 \x01(\rR\x12deviceStateVersion\x12 \n" +
@@ -6390,7 +6404,9 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x11hasRemoteHardware\x18\n" +
 	" \x01(\bR\x11hasRemoteHardware\x12\x16\n" +
 	"\x06hasPKC\x18\v \x01(\bR\x06hasPKC\x12)\n" +
-	"\x10excluded_modules\x18\f \x01(\rR\x0fexcludedModules\"\xcd\x01\n" +
+	"\x10excluded_modules\x18\f \x01(\rR\x0fexcludedModules\x12\x1d\n" +
+	"\n" +
+	"has_xeddsa\x18\x0e \x01(\bR\thasXeddsa\"\xcd\x01\n" +
 	"\x0fLoRaPresetGroup\x12C\n" +
 	"\apresets\x18\x01 \x03(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetR\apresets\x12P\n" +
 	"\x0edefault_preset\x18\x02 \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetR\rdefaultPreset\x12#\n" +
@@ -6602,7 +6618,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x12\x11\n" +
 	"\rRADIO_SPI_BUG\x10\v\x12 \n" +
 	"\x1cFLASH_CORRUPTION_RECOVERABLE\x10\f\x12\"\n" +
-	"\x1eFLASH_CORRUPTION_UNRECOVERABLE\x10\r*\x7f\n" +
+	"\x1eFLASH_CORRUPTION_UNRECOVERABLE\x10\r*\x88\x01\n" +
 	"\x0fFirmwareEdition\x12\v\n" +
 	"\aVANILLA\x10\x00\x12\x11\n" +
 	"\rSMART_CITIZEN\x10\x01\x12\x0e\n" +
@@ -6612,7 +6628,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x06DEFCON\x10\x11\x12\x0f\n" +
 	"\vBURNING_MAN\x10\x12\x12\x0e\n" +
 	"\n" +
-	"HAMVENTION\x10\x13\x12\x0f\n" +
+	"HAMVENTION\x10\x13\x12\a\n" +
+	"\x03FAB\x10\x14\x12\x0f\n" +
 	"\vDIY_EDITION\x10\x7f*\x80\x03\n" +
 	"\x0fExcludedModules\x12\x11\n" +
 	"\rEXCLUDED_NONE\x10\x00\x12\x0f\n" +
