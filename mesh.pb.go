@@ -3264,7 +3264,13 @@ type MeshPacket struct {
 	// Note: this field is _never_ sent on the radio link itself (to save space) Times
 	// are typically not sent over the mesh, but they will be added to any Packet
 	// (chain of SubPacket) sent to the phone (so the phone can know exact time of reception)
-	RxTime uint32 `protobuf:"fixed32,7,opt,name=rx_time,json=rxTime,proto3" json:"rx_time,omitempty"`
+	// Explicit presence: firmware cannot always attach a trustworthy wall-clock timestamp at the
+	// moment of reception - a node with no GPS and no phone connected yet has no time source at
+	// all. has_rx_time disambiguates that state from a genuine (if coincidental) 1970-01-01
+	// reading. A packet delivered with this field absent may still be re-timestamped once a valid
+	// clock becomes available, before the phone ever sees it - "absent" is not guaranteed
+	// permanent, only "not yet known at last observation".
+	RxTime *uint32 `protobuf:"fixed32,7,opt,name=rx_time,json=rxTime,proto3,oneof" json:"rx_time,omitempty"`
 	// *Never* sent over the radio links.
 	// Set during reception to indicate the SNR of this packet.
 	// Used to collect statistics on current link quality.
@@ -3288,7 +3294,10 @@ type MeshPacket struct {
 	// See MeshPacket.Priority description for more details.
 	Priority MeshPacket_Priority `protobuf:"varint,11,opt,name=priority,proto3,enum=meshtastic.MeshPacket_Priority" json:"priority,omitempty"`
 	// rssi of received packet. Only sent to phone for dispay purposes.
-	RxRssi int32 `protobuf:"varint,12,opt,name=rx_rssi,json=rxRssi,proto3" json:"rx_rssi,omitempty"`
+	// Explicit presence: rssi 0 is a legitimate reading on some radios (SX126x can report exactly
+	// 0 dBm; SX127x's formula can even go positive). has_rx_rssi disambiguates; a replayed packet
+	// built from history should leave this field absent rather than emitting 0.
+	RxRssi *int32 `protobuf:"varint,12,opt,name=rx_rssi,json=rxRssi,proto3,oneof" json:"rx_rssi,omitempty"`
 	// Describe if this message is delayed
 	//
 	// Deprecated: Marked as deprecated in meshtastic/mesh.proto.
@@ -3297,6 +3306,10 @@ type MeshPacket struct {
 	ViaMqtt bool `protobuf:"varint,14,opt,name=via_mqtt,json=viaMqtt,proto3" json:"via_mqtt,omitempty"`
 	// Hop limit with which the original packet started. Sent via LoRa using three bits in the unencrypted header.
 	// When receiving a packet, the difference between hop_start and hop_limit gives how many hops it traveled.
+	// hop_start == 0 does not necessarily mean a direct (0-hop) neighbor: firmware prior to 2.3.0
+	// never populated this field, so a receiver can only trust hop_start == 0 as genuine once it has
+	// decoded the packet and confirmed the sender's bitfield is present (added in 2.5.0). Until then,
+	// or for a sender that never sets that bitfield, treat hop_start == 0 as unknown, not direct.
 	HopStart uint32 `protobuf:"varint,15,opt,name=hop_start,json=hopStart,proto3" json:"hop_start,omitempty"`
 	// Records the public key the packet was encrypted with, if applicable.
 	PublicKey []byte `protobuf:"bytes,16,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
@@ -3404,8 +3417,8 @@ func (x *MeshPacket) GetId() uint32 {
 }
 
 func (x *MeshPacket) GetRxTime() uint32 {
-	if x != nil {
-		return x.RxTime
+	if x != nil && x.RxTime != nil {
+		return *x.RxTime
 	}
 	return 0
 }
@@ -3439,8 +3452,8 @@ func (x *MeshPacket) GetPriority() MeshPacket_Priority {
 }
 
 func (x *MeshPacket) GetRxRssi() int32 {
-	if x != nil {
-		return x.RxRssi
+	if x != nil && x.RxRssi != nil {
+		return *x.RxRssi
 	}
 	return 0
 }
@@ -6193,7 +6206,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x04data\x18\x02 \x01(\fH\x00R\x04data\x12\x14\n" +
 	"\x04text\x18\x03 \x01(\tH\x00R\x04text\x12\x1a\n" +
 	"\bretained\x18\x04 \x01(\bR\bretainedB\x11\n" +
-	"\x0fpayload_variant\"\xba\t\n" +
+	"\x0fpayload_variant\"\xdc\t\n" +
 	"\n" +
 	"MeshPacket\x12\x12\n" +
 	"\x04from\x18\x01 \x01(\aR\x04from\x12\x0e\n" +
@@ -6201,14 +6214,14 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\achannel\x18\x03 \x01(\rR\achannel\x12,\n" +
 	"\adecoded\x18\x04 \x01(\v2\x10.meshtastic.DataH\x00R\adecoded\x12\x1e\n" +
 	"\tencrypted\x18\x05 \x01(\fH\x00R\tencrypted\x12\x0e\n" +
-	"\x02id\x18\x06 \x01(\aR\x02id\x12\x17\n" +
-	"\arx_time\x18\a \x01(\aR\x06rxTime\x12\x15\n" +
+	"\x02id\x18\x06 \x01(\aR\x02id\x12\x1c\n" +
+	"\arx_time\x18\a \x01(\aH\x01R\x06rxTime\x88\x01\x01\x12\x15\n" +
 	"\x06rx_snr\x18\b \x01(\x02R\x05rxSnr\x12\x1b\n" +
 	"\thop_limit\x18\t \x01(\rR\bhopLimit\x12\x19\n" +
 	"\bwant_ack\x18\n" +
 	" \x01(\bR\awantAck\x12;\n" +
-	"\bpriority\x18\v \x01(\x0e2\x1f.meshtastic.MeshPacket.PriorityR\bpriority\x12\x17\n" +
-	"\arx_rssi\x18\f \x01(\x05R\x06rxRssi\x12<\n" +
+	"\bpriority\x18\v \x01(\x0e2\x1f.meshtastic.MeshPacket.PriorityR\bpriority\x12\x1c\n" +
+	"\arx_rssi\x18\f \x01(\x05H\x02R\x06rxRssi\x88\x01\x01\x12<\n" +
 	"\adelayed\x18\r \x01(\x0e2\x1e.meshtastic.MeshPacket.DelayedB\x02\x18\x01R\adelayed\x12\x19\n" +
 	"\bvia_mqtt\x18\x0e \x01(\bR\aviaMqtt\x12\x1b\n" +
 	"\thop_start\x18\x0f \x01(\rR\bhopStart\x12\x1d\n" +
@@ -6248,7 +6261,11 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x17TRANSPORT_MULTICAST_UDP\x10\x06\x12\x11\n" +
 	"\rTRANSPORT_API\x10\a\x12\x19\n" +
 	"\x15TRANSPORT_UNICAST_UDP\x10\bB\x11\n" +
-	"\x0fpayload_variant\"\x8c\x04\n" +
+	"\x0fpayload_variantB\n" +
+	"\n" +
+	"\b_rx_timeB\n" +
+	"\n" +
+	"\b_rx_rssi\"\x8c\x04\n" +
 	"\bNodeInfo\x12\x10\n" +
 	"\x03num\x18\x01 \x01(\rR\x03num\x12$\n" +
 	"\x04user\x18\x02 \x01(\v2\x10.meshtastic.UserR\x04user\x120\n" +

@@ -264,8 +264,11 @@ type NodeInfoLite struct {
 	// The public key of the user's device, for PKI-based encrypted DMs.
 	PublicKey []byte `protobuf:"bytes,18,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
 	// Q4-encoded SNR: dB × 4, sint32 zigzag. Matches RouteDiscovery convention.
-	// Encode: snr_q4 = (int32_t)(snr * 4.0f). Decode: snr = snr_q4 / 4.0f.
+	// Encode: snr_q4 = (int32_t)lroundf(snr * 4.0f). Decode: snr = snr_q4 / 4.0f.
 	// float snr is always zeroed on disk; this field carries all persisted SNR.
+	// A stored 0 does not by itself mean "unknown" here - see NODEINFO_BITFIELD_HAS_SNR in
+	// src/mesh/NodeDB.h for the presence bit that disambiguates a genuine 0 dB reading from
+	// "never measured".
 	SnrQ4         int32 `protobuf:"zigzag32,19,opt,name=snr_q4,json=snrQ4,proto3" json:"snr_q4,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
