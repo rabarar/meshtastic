@@ -147,6 +147,8 @@ const (
 	TelemetrySensorType_HM330X TelemetrySensorType = 55
 	// Sensirion SEN6X PM/RHT/VOC/NOx/CO2/HCHO sensor family (SEN62, SEN63C, SEN65, SEN66, SEN68, SEN69C)
 	TelemetrySensorType_SEN6X TelemetrySensorType = 56
+	// AS3935 Franklin lightning sensor
+	TelemetrySensorType_AS3935 TelemetrySensorType = 57
 )
 
 // Enum value maps for TelemetrySensorType.
@@ -209,6 +211,7 @@ var (
 		54: "SPA06",
 		55: "HM330X",
 		56: "SEN6X",
+		57: "AS3935",
 	}
 	TelemetrySensorType_value = map[string]int32{
 		"SENSOR_UNSET":  0,
@@ -268,6 +271,7 @@ var (
 		"SPA06":         54,
 		"HM330X":        55,
 		"SEN6X":         56,
+		"AS3935":        57,
 	}
 )
 
@@ -465,8 +469,42 @@ type EnvironmentMetrics struct {
 	OneWireTemperatureCh6 *float32 `protobuf:"fixed32,38,opt,name=one_wire_temperature_ch6,json=oneWireTemperatureCh6,proto3,oneof" json:"one_wire_temperature_ch6,omitempty"`
 	// Multi-channel One-Wire Temperature Channel 7 (*C)
 	OneWireTemperatureCh7 *float32 `protobuf:"fixed32,39,opt,name=one_wire_temperature_ch7,json=oneWireTemperatureCh7,proto3,oneof" json:"one_wire_temperature_ch7,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// Lightning strikes detected in the last hour
+	LightningStrikeCount_1H *uint32 `protobuf:"varint,40,opt,name=lightning_strike_count_1h,json=lightningStrikeCount1h,proto3,oneof" json:"lightning_strike_count_1h,omitempty"`
+	// Estimated distance to the leading edge of the storm, in km
+	LightningDistanceKm *float32 `protobuf:"fixed32,41,opt,name=lightning_distance_km,json=lightningDistanceKm,proto3,oneof" json:"lightning_distance_km,omitempty"`
+	// Soil pH, 0-14
+	SoilPh *float32 `protobuf:"fixed32,42,opt,name=soil_ph,json=soilPh,proto3,oneof" json:"soil_ph,omitempty"`
+	// pH of water or other solution, 0-14
+	Ph *float32 `protobuf:"fixed32,43,opt,name=ph,proto3,oneof" json:"ph,omitempty"`
+	// Electrical conductivity in mS/cm
+	ElectricalConductivity *float32 `protobuf:"fixed32,44,opt,name=electrical_conductivity,json=electricalConductivity,proto3,oneof" json:"electrical_conductivity,omitempty"`
+	// Salinity in mg/l
+	Salinity *float32 `protobuf:"fixed32,45,opt,name=salinity,proto3,oneof" json:"salinity,omitempty"`
+	// Nitrogen concentration in mg/kg
+	Nitrogen *float32 `protobuf:"fixed32,46,opt,name=nitrogen,proto3,oneof" json:"nitrogen,omitempty"`
+	// Phosphorus concentration in mg/kg
+	Phosphorus *float32 `protobuf:"fixed32,47,opt,name=phosphorus,proto3,oneof" json:"phosphorus,omitempty"`
+	// Potassium concentration in mg/kg
+	Potassium *float32 `protobuf:"fixed32,48,opt,name=potassium,proto3,oneof" json:"potassium,omitempty"`
+	// Dissolved oxygen in mg/l
+	DissolvedOxygen *float32 `protobuf:"fixed32,49,opt,name=dissolved_oxygen,json=dissolvedOxygen,proto3,oneof" json:"dissolved_oxygen,omitempty"`
+	// Oxidation-reduction potential (ORP) in mV
+	Orp *float32 `protobuf:"fixed32,50,opt,name=orp,proto3,oneof" json:"orp,omitempty"`
+	// Chemical oxygen demand in mg/l
+	ChemicalOxygenDemand *float32 `protobuf:"fixed32,51,opt,name=chemical_oxygen_demand,json=chemicalOxygenDemand,proto3,oneof" json:"chemical_oxygen_demand,omitempty"`
+	// Turbidity in NTU
+	Turbidity *float32 `protobuf:"fixed32,52,opt,name=turbidity,proto3,oneof" json:"turbidity,omitempty"`
+	// Nitrate concentration in ppm
+	Nitrate *float32 `protobuf:"fixed32,53,opt,name=nitrate,proto3,oneof" json:"nitrate,omitempty"`
+	// Ammonium concentration in ppm
+	Ammonium *float32 `protobuf:"fixed32,54,opt,name=ammonium,proto3,oneof" json:"ammonium,omitempty"`
+	// Biochemical oxygen demand in mg/l
+	BiochemicalOxygenDemand *float32 `protobuf:"fixed32,55,opt,name=biochemical_oxygen_demand,json=biochemicalOxygenDemand,proto3,oneof" json:"biochemical_oxygen_demand,omitempty"`
+	// Solar irradiance in W/m^2 (distinct from the radiation field's uR/h)
+	SolarIrradiance *float32 `protobuf:"fixed32,56,opt,name=solar_irradiance,json=solarIrradiance,proto3,oneof" json:"solar_irradiance,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *EnvironmentMetrics) Reset() {
@@ -769,6 +807,125 @@ func (x *EnvironmentMetrics) GetOneWireTemperatureCh6() float32 {
 func (x *EnvironmentMetrics) GetOneWireTemperatureCh7() float32 {
 	if x != nil && x.OneWireTemperatureCh7 != nil {
 		return *x.OneWireTemperatureCh7
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetLightningStrikeCount_1H() uint32 {
+	if x != nil && x.LightningStrikeCount_1H != nil {
+		return *x.LightningStrikeCount_1H
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetLightningDistanceKm() float32 {
+	if x != nil && x.LightningDistanceKm != nil {
+		return *x.LightningDistanceKm
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetSoilPh() float32 {
+	if x != nil && x.SoilPh != nil {
+		return *x.SoilPh
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetPh() float32 {
+	if x != nil && x.Ph != nil {
+		return *x.Ph
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetElectricalConductivity() float32 {
+	if x != nil && x.ElectricalConductivity != nil {
+		return *x.ElectricalConductivity
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetSalinity() float32 {
+	if x != nil && x.Salinity != nil {
+		return *x.Salinity
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetNitrogen() float32 {
+	if x != nil && x.Nitrogen != nil {
+		return *x.Nitrogen
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetPhosphorus() float32 {
+	if x != nil && x.Phosphorus != nil {
+		return *x.Phosphorus
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetPotassium() float32 {
+	if x != nil && x.Potassium != nil {
+		return *x.Potassium
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetDissolvedOxygen() float32 {
+	if x != nil && x.DissolvedOxygen != nil {
+		return *x.DissolvedOxygen
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetOrp() float32 {
+	if x != nil && x.Orp != nil {
+		return *x.Orp
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetChemicalOxygenDemand() float32 {
+	if x != nil && x.ChemicalOxygenDemand != nil {
+		return *x.ChemicalOxygenDemand
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetTurbidity() float32 {
+	if x != nil && x.Turbidity != nil {
+		return *x.Turbidity
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetNitrate() float32 {
+	if x != nil && x.Nitrate != nil {
+		return *x.Nitrate
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetAmmonium() float32 {
+	if x != nil && x.Ammonium != nil {
+		return *x.Ammonium
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetBiochemicalOxygenDemand() float32 {
+	if x != nil && x.BiochemicalOxygenDemand != nil {
+		return *x.BiochemicalOxygenDemand
+	}
+	return 0
+}
+
+func (x *EnvironmentMetrics) GetSolarIrradiance() float32 {
+	if x != nil && x.SolarIrradiance != nil {
+		return *x.SolarIrradiance
 	}
 	return 0
 }
@@ -1966,6 +2123,53 @@ func (x *Nau7802Config) GetCalibrationFactor() float32 {
 	return 0
 }
 
+// AS3935 lightning sensor configuration, for saving to flash
+type AS3935Config struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Antenna tuning capacitance in pF, 0 to 120 in steps of 8. The chip does not retain
+	// this across power loss, so it is stored here and re-applied on every boot.
+	TuningCapPf   uint32 `protobuf:"varint,1,opt,name=tuning_cap_pf,json=tuningCapPf,proto3" json:"tuning_cap_pf,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AS3935Config) Reset() {
+	*x = AS3935Config{}
+	mi := &file_meshtastic_telemetry_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AS3935Config) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AS3935Config) ProtoMessage() {}
+
+func (x *AS3935Config) ProtoReflect() protoreflect.Message {
+	mi := &file_meshtastic_telemetry_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AS3935Config.ProtoReflect.Descriptor instead.
+func (*AS3935Config) Descriptor() ([]byte, []int) {
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *AS3935Config) GetTuningCapPf() uint32 {
+	if x != nil {
+		return x.TuningCapPf
+	}
+	return 0
+}
+
 // SEN5X State, for saving to flash (to be merged with SEN6XState)
 type SEN5XState struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1987,7 +2191,7 @@ type SEN5XState struct {
 
 func (x *SEN5XState) Reset() {
 	*x = SEN5XState{}
-	mi := &file_meshtastic_telemetry_proto_msgTypes[10]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1999,7 +2203,7 @@ func (x *SEN5XState) String() string {
 func (*SEN5XState) ProtoMessage() {}
 
 func (x *SEN5XState) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_telemetry_proto_msgTypes[10]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2012,7 +2216,7 @@ func (x *SEN5XState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SEN5XState.ProtoReflect.Descriptor instead.
 func (*SEN5XState) Descriptor() ([]byte, []int) {
-	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{10}
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SEN5XState) GetLastCleaningTime() uint32 {
@@ -2078,7 +2282,7 @@ type SEN6XState struct {
 
 func (x *SEN6XState) Reset() {
 	*x = SEN6XState{}
-	mi := &file_meshtastic_telemetry_proto_msgTypes[11]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2090,7 +2294,7 @@ func (x *SEN6XState) String() string {
 func (*SEN6XState) ProtoMessage() {}
 
 func (x *SEN6XState) ProtoReflect() protoreflect.Message {
-	mi := &file_meshtastic_telemetry_proto_msgTypes[11]
+	mi := &file_meshtastic_telemetry_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2103,7 +2307,7 @@ func (x *SEN6XState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SEN6XState.ProtoReflect.Descriptor instead.
 func (*SEN6XState) Descriptor() ([]byte, []int) {
-	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{11}
+	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SEN6XState) GetLastCleaningTime() uint32 {
@@ -2165,7 +2369,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\b_voltageB\x16\n" +
 	"\x14_channel_utilizationB\x0e\n" +
 	"\f_air_util_txB\x11\n" +
-	"\x0f_uptime_seconds\"\x91\x13\n" +
+	"\x0f_uptime_seconds\"\x8b\x1b\n" +
 	"\x12EnvironmentMetrics\x12%\n" +
 	"\vtemperature\x18\x01 \x01(\x02H\x00R\vtemperature\x88\x01\x01\x120\n" +
 	"\x11relative_humidity\x18\x02 \x01(\x02H\x01R\x10relativeHumidity\x88\x01\x01\x124\n" +
@@ -2209,7 +2413,26 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x18one_wire_temperature_ch4\x18$ \x01(\x02H\"R\x15oneWireTemperatureCh4\x88\x01\x01\x12<\n" +
 	"\x18one_wire_temperature_ch5\x18% \x01(\x02H#R\x15oneWireTemperatureCh5\x88\x01\x01\x12<\n" +
 	"\x18one_wire_temperature_ch6\x18& \x01(\x02H$R\x15oneWireTemperatureCh6\x88\x01\x01\x12<\n" +
-	"\x18one_wire_temperature_ch7\x18' \x01(\x02H%R\x15oneWireTemperatureCh7\x88\x01\x01B\x0e\n" +
+	"\x18one_wire_temperature_ch7\x18' \x01(\x02H%R\x15oneWireTemperatureCh7\x88\x01\x01\x12>\n" +
+	"\x19lightning_strike_count_1h\x18( \x01(\rH&R\x16lightningStrikeCount1h\x88\x01\x01\x127\n" +
+	"\x15lightning_distance_km\x18) \x01(\x02H'R\x13lightningDistanceKm\x88\x01\x01\x12\x1c\n" +
+	"\asoil_ph\x18* \x01(\x02H(R\x06soilPh\x88\x01\x01\x12\x13\n" +
+	"\x02ph\x18+ \x01(\x02H)R\x02ph\x88\x01\x01\x12<\n" +
+	"\x17electrical_conductivity\x18, \x01(\x02H*R\x16electricalConductivity\x88\x01\x01\x12\x1f\n" +
+	"\bsalinity\x18- \x01(\x02H+R\bsalinity\x88\x01\x01\x12\x1f\n" +
+	"\bnitrogen\x18. \x01(\x02H,R\bnitrogen\x88\x01\x01\x12#\n" +
+	"\n" +
+	"phosphorus\x18/ \x01(\x02H-R\n" +
+	"phosphorus\x88\x01\x01\x12!\n" +
+	"\tpotassium\x180 \x01(\x02H.R\tpotassium\x88\x01\x01\x12.\n" +
+	"\x10dissolved_oxygen\x181 \x01(\x02H/R\x0fdissolvedOxygen\x88\x01\x01\x12\x15\n" +
+	"\x03orp\x182 \x01(\x02H0R\x03orp\x88\x01\x01\x129\n" +
+	"\x16chemical_oxygen_demand\x183 \x01(\x02H1R\x14chemicalOxygenDemand\x88\x01\x01\x12!\n" +
+	"\tturbidity\x184 \x01(\x02H2R\tturbidity\x88\x01\x01\x12\x1d\n" +
+	"\anitrate\x185 \x01(\x02H3R\anitrate\x88\x01\x01\x12\x1f\n" +
+	"\bammonium\x186 \x01(\x02H4R\bammonium\x88\x01\x01\x12?\n" +
+	"\x19biochemical_oxygen_demand\x187 \x01(\x02H5R\x17biochemicalOxygenDemand\x88\x01\x01\x12.\n" +
+	"\x10solar_irradiance\x188 \x01(\x02H6R\x0fsolarIrradiance\x88\x01\x01B\x0e\n" +
 	"\f_temperatureB\x14\n" +
 	"\x12_relative_humidityB\x16\n" +
 	"\x14_barometric_pressureB\x11\n" +
@@ -2253,7 +2476,28 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x19_one_wire_temperature_ch4B\x1b\n" +
 	"\x19_one_wire_temperature_ch5B\x1b\n" +
 	"\x19_one_wire_temperature_ch6B\x1b\n" +
-	"\x19_one_wire_temperature_ch7\"\x96\a\n" +
+	"\x19_one_wire_temperature_ch7B\x1c\n" +
+	"\x1a_lightning_strike_count_1hB\x18\n" +
+	"\x16_lightning_distance_kmB\n" +
+	"\n" +
+	"\b_soil_phB\x05\n" +
+	"\x03_phB\x1a\n" +
+	"\x18_electrical_conductivityB\v\n" +
+	"\t_salinityB\v\n" +
+	"\t_nitrogenB\r\n" +
+	"\v_phosphorusB\f\n" +
+	"\n" +
+	"_potassiumB\x13\n" +
+	"\x11_dissolved_oxygenB\x06\n" +
+	"\x04_orpB\x19\n" +
+	"\x17_chemical_oxygen_demandB\f\n" +
+	"\n" +
+	"_turbidityB\n" +
+	"\n" +
+	"\b_nitrateB\v\n" +
+	"\t_ammoniumB\x1c\n" +
+	"\x1a_biochemical_oxygen_demandB\x13\n" +
+	"\x11_solar_irradiance\"\x96\a\n" +
 	"\fPowerMetrics\x12$\n" +
 	"\vch1_voltage\x18\x01 \x01(\x02H\x00R\n" +
 	"ch1Voltage\x88\x01\x01\x12$\n" +
@@ -2429,7 +2673,9 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"zeroOffset\x18\x01 \x01(\x05R\n" +
 	"zeroOffset\x12,\n" +
-	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor\"\xce\x02\n" +
+	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor\"2\n" +
+	"\fAS3935Config\x12\"\n" +
+	"\rtuning_cap_pf\x18\x01 \x01(\rR\vtuningCapPf\"\xce\x02\n" +
 	"\n" +
 	"SEN5XState\x12,\n" +
 	"\x12last_cleaning_time\x18\x01 \x01(\rR\x10lastCleaningTime\x12.\n" +
@@ -2451,7 +2697,7 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x0fvoc_state_array\x18\x06 \x01(\x06H\x02R\rvocStateArray\x88\x01\x01B\x11\n" +
 	"\x0f_voc_state_timeB\x12\n" +
 	"\x10_voc_state_validB\x12\n" +
-	"\x10_voc_state_array*\x8e\x06\n" +
+	"\x10_voc_state_array*\x9a\x06\n" +
 	"\x13TelemetrySensorType\x12\x10\n" +
 	"\fSENSOR_UNSET\x10\x00\x12\n" +
 	"\n" +
@@ -2523,7 +2769,9 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\x05SPA06\x106\x12\n" +
 	"\n" +
 	"\x06HM330X\x107\x12\t\n" +
-	"\x05SEN6X\x108Bf\n" +
+	"\x05SEN6X\x108\x12\n" +
+	"\n" +
+	"\x06AS3935\x109Bf\n" +
 	"\x14org.meshtastic.protoB\x0fTelemetryProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (
@@ -2539,7 +2787,7 @@ func file_meshtastic_telemetry_proto_rawDescGZIP() []byte {
 }
 
 var file_meshtastic_telemetry_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_meshtastic_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_meshtastic_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_meshtastic_telemetry_proto_goTypes = []any{
 	(TelemetrySensorType)(0),       // 0: meshtastic.TelemetrySensorType
 	(*DeviceMetrics)(nil),          // 1: meshtastic.DeviceMetrics
@@ -2552,8 +2800,9 @@ var file_meshtastic_telemetry_proto_goTypes = []any{
 	(*HostMetrics)(nil),            // 8: meshtastic.HostMetrics
 	(*Telemetry)(nil),              // 9: meshtastic.Telemetry
 	(*Nau7802Config)(nil),          // 10: meshtastic.Nau7802Config
-	(*SEN5XState)(nil),             // 11: meshtastic.SEN5XState
-	(*SEN6XState)(nil),             // 12: meshtastic.SEN6XState
+	(*AS3935Config)(nil),           // 11: meshtastic.AS3935Config
+	(*SEN5XState)(nil),             // 12: meshtastic.SEN5XState
+	(*SEN6XState)(nil),             // 13: meshtastic.SEN6XState
 }
 var file_meshtastic_telemetry_proto_depIdxs = []int32{
 	1, // 0: meshtastic.Telemetry.device_metrics:type_name -> meshtastic.DeviceMetrics
@@ -2592,15 +2841,15 @@ func file_meshtastic_telemetry_proto_init() {
 		(*Telemetry_HostMetrics)(nil),
 		(*Telemetry_TrafficManagementStats)(nil),
 	}
-	file_meshtastic_telemetry_proto_msgTypes[10].OneofWrappers = []any{}
 	file_meshtastic_telemetry_proto_msgTypes[11].OneofWrappers = []any{}
+	file_meshtastic_telemetry_proto_msgTypes[12].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meshtastic_telemetry_proto_rawDesc), len(file_meshtastic_telemetry_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

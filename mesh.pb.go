@@ -346,6 +346,12 @@ const (
 	HardwareModel_HELTEC_RC52 HardwareModel = 142
 	// Heltec ESP32C6 + SX1262
 	HardwareModel_HELTEC_RCC6 HardwareModel = 143
+	// Seeed Wio Tracker L1 Pro 1W, nRF52840 + SX1262 with 1 W external PA
+	HardwareModel_SEEED_WIO_TRACKER_L1_PRO_1W HardwareModel = 144
+	// Meshnology W12
+	HardwareModel_MESHNOLOGY_W12 HardwareModel = 145
+	// Seeed Studio MeshPager X2
+	HardwareModel_MESHPAGER_X2 HardwareModel = 146
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -499,6 +505,9 @@ var (
 		141: "HELTEC_RC32",
 		142: "HELTEC_RC52",
 		143: "HELTEC_RCC6",
+		144: "SEEED_WIO_TRACKER_L1_PRO_1W",
+		145: "MESHNOLOGY_W12",
+		146: "MESHPAGER_X2",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -646,6 +655,9 @@ var (
 		"HELTEC_RC32":                  141,
 		"HELTEC_RC52":                  142,
 		"HELTEC_RCC6":                  143,
+		"SEEED_WIO_TRACKER_L1_PRO_1W":  144,
+		"MESHNOLOGY_W12":               145,
+		"MESHPAGER_X2":                 146,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -854,6 +866,10 @@ const (
 	FirmwareEdition_HAMVENTION FirmwareEdition = 19
 	// FAB, the international Fab Lab digital fabrication conference
 	FirmwareEdition_FAB FirmwareEdition = 20
+	// Dragon Con, the yearly pop culture convention in Atlanta, GA
+	FirmwareEdition_DRAGON_CON FirmwareEdition = 21
+	// Chaos Communication Congress, the hacker conference held yearly in Germany
+	FirmwareEdition_CCC FirmwareEdition = 22
 	// Placeholder for DIY and unofficial events
 	FirmwareEdition_DIY_EDITION FirmwareEdition = 127
 )
@@ -868,6 +884,8 @@ var (
 		18:  "BURNING_MAN",
 		19:  "HAMVENTION",
 		20:  "FAB",
+		21:  "DRAGON_CON",
+		22:  "CCC",
 		127: "DIY_EDITION",
 	}
 	FirmwareEdition_value = map[string]int32{
@@ -878,6 +896,8 @@ var (
 		"BURNING_MAN":   18,
 		"HAMVENTION":    19,
 		"FAB":           20,
+		"DRAGON_CON":    21,
+		"CCC":           22,
 		"DIY_EDITION":   127,
 	}
 )
@@ -1820,7 +1840,7 @@ type Position struct {
 	//
 	// Default: "'bout three meters-ish" :)
 	GpsAccuracy uint32 `protobuf:"varint,14,opt,name=gps_accuracy,json=gpsAccuracy,proto3" json:"gps_accuracy,omitempty"`
-	// Ground speed in m/s and True North TRACK in 1/100 degrees
+	// Ground speed in km/h and True North TRACK in 1/100 degrees
 	// Clarification of terms:
 	// - "track" is the direction of motion (measured in horizontal plane)
 	// - "heading" is where the fuselage points (measured in horizontal plane)
@@ -6456,7 +6476,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\xe5\x15\n" +
+	"\x0fpayload_variant*\xaf\x16\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -6614,7 +6634,10 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x0eMESHNOLOGY_W10\x10\x8c\x01\x12\x10\n" +
 	"\vHELTEC_RC32\x10\x8d\x01\x12\x10\n" +
 	"\vHELTEC_RC52\x10\x8e\x01\x12\x10\n" +
-	"\vHELTEC_RCC6\x10\x8f\x01\x12\x0f\n" +
+	"\vHELTEC_RCC6\x10\x8f\x01\x12 \n" +
+	"\x1bSEEED_WIO_TRACKER_L1_PRO_1W\x10\x90\x01\x12\x13\n" +
+	"\x0eMESHNOLOGY_W12\x10\x91\x01\x12\x11\n" +
+	"\fMESHPAGER_X2\x10\x92\x01\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +
@@ -6635,7 +6658,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x12\x11\n" +
 	"\rRADIO_SPI_BUG\x10\v\x12 \n" +
 	"\x1cFLASH_CORRUPTION_RECOVERABLE\x10\f\x12\"\n" +
-	"\x1eFLASH_CORRUPTION_UNRECOVERABLE\x10\r*\x88\x01\n" +
+	"\x1eFLASH_CORRUPTION_UNRECOVERABLE\x10\r*\xa1\x01\n" +
 	"\x0fFirmwareEdition\x12\v\n" +
 	"\aVANILLA\x10\x00\x12\x11\n" +
 	"\rSMART_CITIZEN\x10\x01\x12\x0e\n" +
@@ -6646,7 +6669,10 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\vBURNING_MAN\x10\x12\x12\x0e\n" +
 	"\n" +
 	"HAMVENTION\x10\x13\x12\a\n" +
-	"\x03FAB\x10\x14\x12\x0f\n" +
+	"\x03FAB\x10\x14\x12\x0e\n" +
+	"\n" +
+	"DRAGON_CON\x10\x15\x12\a\n" +
+	"\x03CCC\x10\x16\x12\x0f\n" +
 	"\vDIY_EDITION\x10\x7f*\x80\x03\n" +
 	"\x0fExcludedModules\x12\x11\n" +
 	"\rEXCLUDED_NONE\x10\x00\x12\x0f\n" +

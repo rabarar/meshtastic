@@ -116,6 +116,12 @@ const (
 	// Periodically broadcast by nodes in beacon mode; received by nodes with MeshBeaconConfig.FLAG_LISTEN_ENABLED.
 	// Carries a text message plus optional channel/preset offers for client apps.
 	PortNum_MESH_BEACON_APP PortNum = 37
+	// Acknowledged paging: alerts a person is expected to physically acknowledge, and the
+	// acknowledgements themselves.
+	// ENCODING: protobuf PagingPacket
+	// Distinct from ALERT_APP, which is a text message the recipient never confirms, and from a
+	// routing or delivery ACK, which says the packet arrived rather than that someone saw it.
+	PortNum_PAGING_APP PortNum = 38
 	// Provides a hardware serial interface to send and receive from the Meshtastic network.
 	// Connect to the RX/TX pins of a device with 38400 8N1. Packets received from the Meshtastic
 	// network is forwarded to the RX pin while sending a packet to TX will go out to the Mesh network.
@@ -161,7 +167,7 @@ const (
 	// PowerStress based monitoring support (for automated power consumption testing)
 	PortNum_POWERSTRESS_APP PortNum = 74
 	// LoraWAN Payload Transport
-	// ENCODING: compact binary LoRaWAN uplink (10-byte RF metadata + PHY payload) - see LoRaWANBridgeModule
+	// ENCODING: LoRaWANBridge protobuf, see lorawan_bridge.proto
 	PortNum_LORAWAN_BRIDGE PortNum = 75
 	// Reticulum Network Stack Tunnel App
 	// ENCODING: Fragmented RNS Packet. Handled by Meshtastic RNS interface
@@ -216,6 +222,7 @@ var (
 		35:  "STORE_FORWARD_PLUSPLUS_APP",
 		36:  "NODE_STATUS_APP",
 		37:  "MESH_BEACON_APP",
+		38:  "PAGING_APP",
 		64:  "SERIAL_APP",
 		65:  "STORE_FORWARD_APP",
 		66:  "RANGE_TEST_APP",
@@ -258,6 +265,7 @@ var (
 		"STORE_FORWARD_PLUSPLUS_APP":  35,
 		"NODE_STATUS_APP":             36,
 		"MESH_BEACON_APP":             37,
+		"PAGING_APP":                  38,
 		"SERIAL_APP":                  64,
 		"STORE_FORWARD_APP":           65,
 		"RANGE_TEST_APP":              66,
@@ -313,7 +321,7 @@ var File_meshtastic_portnums_proto protoreflect.FileDescriptor
 const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\n" +
 	"\x19meshtastic/portnums.proto\x12\n" +
-	"meshtastic*\xa4\x06\n" +
+	"meshtastic*\xb4\x06\n" +
 	"\aPortNum\x12\x0f\n" +
 	"\vUNKNOWN_APP\x10\x00\x12\x14\n" +
 	"\x10TEXT_MESSAGE_APP\x10\x01\x12\x17\n" +
@@ -336,6 +344,8 @@ const file_meshtastic_portnums_proto_rawDesc = "" +
 	"\x1aSTORE_FORWARD_PLUSPLUS_APP\x10#\x12\x13\n" +
 	"\x0fNODE_STATUS_APP\x10$\x12\x13\n" +
 	"\x0fMESH_BEACON_APP\x10%\x12\x0e\n" +
+	"\n" +
+	"PAGING_APP\x10&\x12\x0e\n" +
 	"\n" +
 	"SERIAL_APP\x10@\x12\x15\n" +
 	"\x11STORE_FORWARD_APP\x10A\x12\x12\n" +

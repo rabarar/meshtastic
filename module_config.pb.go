@@ -2557,12 +2557,6 @@ type ModuleConfig_MeshBeaconConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Bitwise-OR of Flags values (listen / broadcast / legacy-split toggles).
 	Flags uint32 `protobuf:"varint,1,opt,name=flags,proto3" json:"flags,omitempty"`
-	// Optional: node ID to send beacon messages AS.
-	// When set, the `from` field of outgoing beacon packets is set to this node ID,
-	// making beacons appear to originate from that node.
-	// When unset (0), beacons are sent as the local node.
-	// A remote admin can only set this field to their own node ID.
-	BroadcastSendAsNode uint32 `protobuf:"varint,3,opt,name=broadcast_send_as_node,json=broadcastSendAsNode,proto3" json:"broadcast_send_as_node,omitempty"`
 	// Message to include in each beacon broadcast. Max 100 bytes enforced by firmware.
 	BroadcastMessage string `protobuf:"bytes,4,opt,name=broadcast_message,json=broadcastMessage,proto3" json:"broadcast_message,omitempty"`
 	// Optional channel (name + PSK) to advertise in the MeshBeacon offer_channel field.
@@ -2571,28 +2565,15 @@ type ModuleConfig_MeshBeaconConfig struct {
 	BroadcastOfferRegion Config_LoRaConfig_RegionCode `protobuf:"varint,6,opt,name=broadcast_offer_region,json=broadcastOfferRegion,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"broadcast_offer_region,omitempty"`
 	// Optional modem preset to advertise in the MeshBeacon offer_preset field.
 	BroadcastOfferPreset *Config_LoRaConfig_ModemPreset `protobuf:"varint,7,opt,name=broadcast_offer_preset,json=broadcastOfferPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset,oneof" json:"broadcast_offer_preset,omitempty"`
-	// Single-target TX channel: channel settings (name + PSK) to send beacons on.
-	// If unset, beacons go out on the primary channel. Used only when broadcast_targets is empty.
-	// NOTE: the single-target path embeds the ChannelSettings inline here, whereas a
-	// broadcast_targets entry references a channel-table slot by channel_index instead — see
-	// BroadcastTarget. The two paths are equal, first-class options; only this representation differs.
-	BroadcastOnChannel *ChannelSettings `protobuf:"bytes,8,opt,name=broadcast_on_channel,json=broadcastOnChannel,proto3" json:"broadcast_on_channel,omitempty"`
-	// Region to use when sending beacons on broadcast_on_preset.
-	BroadcastOnRegion Config_LoRaConfig_RegionCode `protobuf:"varint,9,opt,name=broadcast_on_region,json=broadcastOnRegion,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"broadcast_on_region,omitempty"`
-	// Modem preset to use when sending beacons.
-	// If different from current config, the radio is temporarily switched for TX.
-	BroadcastOnPreset *Config_LoRaConfig_ModemPreset `protobuf:"varint,10,opt,name=broadcast_on_preset,json=broadcastOnPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset,oneof" json:"broadcast_on_preset,omitempty"`
 	// How often to broadcast, in seconds. Min 3600 (1 h), default 3600.
 	BroadcastIntervalSecs uint32 `protobuf:"varint,11,opt,name=broadcast_interval_secs,json=broadcastIntervalSecs,proto3" json:"broadcast_interval_secs,omitempty"`
-	// Multi-target broadcast list.
-	// When non-empty the broadcaster transmits one beacon copy per entry in sequence,
-	// each temporarily switching the radio to that entry's preset/region/channel.
-	// When empty, the broadcaster uses the scalar broadcast_on_preset / broadcast_on_region /
-	// broadcast_on_channel fields instead (the single-target path).
-	// Single- and multi-target are equal, first-class options — neither is preferred or
-	// deprecated. They differ only in how the TX channel is named: broadcast_on_channel embeds a
-	// ChannelSettings inline, while a target references an existing channel-table slot by
-	// channel_index (see BroadcastTarget).
+	// Broadcast destination list.
+	// The broadcaster sends one beacon copy per distinct destination, in sequence, temporarily
+	// switching the radio to that entry's preset/region/channel for each.
+	// When empty, a single beacon is sent on the node's running preset and region over the
+	// primary channel.
+	// Entries that resolve to the same effective preset, region and channel are deduplicated, so
+	// a duplicate entry does not produce a second transmission.
 	BroadcastTargets []*ModuleConfig_MeshBeaconConfig_BroadcastTarget `protobuf:"bytes,13,rep,name=broadcast_targets,json=broadcastTargets,proto3" json:"broadcast_targets,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -2635,13 +2616,6 @@ func (x *ModuleConfig_MeshBeaconConfig) GetFlags() uint32 {
 	return 0
 }
 
-func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastSendAsNode() uint32 {
-	if x != nil {
-		return x.BroadcastSendAsNode
-	}
-	return 0
-}
-
 func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastMessage() string {
 	if x != nil {
 		return x.BroadcastMessage
@@ -2666,27 +2640,6 @@ func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOfferRegion() Config_LoRaCon
 func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOfferPreset() Config_LoRaConfig_ModemPreset {
 	if x != nil && x.BroadcastOfferPreset != nil {
 		return *x.BroadcastOfferPreset
-	}
-	return Config_LoRaConfig_LONG_FAST
-}
-
-func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOnChannel() *ChannelSettings {
-	if x != nil {
-		return x.BroadcastOnChannel
-	}
-	return nil
-}
-
-func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOnRegion() Config_LoRaConfig_RegionCode {
-	if x != nil {
-		return x.BroadcastOnRegion
-	}
-	return Config_LoRaConfig_UNSET
-}
-
-func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOnPreset() Config_LoRaConfig_ModemPreset {
-	if x != nil && x.BroadcastOnPreset != nil {
-		return *x.BroadcastOnPreset
 	}
 	return Config_LoRaConfig_LONG_FAST
 }
@@ -2762,8 +2715,8 @@ func (x *ModuleConfig_TAKConfig) GetRole() MemberRole {
 	return MemberRole_Unspecifed
 }
 
-// One entry in the multi-target broadcast list.
-// The broadcaster transmits one beacon copy per entry, each on its own radio settings.
+// One entry in the broadcast destination list.
+// Each entry names one set of radio settings to send a beacon copy on.
 type ModuleConfig_MeshBeaconConfig_BroadcastTarget struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Modem preset to use for this target.
@@ -2836,7 +2789,7 @@ var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\x1a\x15meshtastic/atak.proto\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\"\xe9E\n" +
+	"meshtastic\x1a\x15meshtastic/atak.proto\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\"\x83D\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -3063,18 +3016,13 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x04blue\x18\x05 \x01(\rR\x04blue\x1a6\n" +
 	"\x13StatusMessageConfig\x12\x1f\n" +
 	"\vnode_status\x18\x01 \x01(\tR\n" +
-	"nodeStatus\x1a\xca\t\n" +
+	"nodeStatus\x1a\xe4\a\n" +
 	"\x10MeshBeaconConfig\x12\x14\n" +
-	"\x05flags\x18\x01 \x01(\rR\x05flags\x123\n" +
-	"\x16broadcast_send_as_node\x18\x03 \x01(\rR\x13broadcastSendAsNode\x12+\n" +
+	"\x05flags\x18\x01 \x01(\rR\x05flags\x12+\n" +
 	"\x11broadcast_message\x18\x04 \x01(\tR\x10broadcastMessage\x12S\n" +
 	"\x17broadcast_offer_channel\x18\x05 \x01(\v2\x1b.meshtastic.ChannelSettingsR\x15broadcastOfferChannel\x12^\n" +
 	"\x16broadcast_offer_region\x18\x06 \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\x14broadcastOfferRegion\x12d\n" +
-	"\x16broadcast_offer_preset\x18\a \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x00R\x14broadcastOfferPreset\x88\x01\x01\x12M\n" +
-	"\x14broadcast_on_channel\x18\b \x01(\v2\x1b.meshtastic.ChannelSettingsR\x12broadcastOnChannel\x12X\n" +
-	"\x13broadcast_on_region\x18\t \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\x11broadcastOnRegion\x12^\n" +
-	"\x13broadcast_on_preset\x18\n" +
-	" \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x01R\x11broadcastOnPreset\x88\x01\x01\x126\n" +
+	"\x16broadcast_offer_preset\x18\a \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x00R\x14broadcastOfferPreset\x88\x01\x01\x126\n" +
 	"\x17broadcast_interval_secs\x18\v \x01(\rR\x15broadcastIntervalSecs\x12f\n" +
 	"\x11broadcast_targets\x18\r \x03(\v29.meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTargetR\x10broadcastTargets\x1a\xe2\x01\n" +
 	"\x0fBroadcastTarget\x12F\n" +
@@ -3088,8 +3036,9 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x13FLAG_LISTEN_ENABLED\x10\x01\x12\x1a\n" +
 	"\x16FLAG_BROADCAST_ENABLED\x10\x02\x12\x15\n" +
 	"\x11FLAG_LEGACY_SPLIT\x10\x04B\x19\n" +
-	"\x17_broadcast_offer_presetB\x16\n" +
-	"\x14_broadcast_on_preset\x1a]\n" +
+	"\x17_broadcast_offer_presetJ\x04\b\x03\x10\x04J\x04\b\b\x10\tJ\x04\b\t\x10\n" +
+	"J\x04\b\n" +
+	"\x10\vR\x16broadcast_send_as_nodeR\x14broadcast_on_channelR\x13broadcast_on_regionR\x13broadcast_on_preset\x1a]\n" +
 	"\tTAKConfig\x12$\n" +
 	"\x04team\x18\x01 \x01(\x0e2\x10.meshtastic.TeamR\x04team\x12*\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x16.meshtastic.MemberRoleR\x04roleB\x11\n" +
@@ -3184,19 +3133,16 @@ var file_meshtastic_module_config_proto_depIdxs = []int32{
 	28, // 27: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_offer_channel:type_name -> meshtastic.ChannelSettings
 	29, // 28: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_offer_region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
 	30, // 29: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_offer_preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
-	28, // 30: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_on_channel:type_name -> meshtastic.ChannelSettings
-	29, // 31: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_on_region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
-	30, // 32: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_on_preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
-	27, // 33: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_targets:type_name -> meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget
-	31, // 34: meshtastic.ModuleConfig.TAKConfig.team:type_name -> meshtastic.Team
-	32, // 35: meshtastic.ModuleConfig.TAKConfig.role:type_name -> meshtastic.MemberRole
-	30, // 36: meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget.preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
-	29, // 37: meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget.region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
-	38, // [38:38] is the sub-list for method output_type
-	38, // [38:38] is the sub-list for method input_type
-	38, // [38:38] is the sub-list for extension type_name
-	38, // [38:38] is the sub-list for extension extendee
-	0,  // [0:38] is the sub-list for field type_name
+	27, // 30: meshtastic.ModuleConfig.MeshBeaconConfig.broadcast_targets:type_name -> meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget
+	31, // 31: meshtastic.ModuleConfig.TAKConfig.team:type_name -> meshtastic.Team
+	32, // 32: meshtastic.ModuleConfig.TAKConfig.role:type_name -> meshtastic.MemberRole
+	30, // 33: meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget.preset:type_name -> meshtastic.Config.LoRaConfig.ModemPreset
+	29, // 34: meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTarget.region:type_name -> meshtastic.Config.LoRaConfig.RegionCode
+	35, // [35:35] is the sub-list for method output_type
+	35, // [35:35] is the sub-list for method input_type
+	35, // [35:35] is the sub-list for extension type_name
+	35, // [35:35] is the sub-list for extension extendee
+	0,  // [0:35] is the sub-list for field type_name
 }
 
 func init() { file_meshtastic_module_config_proto_init() }
