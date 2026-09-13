@@ -1499,7 +1499,7 @@ type LockdownAuth struct {
 	// token at unlock time: the client-supplied boots_remaining when
 	// non-zero, otherwise the firmware default (TOKEN_DEFAULT_BOOTS).
 	// Note that boots_remaining == 0 in this message means "use firmware
-	// default", NOT "zero boots" — a client computing the ceiling for
+	// default", NOT "zero boots" - a client computing the ceiling for
 	// display should mirror that resolution rather than multiplying the
 	// raw request value.
 	//
@@ -1509,7 +1509,7 @@ type LockdownAuth struct {
 	//
 	// Uses millis() (CPU uptime), not wall-clock time, so the cap is
 	// immune to GPS spoofing, RTC backup-battery removal, and Faraday
-	// cage isolation — none of those move the uptime counter. The only
+	// cage isolation - none of those move the uptime counter. The only
 	// way to reset the session clock is a reboot, which costs a boot
 	// from the on-flash, HMAC-bound counter.
 	MaxSessionSeconds uint32 `protobuf:"varint,5,opt,name=max_session_seconds,json=maxSessionSeconds,proto3" json:"max_session_seconds,omitempty"`
@@ -1526,7 +1526,7 @@ type LockdownAuth struct {
 	//
 	// NOT reversed by this operation: APPROTECT. Once the debug port
 	// lockout has been burned (on silicon where it is effective) it is
-	// permanent — disabling lockdown decrypts your data and removes the
+	// permanent - disabling lockdown decrypts your data and removes the
 	// access gates, but the SWD/JTAG port stays locked for the life of
 	// the device (recoverable only via a full chip erase over a debug
 	// probe, which destroys all data). Clients should make this
@@ -1901,7 +1901,7 @@ type SensorConfig struct {
 	// SEN6X PM/RHT/VOC/NOx/CO2/HCHO Sensor configuration
 	Sen6XConfig *SEN6XConfig `protobuf:"bytes,6,opt,name=sen6x_config,json=sen6xConfig,proto3" json:"sen6x_config,omitempty"`
 	// AS3935 lightning sensor configuration
-	As3935Config  *AS3935Config `protobuf:"bytes,7,opt,name=as3935_config,json=as3935Config,proto3" json:"as3935_config,omitempty"`
+	As3935Config  *AAS3935Config `protobuf:"bytes,7,opt,name=as3935_config,json=as3935Config,proto3" json:"as3935_config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1978,7 +1978,7 @@ func (x *SensorConfig) GetSen6XConfig() *SEN6XConfig {
 	return nil
 }
 
-func (x *SensorConfig) GetAs3935Config() *AS3935Config {
+func (x *SensorConfig) GetAs3935Config() *AAS3935Config {
 	if x != nil {
 		return x.As3935Config
 	}
@@ -2435,7 +2435,7 @@ func (x *DS248XConfig) GetMainTemperatureChannel() uint32 {
 	return 0
 }
 
-type AS3935Config struct {
+type AAS3935Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Antenna tuning capacitance in pF, 0 to 120 in steps of 8. The antenna tank must
 	// resonate within 3.5% of 500kHz; the correct trim is specific to the sensor board.
@@ -2444,20 +2444,20 @@ type AS3935Config struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *AS3935Config) Reset() {
-	*x = AS3935Config{}
+func (x *AAS3935Config) Reset() {
+	*x = AAS3935Config{}
 	mi := &file_meshtastic_admin_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AS3935Config) String() string {
+func (x *AAS3935Config) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AS3935Config) ProtoMessage() {}
+func (*AAS3935Config) ProtoMessage() {}
 
-func (x *AS3935Config) ProtoReflect() protoreflect.Message {
+func (x *AAS3935Config) ProtoReflect() protoreflect.Message {
 	mi := &file_meshtastic_admin_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2469,12 +2469,12 @@ func (x *AS3935Config) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AS3935Config.ProtoReflect.Descriptor instead.
-func (*AS3935Config) Descriptor() ([]byte, []int) {
+// Deprecated: Use AAS3935Config.ProtoReflect.Descriptor instead.
+func (*AAS3935Config) Descriptor() ([]byte, []int) {
 	return file_meshtastic_admin_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *AS3935Config) GetSetTuningCapPf() uint32 {
+func (x *AAS3935Config) GetSetTuningCapPf() uint32 {
 	if x != nil && x.SetTuningCapPf != nil {
 		return *x.SetTuningCapPf
 	}
@@ -2762,15 +2762,15 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\x17PROVIDE_SECURITY_NUMBER\x10\x01\x12\r\n" +
 	"\tDO_VERIFY\x10\x02\x12\x11\n" +
 	"\rDO_NOT_VERIFY\x10\x03B\x12\n" +
-	"\x10_security_number\"\xbf\x03\n" +
+	"\x10_security_number\"\xc0\x03\n" +
 	"\fSensorConfig\x12;\n" +
 	"\fscd4x_config\x18\x01 \x01(\v2\x18.meshtastic.SCD4X_configR\vscd4xConfig\x12;\n" +
 	"\fsen5x_config\x18\x02 \x01(\v2\x18.meshtastic.SEN5X_configR\vsen5xConfig\x12;\n" +
 	"\fscd30_config\x18\x03 \x01(\v2\x18.meshtastic.SCD30_configR\vscd30Config\x12;\n" +
 	"\fshtxx_config\x18\x04 \x01(\v2\x18.meshtastic.SHTXX_configR\vshtxxConfig\x12>\n" +
 	"\rds248x_config\x18\x05 \x01(\v2\x19.meshtastic.DS248X_configR\fds248xConfig\x12;\n" +
-	"\fsen6x_config\x18\x06 \x01(\v2\x18.meshtastic.SEN6X_configR\vsen6xConfig\x12>\n" +
-	"\ras3935_config\x18\a \x01(\v2\x19.meshtastic.AS3935_configR\fas3935Config\"\xc9\x03\n" +
+	"\fsen6x_config\x18\x06 \x01(\v2\x18.meshtastic.SEN6X_configR\vsen6xConfig\x12?\n" +
+	"\ras3935_config\x18\a \x01(\v2\x1a.meshtastic.AAS3935_configR\fas3935Config\"\xc9\x03\n" +
 	"\fSCD4X_config\x12\x1c\n" +
 	"\aset_asc\x18\x01 \x01(\bH\x00R\x06setAsc\x88\x01\x01\x122\n" +
 	"\x13set_target_co2_conc\x18\x02 \x01(\rH\x01R\x10setTargetCo2Conc\x88\x01\x01\x12,\n" +
@@ -2832,8 +2832,8 @@ const file_meshtastic_admin_proto_rawDesc = "" +
 	"\r_set_accuracy\"k\n" +
 	"\rDS248X_config\x12=\n" +
 	"\x18main_temperature_channel\x18\x01 \x01(\rH\x00R\x16mainTemperatureChannel\x88\x01\x01B\x1b\n" +
-	"\x19_main_temperature_channel\"U\n" +
-	"\rAS3935_config\x12.\n" +
+	"\x19_main_temperature_channel\"V\n" +
+	"\x0eAAS3935_config\x12.\n" +
 	"\x11set_tuning_cap_pf\x18\x01 \x01(\rH\x00R\x0esetTuningCapPf\x88\x01\x01B\x14\n" +
 	"\x12_set_tuning_cap_pf*7\n" +
 	"\aOTAMode\x12\x11\n" +
@@ -2875,7 +2875,7 @@ var file_meshtastic_admin_proto_goTypes = []any{
 	(*SCD30Config)(nil),                    // 15: meshtastic.SCD30_config
 	(*SHTXXConfig)(nil),                    // 16: meshtastic.SHTXX_config
 	(*DS248XConfig)(nil),                   // 17: meshtastic.DS248X_config
-	(*AS3935Config)(nil),                   // 18: meshtastic.AS3935_config
+	(*AAS3935Config)(nil),                  // 18: meshtastic.AAS3935_config
 	(*AdminMessage_InputEvent)(nil),        // 19: meshtastic.AdminMessage.InputEvent
 	(*AdminMessage_OTAEvent)(nil),          // 20: meshtastic.AdminMessage.OTAEvent
 	(*Channel)(nil),                        // 21: meshtastic.Channel
@@ -2924,7 +2924,7 @@ var file_meshtastic_admin_proto_depIdxs = []int32{
 	16, // 32: meshtastic.SensorConfig.shtxx_config:type_name -> meshtastic.SHTXX_config
 	17, // 33: meshtastic.SensorConfig.ds248x_config:type_name -> meshtastic.DS248X_config
 	14, // 34: meshtastic.SensorConfig.sen6x_config:type_name -> meshtastic.SEN6X_config
-	18, // 35: meshtastic.SensorConfig.as3935_config:type_name -> meshtastic.AS3935_config
+	18, // 35: meshtastic.SensorConfig.as3935_config:type_name -> meshtastic.AAS3935_config
 	0,  // 36: meshtastic.AdminMessage.OTAEvent.reboot_ota_mode:type_name -> meshtastic.OTAMode
 	37, // [37:37] is the sub-list for method output_type
 	37, // [37:37] is the sub-list for method input_type

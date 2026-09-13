@@ -352,6 +352,8 @@ const (
 	HardwareModel_MESHNOLOGY_W12 HardwareModel = 145
 	// Seeed Studio MeshPager X2
 	HardwareModel_MESHPAGER_X2 HardwareModel = 146
+	// Lilygo T-CONNECT PRO
+	HardwareModel_T_CONNECT_PRO HardwareModel = 147
 	// ------------------------------------------------------------------------------------------------------------------------------------------
 	// Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it within 8 bits.
 	// ------------------------------------------------------------------------------------------------------------------------------------------
@@ -508,6 +510,7 @@ var (
 		144: "SEEED_WIO_TRACKER_L1_PRO_1W",
 		145: "MESHNOLOGY_W12",
 		146: "MESHPAGER_X2",
+		147: "T_CONNECT_PRO",
 		255: "PRIVATE_HW",
 	}
 	HardwareModel_value = map[string]int32{
@@ -658,6 +661,7 @@ var (
 		"SEEED_WIO_TRACKER_L1_PRO_1W":  144,
 		"MESHNOLOGY_W12":               145,
 		"MESHPAGER_X2":                 146,
+		"T_CONNECT_PRO":                147,
 		"PRIVATE_HW":                   255,
 	}
 )
@@ -3622,8 +3626,17 @@ type NodeInfo struct {
 	// Persists between NodeDB internal clean ups
 	// LSB 1 of the bitfield
 	HasXeddsaSigned bool `protobuf:"varint,14,opt,name=has_xeddsa_signed,json=hasXeddsaSigned,proto3" json:"has_xeddsa_signed,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// True if we have heard this node over RF since our current LoRa
+	// configuration took effect. Cleared for every node whenever the region,
+	// modem preset (or the custom bandwidth/spread factor/coding rate when
+	// use_preset is false), override_frequency, channel_num or the primary
+	// channel name changes - the frequency slot is derived from that name.
+	// Not set for nodes heard over MQTT, which reach us over the internet
+	// rather than over our own radio - see via_mqtt.
+	// LSB 11 of the bitfield
+	HeardOnCurrentLora bool `protobuf:"varint,15,opt,name=heard_on_current_lora,json=heardOnCurrentLora,proto3" json:"heard_on_current_lora,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *NodeInfo) Reset() {
@@ -3750,6 +3763,13 @@ func (x *NodeInfo) GetIsMuted() bool {
 func (x *NodeInfo) GetHasXeddsaSigned() bool {
 	if x != nil {
 		return x.HasXeddsaSigned
+	}
+	return false
+}
+
+func (x *NodeInfo) GetHeardOnCurrentLora() bool {
+	if x != nil {
+		return x.HeardOnCurrentLora
 	}
 	return false
 }
@@ -4407,15 +4427,15 @@ type LockdownStatus struct {
 	State LockdownStatus_State `protobuf:"varint,1,opt,name=state,proto3,enum=meshtastic.LockdownStatus_State" json:"state,omitempty"`
 	// For LOCKED: machine-readable reason. Known values:
 	//
-	//	"needs_auth"        — storage already unlocked, client must auth
-	//	"token_missing"     — no boot token on flash
-	//	"token_expired"     — boot token wall-clock TTL elapsed
-	//	"token_boots_zero"  — boot token boot-count TTL exhausted
-	//	"token_hmac_fail"   — token tampered or wrong device
-	//	"token_dek_fail"    — token DEK decrypt failed
-	//	"token_wrong_size"  — token file corrupted
-	//	"token_bad_magic"   — token file corrupted
-	//	"not_provisioned"   — should generally use NEEDS_PROVISION state instead
+	//	"needs_auth"        - storage already unlocked, client must auth
+	//	"token_missing"     - no boot token on flash
+	//	"token_expired"     - boot token wall-clock TTL elapsed
+	//	"token_boots_zero"  - boot token boot-count TTL exhausted
+	//	"token_hmac_fail"   - token tampered or wrong device
+	//	"token_dek_fail"    - token DEK decrypt failed
+	//	"token_wrong_size"  - token file corrupted
+	//	"token_bad_magic"   - token file corrupted
+	//	"not_provisioned"   - should generally use NEEDS_PROVISION state instead
 	//
 	// Other values may be added; clients should treat unknown values as
 	// "locked, ask for passphrase".
@@ -6285,7 +6305,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\n" +
 	"\b_rx_timeB\n" +
 	"\n" +
-	"\b_rx_rssi\"\x8c\x04\n" +
+	"\b_rx_rssi\"\xbf\x04\n" +
 	"\bNodeInfo\x12\x10\n" +
 	"\x03num\x18\x01 \x01(\rR\x03num\x12$\n" +
 	"\x04user\x18\x02 \x01(\v2\x10.meshtastic.UserR\x04user\x120\n" +
@@ -6304,7 +6324,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"is_ignored\x18\v \x01(\bR\tisIgnored\x127\n" +
 	"\x18is_key_manually_verified\x18\f \x01(\bR\x15isKeyManuallyVerified\x12\x19\n" +
 	"\bis_muted\x18\r \x01(\bR\aisMuted\x12*\n" +
-	"\x11has_xeddsa_signed\x18\x0e \x01(\bR\x0fhasXeddsaSignedB\f\n" +
+	"\x11has_xeddsa_signed\x18\x0e \x01(\bR\x0fhasXeddsaSigned\x121\n" +
+	"\x15heard_on_current_lora\x18\x0f \x01(\bR\x12heardOnCurrentLoraB\f\n" +
 	"\n" +
 	"_hops_away\"\x98\x02\n" +
 	"\n" +
@@ -6476,7 +6497,7 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\x10request_transfer\x18\x02 \x01(\bH\x00R\x0frequestTransfer\x12)\n" +
 	"\x0faccept_transfer\x18\x03 \x01(\bH\x00R\x0eacceptTransfer\x12@\n" +
 	"\rresend_chunks\x18\x04 \x01(\v2\x19.meshtastic.resend_chunksH\x00R\fresendChunksB\x11\n" +
-	"\x0fpayload_variant*\xaf\x16\n" +
+	"\x0fpayload_variant*\xc3\x16\n" +
 	"\rHardwareModel\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bTLORA_V2\x10\x01\x12\f\n" +
@@ -6637,7 +6658,8 @@ const file_meshtastic_mesh_proto_rawDesc = "" +
 	"\vHELTEC_RCC6\x10\x8f\x01\x12 \n" +
 	"\x1bSEEED_WIO_TRACKER_L1_PRO_1W\x10\x90\x01\x12\x13\n" +
 	"\x0eMESHNOLOGY_W12\x10\x91\x01\x12\x11\n" +
-	"\fMESHPAGER_X2\x10\x92\x01\x12\x0f\n" +
+	"\fMESHPAGER_X2\x10\x92\x01\x12\x12\n" +
+	"\rT_CONNECT_PRO\x10\x93\x01\x12\x0f\n" +
 	"\n" +
 	"PRIVATE_HW\x10\xff\x01*,\n" +
 	"\tConstants\x12\b\n" +

@@ -144,8 +144,14 @@ type ChannelSettings struct {
 	DownlinkEnabled bool `protobuf:"varint,6,opt,name=downlink_enabled,json=downlinkEnabled,proto3" json:"downlink_enabled,omitempty"`
 	// Per-channel module settings.
 	ModuleSettings *ModuleSettings `protobuf:"bytes,7,opt,name=module_settings,json=moduleSettings,proto3" json:"module_settings,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Enable authenticated encryption (AES-CCM) for this channel.
+	// When true, messages include a 12-byte authentication tag that prevents
+	// forgery and bit-flipping attacks. All nodes on the channel must have
+	// this enabled - unauthenticated (AES-CTR) packets are rejected.
+	// Experimental. Default: false (standard AES-CTR encryption).
+	UseAead       bool `protobuf:"varint,8,opt,name=use_aead,json=useAead,proto3" json:"use_aead,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ChannelSettings) Reset() {
@@ -226,6 +232,13 @@ func (x *ChannelSettings) GetModuleSettings() *ModuleSettings {
 		return x.ModuleSettings
 	}
 	return nil
+}
+
+func (x *ChannelSettings) GetUseAead() bool {
+	if x != nil {
+		return x.UseAead
+	}
+	return false
 }
 
 // This message is specifically for modules to store per-channel configuration data.
@@ -355,7 +368,7 @@ var File_meshtastic_channel_proto protoreflect.FileDescriptor
 const file_meshtastic_channel_proto_rawDesc = "" +
 	"\n" +
 	"\x18meshtastic/channel.proto\x12\n" +
-	"meshtastic\"\x83\x02\n" +
+	"meshtastic\"\x9e\x02\n" +
 	"\x0fChannelSettings\x12#\n" +
 	"\vchannel_num\x18\x01 \x01(\rB\x02\x18\x01R\n" +
 	"channelNum\x12\x10\n" +
@@ -364,7 +377,8 @@ const file_meshtastic_channel_proto_rawDesc = "" +
 	"\x02id\x18\x04 \x01(\aR\x02id\x12%\n" +
 	"\x0euplink_enabled\x18\x05 \x01(\bR\ruplinkEnabled\x12)\n" +
 	"\x10downlink_enabled\x18\x06 \x01(\bR\x0fdownlinkEnabled\x12C\n" +
-	"\x0fmodule_settings\x18\a \x01(\v2\x1a.meshtastic.ModuleSettingsR\x0emoduleSettings\"Z\n" +
+	"\x0fmodule_settings\x18\a \x01(\v2\x1a.meshtastic.ModuleSettingsR\x0emoduleSettings\x12\x19\n" +
+	"\buse_aead\x18\b \x01(\bR\auseAead\"Z\n" +
 	"\x0eModuleSettings\x12-\n" +
 	"\x12position_precision\x18\x01 \x01(\rR\x11positionPrecision\x12\x19\n" +
 	"\bis_muted\x18\x02 \x01(\bR\aisMuted\"\xb8\x01\n" +

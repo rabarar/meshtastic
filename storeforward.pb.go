@@ -142,7 +142,9 @@ type StoreAndForward struct {
 	//	*StoreAndForward_History_
 	//	*StoreAndForward_Heartbeat_
 	//	*StoreAndForward_Text
-	Variant       isStoreAndForward_Variant `protobuf_oneof:"variant"`
+	Variant isStoreAndForward_Variant `protobuf_oneof:"variant"`
+	// Contains the original ID of the contained message.
+	OriginalId    uint32 `protobuf:"varint,6,opt,name=original_id,json=originalId,proto3" json:"original_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -225,6 +227,13 @@ func (x *StoreAndForward) GetText() []byte {
 		}
 	}
 	return nil
+}
+
+func (x *StoreAndForward) GetOriginalId() uint32 {
+	if x != nil {
+		return x.OriginalId
+	}
+	return 0
 }
 
 type isStoreAndForward_Variant interface {
@@ -502,13 +511,15 @@ var File_meshtastic_storeforward_proto protoreflect.FileDescriptor
 const file_meshtastic_storeforward_proto_rawDesc = "" +
 	"\n" +
 	"\x1dmeshtastic/storeforward.proto\x12\n" +
-	"meshtastic\"\xec\b\n" +
+	"meshtastic\"\x8d\t\n" +
 	"\x0fStoreAndForward\x12;\n" +
 	"\x02rr\x18\x01 \x01(\x0e2+.meshtastic.StoreAndForward.RequestResponseR\x02rr\x12>\n" +
 	"\x05stats\x18\x02 \x01(\v2&.meshtastic.StoreAndForward.StatisticsH\x00R\x05stats\x12?\n" +
 	"\ahistory\x18\x03 \x01(\v2#.meshtastic.StoreAndForward.HistoryH\x00R\ahistory\x12E\n" +
 	"\theartbeat\x18\x04 \x01(\v2%.meshtastic.StoreAndForward.HeartbeatH\x00R\theartbeat\x12\x14\n" +
-	"\x04text\x18\x05 \x01(\fH\x00R\x04text\x1a\xbf\x02\n" +
+	"\x04text\x18\x05 \x01(\fH\x00R\x04text\x12\x1f\n" +
+	"\voriginal_id\x18\x06 \x01(\rR\n" +
+	"originalId\x1a\xbf\x02\n" +
 	"\n" +
 	"Statistics\x12%\n" +
 	"\x0emessages_total\x18\x01 \x01(\rR\rmessagesTotal\x12%\n" +

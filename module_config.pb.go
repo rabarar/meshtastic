@@ -150,22 +150,33 @@ const (
 	ModuleConfig_AudioConfig_CODEC2_1400    ModuleConfig_AudioConfig_Audio_Baud = 4
 	ModuleConfig_AudioConfig_CODEC2_1300    ModuleConfig_AudioConfig_Audio_Baud = 5
 	ModuleConfig_AudioConfig_CODEC2_1200    ModuleConfig_AudioConfig_Audio_Baud = 6
-	ModuleConfig_AudioConfig_CODEC2_700     ModuleConfig_AudioConfig_Audio_Baud = 7
-	ModuleConfig_AudioConfig_CODEC2_700B    ModuleConfig_AudioConfig_Audio_Baud = 8
+	// Removed from libcodec2 upstream. A device configured to one of these
+	// falls back to CODEC2_700C.
+	//
+	// Deprecated: Marked as deprecated in meshtastic/module_config.proto.
+	ModuleConfig_AudioConfig_CODEC2_700 ModuleConfig_AudioConfig_Audio_Baud = 7
+	// Deprecated: Marked as deprecated in meshtastic/module_config.proto.
+	ModuleConfig_AudioConfig_CODEC2_700B ModuleConfig_AudioConfig_Audio_Baud = 8
+	// Replaces CODEC2_700. Default for new configurations.
+	ModuleConfig_AudioConfig_CODEC2_700C ModuleConfig_AudioConfig_Audio_Baud = 9
+	// Lowest rate, and the only one usable on slower modem presets.
+	ModuleConfig_AudioConfig_CODEC2_450 ModuleConfig_AudioConfig_Audio_Baud = 10
 )
 
 // Enum value maps for ModuleConfig_AudioConfig_Audio_Baud.
 var (
 	ModuleConfig_AudioConfig_Audio_Baud_name = map[int32]string{
-		0: "CODEC2_DEFAULT",
-		1: "CODEC2_3200",
-		2: "CODEC2_2400",
-		3: "CODEC2_1600",
-		4: "CODEC2_1400",
-		5: "CODEC2_1300",
-		6: "CODEC2_1200",
-		7: "CODEC2_700",
-		8: "CODEC2_700B",
+		0:  "CODEC2_DEFAULT",
+		1:  "CODEC2_3200",
+		2:  "CODEC2_2400",
+		3:  "CODEC2_1600",
+		4:  "CODEC2_1400",
+		5:  "CODEC2_1300",
+		6:  "CODEC2_1200",
+		7:  "CODEC2_700",
+		8:  "CODEC2_700B",
+		9:  "CODEC2_700C",
+		10: "CODEC2_450",
 	}
 	ModuleConfig_AudioConfig_Audio_Baud_value = map[string]int32{
 		"CODEC2_DEFAULT": 0,
@@ -177,6 +188,8 @@ var (
 		"CODEC2_1200":    6,
 		"CODEC2_700":     7,
 		"CODEC2_700B":    8,
+		"CODEC2_700C":    9,
+		"CODEC2_450":     10,
 	}
 )
 
@@ -1385,7 +1398,7 @@ type ModuleConfig_AudioConfig struct {
 	Codec2Enabled bool `protobuf:"varint,1,opt,name=codec2_enabled,json=codec2Enabled,proto3" json:"codec2_enabled,omitempty"`
 	// PTT Pin
 	PttPin uint32 `protobuf:"varint,2,opt,name=ptt_pin,json=pttPin,proto3" json:"ptt_pin,omitempty"`
-	// The audio sample rate to use for codec2
+	// The codec2 bitrate to encode at. Sample rate is always 8 kHz.
 	Bitrate ModuleConfig_AudioConfig_Audio_Baud `protobuf:"varint,3,opt,name=bitrate,proto3,enum=meshtastic.ModuleConfig_AudioConfig_Audio_Baud" json:"bitrate,omitempty"`
 	// I2S Word Select
 	I2SWs uint32 `protobuf:"varint,4,opt,name=i2s_ws,json=i2sWs,proto3" json:"i2s_ws,omitempty"`
@@ -1551,11 +1564,15 @@ func (x *ModuleConfig_PaxcounterConfig) GetBleThreshold() int32 {
 }
 
 // Config for the Traffic Management module.
-// Provides packet inspection and traffic shaping to help reduce channel utilization
+// Provides packet inspection and traffic shaping to help reduce channel utilization.
+// Every field uses the proto3 zero value to mean "disabled"; there is no
+// "use the firmware default" sentinel. Firmware installs its own defaults when it
+// first creates this config, and a client that writes 0 turns that feature off.
 type ModuleConfig_TrafficManagementConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Minimum interval in seconds between position updates from the same node.
 	// A non-zero value implicitly enables the suppression window; 0 disables it.
+	// Firmware default: 21600 (6 hours), installed when this config is first created.
 	PositionMinIntervalSecs uint32 `protobuf:"varint,4,opt,name=position_min_interval_secs,json=positionMinIntervalSecs,proto3" json:"position_min_interval_secs,omitempty"`
 	// Maximum hop distance from the requestor at which direct NodeInfo responses
 	// are served from the local cache. A non-zero value implicitly enables direct
@@ -2789,7 +2806,7 @@ var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\x1a\x15meshtastic/atak.proto\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\"\x83D\n" +
+	"meshtastic\x1a\x15meshtastic/atak.proto\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\"\xacD\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2858,7 +2875,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\fFALLING_EDGE\x10\x02\x12\x0f\n" +
 	"\vRISING_EDGE\x10\x03\x12\x1a\n" +
 	"\x16EITHER_EDGE_ACTIVE_LOW\x10\x04\x12\x1b\n" +
-	"\x17EITHER_EDGE_ACTIVE_HIGH\x10\x05\x1a\xa2\x03\n" +
+	"\x17EITHER_EDGE_ACTIVE_HIGH\x10\x05\x1a\xcb\x03\n" +
 	"\vAudioConfig\x12%\n" +
 	"\x0ecodec2_enabled\x18\x01 \x01(\bR\rcodec2Enabled\x12\x17\n" +
 	"\aptt_pin\x18\x02 \x01(\rR\x06pttPin\x12I\n" +
@@ -2866,7 +2883,7 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x06i2s_ws\x18\x04 \x01(\rR\x05i2sWs\x12\x15\n" +
 	"\x06i2s_sd\x18\x05 \x01(\rR\x05i2sSd\x12\x17\n" +
 	"\ai2s_din\x18\x06 \x01(\rR\x06i2sDin\x12\x17\n" +
-	"\ai2s_sck\x18\a \x01(\rR\x06i2sSck\"\xa7\x01\n" +
+	"\ai2s_sck\x18\a \x01(\rR\x06i2sSck\"\xd0\x01\n" +
 	"\n" +
 	"Audio_Baud\x12\x12\n" +
 	"\x0eCODEC2_DEFAULT\x10\x00\x12\x0f\n" +
@@ -2875,10 +2892,14 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\vCODEC2_1600\x10\x03\x12\x0f\n" +
 	"\vCODEC2_1400\x10\x04\x12\x0f\n" +
 	"\vCODEC2_1300\x10\x05\x12\x0f\n" +
-	"\vCODEC2_1200\x10\x06\x12\x0e\n" +
+	"\vCODEC2_1200\x10\x06\x12\x12\n" +
 	"\n" +
-	"CODEC2_700\x10\a\x12\x0f\n" +
-	"\vCODEC2_700B\x10\b\x1a\xb6\x01\n" +
+	"CODEC2_700\x10\a\x1a\x02\b\x01\x12\x13\n" +
+	"\vCODEC2_700B\x10\b\x1a\x02\b\x01\x12\x0f\n" +
+	"\vCODEC2_700C\x10\t\x12\x0e\n" +
+	"\n" +
+	"CODEC2_450\x10\n" +
+	"\x1a\xb6\x01\n" +
 	"\x10PaxcounterConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12<\n" +
 	"\x1apaxcounter_update_interval\x18\x02 \x01(\rR\x18paxcounterUpdateInterval\x12%\n" +

@@ -169,6 +169,10 @@ const (
 	Language_CZECH Language = 18
 	// Danish
 	Language_DANISH Language = 19
+	// Hungarian
+	Language_HUNGARIAN Language = 20
+	// Azerbaijani
+	Language_AZERBAIJANI Language = 21
 	// Simplified Chinese (experimental)
 	Language_SIMPLIFIED_CHINESE Language = 30
 	// Traditional Chinese (experimental)
@@ -198,6 +202,8 @@ var (
 		17: "BULGARIAN",
 		18: "CZECH",
 		19: "DANISH",
+		20: "HUNGARIAN",
+		21: "AZERBAIJANI",
 		30: "SIMPLIFIED_CHINESE",
 		31: "TRADITIONAL_CHINESE",
 	}
@@ -222,6 +228,8 @@ var (
 		"BULGARIAN":           17,
 		"CZECH":               18,
 		"DANISH":              19,
+		"HUNGARIAN":           20,
+		"AZERBAIJANI":         21,
 		"SIMPLIFIED_CHINESE":  30,
 		"TRADITIONAL_CHINESE": 31,
 	}
@@ -915,7 +923,7 @@ const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"\x05Theme\x12\b\n" +
 	"\x04DARK\x10\x00\x12\t\n" +
 	"\x05LIGHT\x10\x01\x12\a\n" +
-	"\x03RED\x10\x02*\xc0\x02\n" +
+	"\x03RED\x10\x02*\xe0\x02\n" +
 	"\bLanguage\x12\v\n" +
 	"\aENGLISH\x10\x00\x12\n" +
 	"\n" +
@@ -942,7 +950,9 @@ const file_meshtastic_device_ui_proto_rawDesc = "" +
 	"\tBULGARIAN\x10\x11\x12\t\n" +
 	"\x05CZECH\x10\x12\x12\n" +
 	"\n" +
-	"\x06DANISH\x10\x13\x12\x16\n" +
+	"\x06DANISH\x10\x13\x12\r\n" +
+	"\tHUNGARIAN\x10\x14\x12\x0f\n" +
+	"\vAZERBAIJANI\x10\x15\x12\x16\n" +
 	"\x12SIMPLIFIED_CHINESE\x10\x1e\x12\x17\n" +
 	"\x13TRADITIONAL_CHINESE\x10\x1fBe\n" +
 	"\x14org.meshtastic.protoB\x0eDeviceUIProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"

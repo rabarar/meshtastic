@@ -24,7 +24,7 @@ const (
 // Payload for MESH_BEACON_APP packets.
 // Periodically broadcast by nodes in beacon mode.
 // Listeners deliver the text message to the local inbox and cache any offered
-// channel/preset for the client app to act on — the firmware never auto-applies them.
+// channel/preset for the client app to act on - the firmware never auto-applies them.
 type MeshBeacon struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Human-readable beacon message. Max 100 bytes enforced by firmware on send.
