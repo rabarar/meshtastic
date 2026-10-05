@@ -36,9 +36,17 @@ type MeshBeacon struct {
 	OfferRegion Config_LoRaConfig_RegionCode `protobuf:"varint,3,opt,name=offer_region,json=offerRegion,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"offer_region,omitempty"`
 	// Optional modem preset being advertised.
 	// Combined with offer_region, tells a client "there is a mesh on this preset/region".
-	OfferPreset   *Config_LoRaConfig_ModemPreset `protobuf:"varint,4,opt,name=offer_preset,json=offerPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset,oneof" json:"offer_preset,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	OfferPreset *Config_LoRaConfig_ModemPreset `protobuf:"varint,4,opt,name=offer_preset,json=offerPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset,oneof" json:"offer_preset,omitempty"`
+	// Frequency slot this mesh uses, 1-based, matching Config.LoRaConfig.channel_num.
+	// OMITTED when a receiver can derive the slot itself from offer_region, offer_channel's
+	// name and offer_preset - an unset offer_preset means the region's default preset. That
+	// covers both a region with a mandated slot and a mesh on the default name hash.
+	// PRESENT means this mesh deliberately deviates from what derivation would produce; a
+	// client should still validate the result against its own region before offering to join.
+	// Do not send 0 - it is the same as omitting the field.
+	OfferFrequencySlot *uint32 `protobuf:"varint,5,opt,name=offer_frequency_slot,json=offerFrequencySlot,proto3,oneof" json:"offer_frequency_slot,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *MeshBeacon) Reset() {
@@ -99,19 +107,28 @@ func (x *MeshBeacon) GetOfferPreset() Config_LoRaConfig_ModemPreset {
 	return Config_LoRaConfig_LONG_FAST
 }
 
+func (x *MeshBeacon) GetOfferFrequencySlot() uint32 {
+	if x != nil && x.OfferFrequencySlot != nil {
+		return *x.OfferFrequencySlot
+	}
+	return 0
+}
+
 var File_meshtastic_mesh_beacon_proto protoreflect.FileDescriptor
 
 const file_meshtastic_mesh_beacon_proto_rawDesc = "" +
 	"\n" +
 	"\x1cmeshtastic/mesh_beacon.proto\x12\n" +
-	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\"\x99\x02\n" +
+	"meshtastic\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\"\xe9\x02\n" +
 	"\n" +
 	"MeshBeacon\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\x12@\n" +
 	"\roffer_channel\x18\x02 \x01(\v2\x1b.meshtastic.ChannelSettingsR\fofferChannel\x12K\n" +
 	"\foffer_region\x18\x03 \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\vofferRegion\x12Q\n" +
-	"\foffer_preset\x18\x04 \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x00R\vofferPreset\x88\x01\x01B\x0f\n" +
-	"\r_offer_presetBg\n" +
+	"\foffer_preset\x18\x04 \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x00R\vofferPreset\x88\x01\x01\x125\n" +
+	"\x14offer_frequency_slot\x18\x05 \x01(\rH\x01R\x12offerFrequencySlot\x88\x01\x01B\x0f\n" +
+	"\r_offer_presetB\x17\n" +
+	"\x15_offer_frequency_slotBg\n" +
 	"\x14org.meshtastic.protoB\x10MeshBeaconProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
 
 var (

@@ -542,7 +542,8 @@ func (Config_NetworkConfig_ProtocolFlags) EnumDescriptor() ([]byte, []int) {
 	return file_meshtastic_config_proto_rawDescGZIP(), []int{0, 3, 1}
 }
 
-// Deprecated in 2.7.4: Unused
+// Unused. Kept so the deprecated gps_format field still has a type; when
+// firmware stopped reading that field is recorded on the field itself.
 type Config_DisplayConfig_DeprecatedGpsCoordinateFormat int32
 
 const (
@@ -2127,7 +2128,6 @@ type Config_DisplayConfig struct {
 	// Number of seconds the screen stays on after pressing the user button or receiving a message
 	// 0 for default of one minute MAXUINT for always on
 	ScreenOnSecs uint32 `protobuf:"varint,1,opt,name=screen_on_secs,json=screenOnSecs,proto3" json:"screen_on_secs,omitempty"`
-	// Deprecated in 2.7.4: Unused
 	// How the GPS coordinates are formatted on the OLED screen.
 	//
 	// Deprecated: Marked as deprecated in meshtastic/config.proto.
@@ -2299,24 +2299,43 @@ func (x *Config_DisplayConfig) GetEnableMessageBubbles() bool {
 // Lora Config
 type Config_LoRaConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// When enabled, the `modem_preset` fields will be adhered to, else the `bandwidth`/`spread_factor`/`coding_rate`
-	// will be taked from their respective manually defined fields
+	// When enabled, the `modem_preset` sets the bandwidth and spread factor, and the
+	// `bandwidth`/`spread_factor` fields are ignored. `coding_rate` is the exception:
+	// see that field. When disabled, all three are taken from their respective
+	// manually defined fields.
 	UsePreset bool `protobuf:"varint,1,opt,name=use_preset,json=usePreset,proto3" json:"use_preset,omitempty"`
 	// Either modem_config or bandwidth/spreading/coding will be specified - NOT BOTH.
 	// As a heuristic: If bandwidth is specified, do not use modem_config.
 	// Because protobufs take ZERO space when the value is zero this works out nicely.
 	// This value is replaced by bandwidth/spread_factor/coding_rate.
+	// The one exception is `coding_rate`, which can raise the preset's coding rate
+	// without moving off the preset; see that field.
 	// If you'd like to experiment with other options add them to MeshRadio.cpp in the device code.
 	ModemPreset Config_LoRaConfig_ModemPreset `protobuf:"varint,2,opt,name=modem_preset,json=modemPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset" json:"modem_preset,omitempty"`
-	// Bandwidth in MHz
+	// Bandwidth in kHz
 	// Certain bandwidth numbers are 'special' and will be converted to the
-	// appropriate floating point value: 31 -> 31.25MHz
+	// appropriate floating point value: 31 -> 31.25kHz
 	Bandwidth uint32 `protobuf:"varint,3,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
-	// A number from 7 to 12.
+	// A number from 5 to 12, which the firmware clamps to that range.
 	// Indicates number of chirps per symbol as 1<<spread_factor.
+	// RF95 radios additionally reject 5 and 6; that exclusion is per hardware
+	// and so is not expressible as a bound here.
 	SpreadFactor uint32 `protobuf:"varint,4,opt,name=spread_factor,json=spreadFactor,proto3" json:"spread_factor,omitempty"`
 	// The denominator of the coding rate.
 	// ie for 4/5, the value is 5. 4/8 the value is 8.
+	//
+	// With `use_preset` disabled this is the coding rate, clamped to 5 through 8.
+	//
+	// With `use_preset` enabled, since 2.7.18 this raises the preset's coding rate
+	// when it is 5 through 8 AND higher than the preset's. A lower value, a value
+	// out of range, and 0 all leave the preset's coding rate in place, so 0 is how
+	// a client says "use the preset's". Bandwidth and spread factor still come from
+	// the preset, and the coding rate travels in the explicit LoRa header, so nodes
+	// on the same preset still hear each other either way.
+	//
+	// No bound is stated here because the valid set differs between the two cases:
+	// 5 through 8 with `use_preset` off, and 0 plus anything from above the preset's
+	// own coding rate up to 8 with it on.
 	CodingRate uint32 `protobuf:"varint,5,opt,name=coding_rate,json=codingRate,proto3" json:"coding_rate,omitempty"`
 	// This parameter is for advanced users with advanced test equipment, we do not recommend most users use it.
 	// A frequency offset that is added to to the calculated band center frequency.
@@ -2833,7 +2852,7 @@ var File_meshtastic_config_proto protoreflect.FileDescriptor
 const file_meshtastic_config_proto_rawDesc = "" +
 	"\n" +
 	"\x17meshtastic/config.proto\x12\n" +
-	"meshtastic\x1a\x1ameshtastic/device_ui.proto\"\x85:\n" +
+	"meshtastic\x1a\x1ameshtastic/device_ui.proto\x1a\x1fmeshtastic/field_metadata.proto\"\xa5\x8e\x01\n" +
 	"\x06Config\x129\n" +
 	"\x06device\x18\x01 \x01(\v2\x1f.meshtastic.Config.DeviceConfigH\x00R\x06device\x12?\n" +
 	"\bposition\x18\x02 \x01(\v2!.meshtastic.Config.PositionConfigH\x00R\bposition\x126\n" +
@@ -2847,319 +2866,309 @@ const file_meshtastic_config_proto_rawDesc = "" +
 	"sessionkey\x18\t \x01(\v2#.meshtastic.Config.SessionkeyConfigH\x00R\n" +
 	"sessionkey\x129\n" +
 	"\tdevice_ui\x18\n" +
-	" \x01(\v2\x1a.meshtastic.DeviceUIConfigH\x00R\bdeviceUi\x1a\xab\b\n" +
-	"\fDeviceConfig\x128\n" +
-	"\x04role\x18\x01 \x01(\x0e2$.meshtastic.Config.DeviceConfig.RoleR\x04role\x12)\n" +
-	"\x0eserial_enabled\x18\x02 \x01(\bB\x02\x18\x01R\rserialEnabled\x12\x1f\n" +
-	"\vbutton_gpio\x18\x04 \x01(\rR\n" +
-	"buttonGpio\x12\x1f\n" +
-	"\vbuzzer_gpio\x18\x05 \x01(\rR\n" +
-	"buzzerGpio\x12Z\n" +
-	"\x10rebroadcast_mode\x18\x06 \x01(\x0e2/.meshtastic.Config.DeviceConfig.RebroadcastModeR\x0frebroadcastMode\x127\n" +
-	"\x18node_info_broadcast_secs\x18\a \x01(\rR\x15nodeInfoBroadcastSecs\x12:\n" +
-	"\x1adouble_tap_as_button_press\x18\b \x01(\bR\x16doubleTapAsButtonPress\x12!\n" +
+	" \x01(\v2\x1a.meshtastic.DeviceUIConfigH\x00R\bdeviceUi\x1a\xc5\x1f\n" +
+	"\fDeviceConfig\x12K\n" +
+	"\x04role\x18\x01 \x01(\x0e2$.meshtastic.Config.DeviceConfig.RoleB\x11\xca\xf3\x18\r:\vDevice RoleR\x04role\x12)\n" +
+	"\x0eserial_enabled\x18\x02 \x01(\bB\x02\x18\x01R\rserialEnabled\x12\x81\x01\n" +
+	"\vbutton_gpio\x18\x04 \x01(\rB`\xca\xf3\x18\\:\vButton GPIOBMGPIO pin for the user button, can be remapped on boards with multiple buttonsR\n" +
+	"buttonGpio\x12O\n" +
+	"\vbuzzer_gpio\x18\x05 \x01(\rB.\xca\xf3\x18*:\vBuzzer GPIOB\x1bGPIO pin for the PWM buzzerR\n" +
+	"buzzerGpio\x12r\n" +
+	"\x10rebroadcast_mode\x18\x06 \x01(\x0e2/.meshtastic.Config.DeviceConfig.RebroadcastModeB\x16\xca\xf3\x18\x12:\x10Rebroadcast ModeR\x0frebroadcastMode\x12\x9c\x01\n" +
+	"\x18node_info_broadcast_secs\x18\a \x01(\rBc\xca\xf3\x18_*\x01s:\x1cNode Info Broadcast IntervalB<How often node information is sent. Defaults to 900 seconds.R\x15nodeInfoBroadcastSecs\x12\x9c\x01\n" +
+	"\x1adouble_tap_as_button_press\x18\b \x01(\bB`\xca\xf3\x18\\:\x14Double Tap as ButtonBDTreat double tap on supported accelerometers as a user button press.R\x16doubleTapAsButtonPress\x12!\n" +
 	"\n" +
-	"is_managed\x18\t \x01(\bB\x02\x18\x01R\tisManaged\x120\n" +
+	"is_managed\x18\t \x01(\bB\x02\x18\x01R\tisManaged\x12}\n" +
 	"\x14disable_triple_click\x18\n" +
-	" \x01(\bR\x12disableTripleClick\x12\x14\n" +
-	"\x05tzdef\x18\v \x01(\tR\x05tzdef\x124\n" +
-	"\x16led_heartbeat_disabled\x18\f \x01(\bR\x14ledHeartbeatDisabled\x12K\n" +
-	"\vbuzzer_mode\x18\r \x01(\x0e2*.meshtastic.Config.DeviceConfig.BuzzerModeR\n" +
-	"buzzerMode\"\xd4\x01\n" +
-	"\x04Role\x12\n" +
-	"\n" +
-	"\x06CLIENT\x10\x00\x12\x0f\n" +
-	"\vCLIENT_MUTE\x10\x01\x12\n" +
-	"\n" +
-	"\x06ROUTER\x10\x02\x12\x15\n" +
-	"\rROUTER_CLIENT\x10\x03\x1a\x02\b\x01\x12\x10\n" +
-	"\bREPEATER\x10\x04\x1a\x02\b\x01\x12\v\n" +
-	"\aTRACKER\x10\x05\x12\n" +
-	"\n" +
-	"\x06SENSOR\x10\x06\x12\a\n" +
-	"\x03TAK\x10\a\x12\x11\n" +
-	"\rCLIENT_HIDDEN\x10\b\x12\x12\n" +
-	"\x0eLOST_AND_FOUND\x10\t\x12\x0f\n" +
+	" \x01(\bBK\xca\xf3\x18G:\x14Disable Triple ClickB/Disables the user button triple-press shortcut.R\x12disableTripleClick\x12G\n" +
+	"\x05tzdef\x18\v \x01(\tB1\xca\xf3\x18-:\tTime ZoneB POSIX timezone definition stringR\x05tzdef\x12\xe2\x01\n" +
+	"\x16led_heartbeat_disabled\x18\f \x01(\bB\xab\x01\xca\xf3\x18\xa6\x01:\rLED HeartbeatB\x94\x01Controls the blinking LED on the device.  For most devices this will control one of the up to 4 LEDS, the charger and GPS LEDs are not controllable.R\x14ledHeartbeatDisabled\x12X\n" +
+	"\vbuzzer_mode\x18\r \x01(\x0e2*.meshtastic.Config.DeviceConfig.BuzzerModeB\v\xca\xf3\x18\aR\x052.7.0R\n" +
+	"buzzerMode\"\xd4\v\n" +
+	"\x04Role\x12H\n" +
+	"\x06CLIENT\x10\x00\x1a<\xca\xf3\x188:\x06ClientB.App connected or stand alone messaging device.\x12\\\n" +
+	"\vCLIENT_MUTE\x10\x01\x1aK\xca\xf3\x18G:\vClient MuteB8Device that does not forward packets from other devices.\x12\xb0\x01\n" +
+	"\x06ROUTER\x10\x02\x1a\xa3\x01\xca\xf3\x18\x9e\x01:\x06RouterB\x93\x01Infrastructure node on a tower or mountain top only.  Not to be used for roofs or mobile nodes.  Needs exceptional coverage. Visible in Nodes list.\x12(\n" +
+	"\rROUTER_CLIENT\x10\x03\x1a\x15\xca\xf3\x18\x0f:\rRouter Client\b\x01\x12\xb3\x01\n" +
+	"\bREPEATER\x10\x04\x1a\xa4\x01\xca\xf3\x18\x9d\x01:\bRepeaterB\x90\x01Deprecated infrastructure role that creates gaps in the mesh rebroadcast chain. Switch this node to a Router-based role (Router or Router Late).\b\x01\x12H\n" +
+	"\aTRACKER\x10\x05\x1a;\xca\xf3\x187:\aTrackerB,Broadcasts GPS position packets as priority.\x12C\n" +
+	"\x06SENSOR\x10\x06\x1a7\xca\xf3\x183:\x06SensorB)Broadcasts telemetry packets as priority.\x12X\n" +
+	"\x03TAK\x10\a\x1aO\xca\xf3\x18K:\x03TAKBDOptimized for ATAK system communication, reduces routine broadcasts.\x12k\n" +
+	"\rCLIENT_HIDDEN\x10\b\x1aX\xca\xf3\x18T:\rClient HiddenBCDevice that only broadcasts as needed for stealth or power savings.\x12\x89\x01\n" +
+	"\x0eLOST_AND_FOUND\x10\t\x1au\xca\xf3\x18q:\x0eLost and FoundB_Broadcasts location as message to default channel regularly for to assist with device recovery.\x12h\n" +
 	"\vTAK_TRACKER\x10\n" +
-	"\x12\x0f\n" +
-	"\vROUTER_LATE\x10\v\x12\x0f\n" +
-	"\vCLIENT_BASE\x10\f\"s\n" +
-	"\x0fRebroadcastMode\x12\a\n" +
-	"\x03ALL\x10\x00\x12\x15\n" +
-	"\x11ALL_SKIP_DECODING\x10\x01\x12\x0e\n" +
+	"\x1aW\xca\xf3\x18S:\vTAK TrackerBDEnables automatic TAK PLI broadcasts and reduces routine broadcasts.\x12\xbc\x01\n" +
+	"\vROUTER_LATE\x10\v\x1a\xaa\x01\xca\xf3\x18\xa5\x01:\vRouter LateB\x95\x01Infrastructure node that always rebroadcasts packets once but only after all other modes. Visible in Nodes list. Not a good choice for rooftop nodes.\x12\x85\x01\n" +
+	"\vCLIENT_BASE\x10\f\x1at\xca\xf3\x18p:\vClient BaseBaUsed for rooftop nodes to distribute messages more widely from multiple nearby client mute nodes.\"\xc9\b\n" +
+	"\x0fRebroadcastMode\x12\x8a\x01\n" +
+	"\x03ALL\x10\x00\x1a\x80\x01\xca\xf3\x18|:\x03AllBuRebroadcast any observed message, if it was on our private channel or from another channel with the same lora params.\x12\xe0\x01\n" +
+	"\x11ALL_SKIP_DECODING\x10\x01\x1a\xc8\x01\xca\xf3\x18\xc3\x01:\x11All Skip DecodingB\xad\x01Same as behavior as ALL but skips packet decoding and simply rebroadcasts them. Only available in Repeater role. Setting this on any other roles will result in ALL behavior.\x12\xcd\x01\n" +
 	"\n" +
-	"LOCAL_ONLY\x10\x02\x12\x0e\n" +
+	"LOCAL_ONLY\x10\x02\x1a\xbc\x01\xca\xf3\x18\xb7\x01:\n" +
+	"Local OnlyB\xa8\x01Ignores observed messages from foreign meshes that are open or those which it cannot decrypt. Only rebroadcasts message on the nodes local primary / secondary channels.\x12\xc8\x01\n" +
 	"\n" +
-	"KNOWN_ONLY\x10\x03\x12\b\n" +
-	"\x04NONE\x10\x04\x12\x16\n" +
-	"\x12CORE_PORTNUMS_ONLY\x10\x05\"i\n" +
+	"KNOWN_ONLY\x10\x03\x1a\xb7\x01\xca\xf3\x18\xb2\x01:\n" +
+	"Known OnlyB\xa3\x01Ignores observed messages from foreign meshes like Local Only, but takes it step further by also ignoring messages from nodes not already in the node's known list.\x12\x92\x01\n" +
+	"\x04NONE\x10\x04\x1a\x87\x01\xca\xf3\x18\x82\x01:\x04NoneBzOnly permitted for SENSOR, TRACKER and TAK_TRACKER roles, this will inhibit all rebroadcasts, not unlike CLIENT_MUTE role.\x12\x95\x01\n" +
+	"\x12CORE_PORTNUMS_ONLY\x10\x05\x1a}\xca\xf3\x18y:\x12Core Portnums OnlyBcOnly rebroadcasts packets from the core portnums: NodeInfo, Text, Position, Telemetry, and Routing.\"i\n" +
 	"\n" +
 	"BuzzerMode\x12\x0f\n" +
 	"\vALL_ENABLED\x10\x00\x12\f\n" +
 	"\bDISABLED\x10\x01\x12\x16\n" +
 	"\x12NOTIFICATIONS_ONLY\x10\x02\x12\x0f\n" +
 	"\vSYSTEM_ONLY\x10\x03\x12\x13\n" +
-	"\x0fDIRECT_MSG_ONLY\x10\x04\x1a\xfa\x06\n" +
-	"\x0ePositionConfig\x126\n" +
-	"\x17position_broadcast_secs\x18\x01 \x01(\rR\x15positionBroadcastSecs\x12G\n" +
-	" position_broadcast_smart_enabled\x18\x02 \x01(\bR\x1dpositionBroadcastSmartEnabled\x12%\n" +
-	"\x0efixed_position\x18\x03 \x01(\bR\rfixedPosition\x12#\n" +
+	"\x0fDIRECT_MSG_ONLY\x10\x04\x1a\x80\x11\n" +
+	"\x0ePositionConfig\x12\x90\x01\n" +
+	"\x17position_broadcast_secs\x18\x01 \x01(\rBX\xca\xf3\x18T*\x01s:\x12Broadcast IntervalB;The longest a node will go without broadcasting a position.R\x15positionBroadcastSecs\x12]\n" +
+	" position_broadcast_smart_enabled\x18\x02 \x01(\bB\x14\xca\xf3\x18\x10:\x0eSmart PositionR\x1dpositionBroadcastSmartEnabled\x12\xc1\x01\n" +
+	"\x0efixed_position\x18\x03 \x01(\bB\x99\x01\xca\xf3\x18\x94\x01:\x0eFixed PositionB\x81\x01The last known latitude, longitude and altitude are broadcast over the mesh on the position interval, rather than a live GPS fix.R\rfixedPosition\x12#\n" +
 	"\vgps_enabled\x18\x04 \x01(\bB\x02\x18\x01R\n" +
-	"gpsEnabled\x12.\n" +
-	"\x13gps_update_interval\x18\x05 \x01(\rR\x11gpsUpdateInterval\x12,\n" +
-	"\x10gps_attempt_time\x18\x06 \x01(\rB\x02\x18\x01R\x0egpsAttemptTime\x12%\n" +
-	"\x0eposition_flags\x18\a \x01(\rR\rpositionFlags\x12\x17\n" +
-	"\arx_gpio\x18\b \x01(\rR\x06rxGpio\x12\x17\n" +
-	"\atx_gpio\x18\t \x01(\rR\x06txGpio\x12G\n" +
+	"gpsEnabled\x12q\n" +
+	"\x13gps_update_interval\x18\x05 \x01(\rBA\xca\xf3\x18=*\x01s:\x0fUpdate IntervalB'How often to try to get a GPS position.R\x11gpsUpdateInterval\x12,\n" +
+	"\x10gps_attempt_time\x18\x06 \x01(\rB\x02\x18\x01R\x0egpsAttemptTime\x12y\n" +
+	"\x0eposition_flags\x18\a \x01(\rBR\xca\xf3\x18N:\x0ePosition FlagsB<Optional fields to include when assembling position messagesR\rpositionFlags\x12F\n" +
+	"\arx_gpio\x18\b \x01(\rB-\xca\xf3\x18)\b\x01:\x10GPS Receive GPIOB\x13GPIO pin for GPS RXR\x06rxGpio\x12G\n" +
+	"\atx_gpio\x18\t \x01(\rB.\xca\xf3\x18*\b\x01:\x11GPS Transmit GPIOB\x13GPIO pin for GPS TXR\x06txGpio\x12\xb3\x01\n" +
 	" broadcast_smart_minimum_distance\x18\n" +
-	" \x01(\rR\x1dbroadcastSmartMinimumDistance\x12P\n" +
-	"%broadcast_smart_minimum_interval_secs\x18\v \x01(\rR!broadcastSmartMinimumIntervalSecs\x12\x1e\n" +
-	"\vgps_en_gpio\x18\f \x01(\rR\tgpsEnGpio\x12D\n" +
-	"\bgps_mode\x18\r \x01(\x0e2).meshtastic.Config.PositionConfig.GpsModeR\agpsMode\"\xab\x01\n" +
+	" \x01(\rBj\xca\xf3\x18f*\x01m:\x10Minimum DistanceBOThe minimum change in distance before a smart position broadcast is considered.R\x1dbroadcastSmartMinimumDistance\x12\xc3\x01\n" +
+	"%broadcast_smart_minimum_interval_secs\x18\v \x01(\rBq\xca\xf3\x18m*\x01s:\x10Minimum IntervalBVThe shortest interval between position updates once the minimum distance has been met.R!broadcastSmartMinimumIntervalSecs\x12L\n" +
+	"\vgps_en_gpio\x18\f \x01(\rB,\xca\xf3\x18(\b\x01:\vGPS EN GPIOB\x17GPIO pin for GPS enableR\tgpsEnGpio\x12T\n" +
+	"\bgps_mode\x18\r \x01(\x0e2).meshtastic.Config.PositionConfig.GpsModeB\x0e\xca\xf3\x18\n" +
+	":\bGPS ModeR\agpsMode\"\xdc\x04\n" +
 	"\rPositionFlags\x12\t\n" +
-	"\x05UNSET\x10\x00\x12\f\n" +
-	"\bALTITUDE\x10\x01\x12\x10\n" +
-	"\fALTITUDE_MSL\x10\x02\x12\x16\n" +
-	"\x12GEOIDAL_SEPARATION\x10\x04\x12\a\n" +
-	"\x03DOP\x10\b\x12\t\n" +
-	"\x05HVDOP\x10\x10\x12\r\n" +
-	"\tSATINVIEW\x10 \x12\n" +
-	"\n" +
-	"\x06SEQ_NO\x10@\x12\x0e\n" +
-	"\tTIMESTAMP\x10\x80\x01\x12\f\n" +
-	"\aHEADING\x10\x80\x02\x12\n" +
-	"\n" +
-	"\x05SPEED\x10\x80\x04\"5\n" +
-	"\aGpsMode\x12\f\n" +
-	"\bDISABLED\x10\x00\x12\v\n" +
-	"\aENABLED\x10\x01\x12\x0f\n" +
-	"\vNOT_PRESENT\x10\x02\x1a\xa1\x03\n" +
-	"\vPowerConfig\x12&\n" +
-	"\x0fis_power_saving\x18\x01 \x01(\bR\risPowerSaving\x12B\n" +
-	"\x1eon_battery_shutdown_after_secs\x18\x02 \x01(\rR\x1aonBatteryShutdownAfterSecs\x126\n" +
-	"\x17adc_multiplier_override\x18\x03 \x01(\x02R\x15adcMultiplierOverride\x12.\n" +
-	"\x13wait_bluetooth_secs\x18\x04 \x01(\rR\x11waitBluetoothSecs\x12\x19\n" +
+	"\x05UNSET\x10\x00\x12c\n" +
+	"\bALTITUDE\x10\x01\x1aU\xca\xf3\x18Q:\bAltitudeBEInclude an altitude value in position reports, when one is available.\x122\n" +
+	"\fALTITUDE_MSL\x10\x02\x1a \xca\xf3\x18\x1c:\x1aAltitude is Mean Sea Level\x129\n" +
+	"\x12GEOIDAL_SEPARATION\x10\x04\x1a!\xca\xf3\x18\x1d:\x1bAltitude Geoidal Separation\x12U\n" +
+	"\x03DOP\x10\b\x1aL\xca\xf3\x18H:\x03DOPBAInclude the dilution of precision value. PDOP is used by default.\x12`\n" +
+	"\x05HVDOP\x10\x10\x1aU\xca\xf3\x18Q:\vHDOP / VDOPBBIf DOP is set, send separate HDOP and VDOP values instead of PDOP.\x12)\n" +
+	"\tSATINVIEW\x10 \x1a\x1a\xca\xf3\x18\x16:\x14Number of satellites\x12!\n" +
+	"\x06SEQ_NO\x10@\x1a\x15\xca\xf3\x18\x11:\x0fSequence number\x12\x1f\n" +
+	"\tTIMESTAMP\x10\x80\x01\x1a\x0f\xca\xf3\x18\v:\tTimestamp\x12#\n" +
+	"\aHEADING\x10\x80\x02\x1a\x15\xca\xf3\x18\x11:\x0fVehicle heading\x12\x1f\n" +
+	"\x05SPEED\x10\x80\x04\x1a\x13\xca\xf3\x18\x0f:\rVehicle speed\"g\n" +
+	"\aGpsMode\x12\x1c\n" +
+	"\bDISABLED\x10\x00\x1a\x0e\xca\xf3\x18\n" +
+	":\bDisabled\x12\x1a\n" +
+	"\aENABLED\x10\x01\x1a\r\xca\xf3\x18\t:\aEnabled\x12\"\n" +
+	"\vNOT_PRESENT\x10\x02\x1a\x11\xca\xf3\x18\r:\vNot Present\x1a\xd5\x06\n" +
+	"\vPowerConfig\x12\xa7\x02\n" +
+	"\x0fis_power_saving\x18\x01 \x01(\bB\xfe\x01\xca\xf3\x18\xf9\x01:\fPower SavingB\xe8\x01Will sleep everything as much as possible, for the tracker and sensor role this will also include the lora radio. Don't use this setting if you want to use your device with the phone apps or are using a device without a user button.R\risPowerSaving\x12\xbc\x01\n" +
+	"\x1eon_battery_shutdown_after_secs\x18\x02 \x01(\rBx\xca\xf3\x18t*\x01s:\x16Shutdown on Power LossBWHow long after external power is removed before the device powers off. Zero to disable.R\x1aonBatteryShutdownAfterSecs\x12J\n" +
+	"\x17adc_multiplier_override\x18\x03 \x01(\x02B\x12\xca\xf3\x18\x0e:\fADC OverrideR\x15adcMultiplierOverride\x12Q\n" +
+	"\x13wait_bluetooth_secs\x18\x04 \x01(\rB!\xca\xf3\x18\x1d:\x1bWait for Bluetooth DurationR\x11waitBluetoothSecs\x12\x19\n" +
 	"\bsds_secs\x18\x06 \x01(\rR\asdsSecs\x12\x17\n" +
 	"\als_secs\x18\a \x01(\rR\x06lsSecs\x12\"\n" +
 	"\rmin_wake_secs\x18\b \x01(\rR\vminWakeSecs\x12;\n" +
 	"\x1adevice_battery_ina_address\x18\t \x01(\rR\x17deviceBatteryInaAddress\x12)\n" +
-	"\x10powermon_enables\x18  \x01(\x04R\x0fpowermonEnables\x1a\xfd\x04\n" +
-	"\rNetworkConfig\x12!\n" +
-	"\fwifi_enabled\x18\x01 \x01(\bR\vwifiEnabled\x12\x1b\n" +
-	"\twifi_ssid\x18\x03 \x01(\tR\bwifiSsid\x12\x19\n" +
-	"\bwifi_psk\x18\x04 \x01(\tR\awifiPsk\x12\x1d\n" +
+	"\x10powermon_enables\x18  \x01(\x04R\x0fpowermonEnables\x1a\xdd\t\n" +
+	"\rNetworkConfig\x12v\n" +
+	"\fwifi_enabled\x18\x01 \x01(\bBS\xca\xf3\x18O:\fWiFi EnabledB?Enabling WiFi will disable the bluetooth connection to the app.R\vwifiEnabled\x12H\n" +
+	"\twifi_ssid\x18\x03 \x01(\tB+\xca\xf3\x18':\x04SSIDB\x1fWiFi network name to connect toR\bwifiSsid\x12K\n" +
+	"\bwifi_psk\x18\x04 \x01(\tB0\xca\xf3\x18,:\bPasswordB WiFi password for authenticationR\awifiPsk\x12h\n" +
 	"\n" +
-	"ntp_server\x18\x05 \x01(\tR\tntpServer\x12\x1f\n" +
-	"\veth_enabled\x18\x06 \x01(\bR\n" +
-	"ethEnabled\x12O\n" +
-	"\faddress_mode\x18\a \x01(\x0e2,.meshtastic.Config.NetworkConfig.AddressModeR\vaddressMode\x12L\n" +
+	"ntp_server\x18\x05 \x01(\tBI\xca\xf3\x18E:\n" +
+	"NTP ServerB7NTP server address. Defaults to meshtastic.pool.ntp.orgR\tntpServer\x12|\n" +
+	"\veth_enabled\x18\x06 \x01(\bB[\xca\xf3\x18W:\x10Ethernet EnabledBCEnabling Ethernet will disable the bluetooth connection to the app.R\n" +
+	"ethEnabled\x12c\n" +
+	"\faddress_mode\x18\a \x01(\x0e2,.meshtastic.Config.NetworkConfig.AddressModeB\x12\xca\xf3\x18\x0e:\fAddress ModeR\vaddressMode\x12L\n" +
 	"\vipv4_config\x18\b \x01(\v2+.meshtastic.Config.NetworkConfig.IpV4ConfigR\n" +
-	"ipv4Config\x12%\n" +
-	"\x0ersyslog_server\x18\t \x01(\tR\rrsyslogServer\x12+\n" +
+	"ipv4Config\x12;\n" +
+	"\x0ersyslog_server\x18\t \x01(\tB\x14\xca\xf3\x18\x10:\x0eRsyslog ServerR\rrsyslogServer\x12\x88\x01\n" +
 	"\x11enabled_protocols\x18\n" +
-	" \x01(\rR\x10enabledProtocols\x12!\n" +
-	"\fipv6_enabled\x18\v \x01(\bR\vipv6Enabled\x1a`\n" +
+	" \x01(\rB[\xca\xf3\x18W:\x11Enabled ProtocolsB;Enable broadcasting packets via UDP over the local network.R\x052.6.0R\x10enabledProtocols\x12/\n" +
+	"\fipv6_enabled\x18\v \x01(\bB\f\xca\xf3\x18\bR\x062.7.16R\vipv6Enabled\x1a\x92\x01\n" +
 	"\n" +
-	"IpV4Config\x12\x0e\n" +
-	"\x02ip\x18\x01 \x01(\aR\x02ip\x12\x18\n" +
-	"\agateway\x18\x02 \x01(\aR\agateway\x12\x16\n" +
-	"\x06subnet\x18\x03 \x01(\aR\x06subnet\x12\x10\n" +
-	"\x03dns\x18\x04 \x01(\aR\x03dns\"#\n" +
-	"\vAddressMode\x12\b\n" +
-	"\x04DHCP\x10\x00\x12\n" +
+	"IpV4Config\x12\x18\n" +
+	"\x02ip\x18\x01 \x01(\aB\b\xca\xf3\x18\x04:\x02IPR\x02ip\x12'\n" +
+	"\agateway\x18\x02 \x01(\aB\r\xca\xf3\x18\t:\aGatewayR\agateway\x12$\n" +
+	"\x06subnet\x18\x03 \x01(\aB\f\xca\xf3\x18\b:\x06SubnetR\x06subnet\x12\x1b\n" +
+	"\x03dns\x18\x04 \x01(\aB\t\xca\xf3\x18\x05:\x03DNSR\x03dns\"=\n" +
+	"\vAddressMode\x12\x14\n" +
+	"\x04DHCP\x10\x00\x1a\n" +
+	"\xca\xf3\x18\x06:\x04DHCP\x12\x18\n" +
+	"\x06STATIC\x10\x01\x1a\f\xca\xf3\x18\b:\x06Static\"U\n" +
+	"\rProtocolFlags\x12\x1c\n" +
+	"\fNO_BROADCAST\x10\x00\x1a\n" +
+	"\xca\xf3\x18\x06:\x04None\x12&\n" +
+	"\rUDP_BROADCAST\x10\x01\x1a\x13\xca\xf3\x18\x0f:\rUDP Broadcast\x1a\xdd\x14\n" +
+	"\rDisplayConfig\x12\x97\x01\n" +
+	"\x0escreen_on_secs\x18\x01 \x01(\rBq\xca\xf3\x18m*\x01s:\rScreen on forBYHow long the screen remains on after the user button is pressed or messages are received.R\fscreenOnSecs\x12m\n" +
 	"\n" +
-	"\x06STATIC\x10\x01\"4\n" +
-	"\rProtocolFlags\x12\x10\n" +
-	"\fNO_BROADCAST\x10\x00\x12\x11\n" +
-	"\rUDP_BROADCAST\x10\x01\x1a\x92\n" +
-	"\n" +
-	"\rDisplayConfig\x12$\n" +
-	"\x0escreen_on_secs\x18\x01 \x01(\rR\fscreenOnSecs\x12a\n" +
-	"\n" +
-	"gps_format\x18\x02 \x01(\x0e2>.meshtastic.Config.DisplayConfig.DeprecatedGpsCoordinateFormatB\x02\x18\x01R\tgpsFormat\x129\n" +
-	"\x19auto_screen_carousel_secs\x18\x03 \x01(\rR\x16autoScreenCarouselSecs\x12.\n" +
-	"\x11compass_north_top\x18\x04 \x01(\bB\x02\x18\x01R\x0fcompassNorthTop\x12\x1f\n" +
-	"\vflip_screen\x18\x05 \x01(\bR\n" +
-	"flipScreen\x12C\n" +
-	"\x05units\x18\x06 \x01(\x0e2-.meshtastic.Config.DisplayConfig.DisplayUnitsR\x05units\x12=\n" +
-	"\x04oled\x18\a \x01(\x0e2).meshtastic.Config.DisplayConfig.OledTypeR\x04oled\x12N\n" +
-	"\vdisplaymode\x18\b \x01(\x0e2,.meshtastic.Config.DisplayConfig.DisplayModeR\vdisplaymode\x12!\n" +
-	"\fheading_bold\x18\t \x01(\bR\vheadingBold\x120\n" +
+	"gps_format\x18\x02 \x01(\x0e2>.meshtastic.Config.DisplayConfig.DeprecatedGpsCoordinateFormatB\x0e\xca\xf3\x18\bZ\x062.7.10\x18\x01R\tgpsFormat\x12\xa6\x01\n" +
+	"\x19auto_screen_carousel_secs\x18\x03 \x01(\rBk\xca\xf3\x18g*\x01s:\x11Carousel IntervalBOAutomatically moves to the next screen page, like a carousel, on this interval.R\x16autoScreenCarouselSecs\x12\x9f\x01\n" +
+	"\x11compass_north_top\x18\x04 \x01(\bBs\xca\xf3\x18m:\x12Always point northBPThe compass heading on the screen outside of the circle will always point north.Z\x052.7.1\x18\x01R\x0fcompassNorthTop\x12J\n" +
+	"\vflip_screen\x18\x05 \x01(\bB)\xca\xf3\x18%:\vFlip ScreenB\x16Flip screen verticallyR\n" +
+	"flipScreen\x12{\n" +
+	"\x05units\x18\x06 \x01(\x0e2-.meshtastic.Config.DisplayConfig.DisplayUnitsB6\xca\xf3\x182:\rDisplay UnitsB!Units shown on the device screen.R\x05units\x12y\n" +
+	"\x04oled\x18\a \x01(\x0e2).meshtastic.Config.DisplayConfig.OledTypeB:\xca\xf3\x186:\tOLED TypeB)Override automatic OLED screen detection.R\x04oled\x12\x83\x01\n" +
+	"\vdisplaymode\x18\b \x01(\x0e2,.meshtastic.Config.DisplayConfig.DisplayModeB3\xca\xf3\x18/:\fDisplay ModeB\x1fOverride default screen layout.R\vdisplaymode\x12[\n" +
+	"\fheading_bold\x18\t \x01(\bB8\xca\xf3\x184:\fBold HeadingB$Bold the heading text on the screen.R\vheadingBold\x12\x8d\x01\n" +
 	"\x15wake_on_tap_or_motion\x18\n" +
-	" \x01(\bR\x11wakeOnTapOrMotion\x12d\n" +
-	"\x13compass_orientation\x18\v \x01(\x0e23.meshtastic.Config.DisplayConfig.CompassOrientationR\x12compassOrientation\x12\"\n" +
-	"\ruse_12h_clock\x18\f \x01(\bR\vuse12hClock\x12+\n" +
-	"\x12use_long_node_name\x18\r \x01(\bR\x0fuseLongNodeName\x124\n" +
-	"\x16enable_message_bubbles\x18\x0e \x01(\bR\x14enableMessageBubbles\"+\n" +
+	" \x01(\bB[\xca\xf3\x18W:\x1cWake Screen on tap or motionB7Requires that there be an accelerometer on your device.R\x11wakeOnTapOrMotion\x12\xcb\x01\n" +
+	"\x13compass_orientation\x18\v \x01(\x0e23.meshtastic.Config.DisplayConfig.CompassOrientationBe\xca\xf3\x18a:\x13Compass OrientationBJIndicates how to rotate or invert the compass output for accurate display.R\x12compassOrientation\x12i\n" +
+	"\ruse_12h_clock\x18\f \x01(\bBE\xca\xf3\x18A:\r12 Hour ClockB(Sets the screen clock format to 12-hour.R\x062.5.22R\vuse12hClock\x129\n" +
+	"\x12use_long_node_name\x18\r \x01(\bB\f\xca\xf3\x18\bR\x062.7.13R\x0fuseLongNodeName\x12B\n" +
+	"\x16enable_message_bubbles\x18\x0e \x01(\bB\f\xca\xf3\x18\bR\x062.7.19R\x14enableMessageBubbles\"+\n" +
 	"\x1dDeprecatedGpsCoordinateFormat\x12\n" +
 	"\n" +
-	"\x06UNUSED\x10\x00\"(\n" +
-	"\fDisplayUnits\x12\n" +
+	"\x06UNUSED\x10\x00\"F\n" +
+	"\fDisplayUnits\x12\x18\n" +
+	"\x06METRIC\x10\x00\x1a\f\xca\xf3\x18\b:\x06Metric\x12\x1c\n" +
+	"\bIMPERIAL\x10\x01\x1a\x0e\xca\xf3\x18\n" +
+	":\bImperial\"\xf7\x01\n" +
+	"\bOledType\x12)\n" +
+	"\tOLED_AUTO\x10\x00\x1a\x1a\xca\xf3\x18\x16:\x14Detect Automatically\x12 \n" +
+	"\fOLED_SSD1306\x10\x01\x1a\x0e\xca\xf3\x18\n" +
+	":\bSSD 1306\x12\x1e\n" +
+	"\vOLED_SH1106\x10\x02\x1a\r\xca\xf3\x18\t:\aSH 1106\x12\x1e\n" +
+	"\vOLED_SH1107\x10\x03\x1a\r\xca\xf3\x18\t:\aSH 1107\x12.\n" +
+	"\x13OLED_SH1107_128_128\x10\x04\x1a\x15\xca\xf3\x18\x11:\x0fSH 1107 128x128\x12.\n" +
+	"\x13OLED_SH1107_ROTATED\x10\x05\x1a\x15\xca\xf3\x18\x11:\x0fSH 1107 Rotated\"\xd6\x01\n" +
+	"\vDisplayMode\x12/\n" +
+	"\aDEFAULT\x10\x00\x1a\"\xca\xf3\x18\x1e:\x1cDefault 128x64 screen layout\x122\n" +
+	"\bTWOCOLOR\x10\x01\x1a$\xca\xf3\x18 :\x1eOptimized for 2 color displays\x128\n" +
+	"\bINVERTED\x10\x02\x1a*\xca\xf3\x18&:$Inverted top bar for 2 Color display\x12(\n" +
+	"\x05COLOR\x10\x03\x1a\x1d\xca\xf3\x18\x19:\x17TFT Full Color Displays\"\xc0\x02\n" +
+	"\x12CompassOrientation\x12\x18\n" +
+	"\tDEGREES_0\x10\x00\x1a\t\xca\xf3\x18\x05:\x030°\x12\x1a\n" +
 	"\n" +
-	"\x06METRIC\x10\x00\x12\f\n" +
-	"\bIMPERIAL\x10\x01\"\x7f\n" +
-	"\bOledType\x12\r\n" +
-	"\tOLED_AUTO\x10\x00\x12\x10\n" +
-	"\fOLED_SSD1306\x10\x01\x12\x0f\n" +
-	"\vOLED_SH1106\x10\x02\x12\x0f\n" +
-	"\vOLED_SH1107\x10\x03\x12\x17\n" +
-	"\x13OLED_SH1107_128_128\x10\x04\x12\x17\n" +
-	"\x13OLED_SH1107_ROTATED\x10\x05\"A\n" +
-	"\vDisplayMode\x12\v\n" +
-	"\aDEFAULT\x10\x00\x12\f\n" +
-	"\bTWOCOLOR\x10\x01\x12\f\n" +
-	"\bINVERTED\x10\x02\x12\t\n" +
-	"\x05COLOR\x10\x03\"\xba\x01\n" +
-	"\x12CompassOrientation\x12\r\n" +
-	"\tDEGREES_0\x10\x00\x12\x0e\n" +
+	"DEGREES_90\x10\x01\x1a\n" +
+	"\xca\xf3\x18\x06:\x0490°\x12\x1c\n" +
+	"\vDEGREES_180\x10\x02\x1a\v\xca\xf3\x18\a:\x05180°\x12\x1c\n" +
+	"\vDEGREES_270\x10\x03\x1a\v\xca\xf3\x18\a:\x05270°\x12*\n" +
+	"\x12DEGREES_0_INVERTED\x10\x04\x1a\x12\xca\xf3\x18\x0e:\f0° Inverted\x12,\n" +
+	"\x13DEGREES_90_INVERTED\x10\x05\x1a\x13\xca\xf3\x18\x0f:\r90° Inverted\x12.\n" +
+	"\x14DEGREES_180_INVERTED\x10\x06\x1a\x14\xca\xf3\x18\x10:\x0e180° Inverted\x12.\n" +
+	"\x14DEGREES_270_INVERTED\x10\a\x1a\x14\xca\xf3\x18\x10:\x0e270° Inverted\x1a\x96#\n" +
 	"\n" +
-	"DEGREES_90\x10\x01\x12\x0f\n" +
-	"\vDEGREES_180\x10\x02\x12\x0f\n" +
-	"\vDEGREES_270\x10\x03\x12\x16\n" +
-	"\x12DEGREES_0_INVERTED\x10\x04\x12\x17\n" +
-	"\x13DEGREES_90_INVERTED\x10\x05\x12\x18\n" +
-	"\x14DEGREES_180_INVERTED\x10\x06\x12\x18\n" +
-	"\x14DEGREES_270_INVERTED\x10\a\x1a\xa0\r\n" +
+	"LoRaConfig\x12\x8b\x01\n" +
 	"\n" +
-	"LoRaConfig\x12\x1d\n" +
-	"\n" +
-	"use_preset\x18\x01 \x01(\bR\tusePreset\x12L\n" +
-	"\fmodem_preset\x18\x02 \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetR\vmodemPreset\x12\x1c\n" +
-	"\tbandwidth\x18\x03 \x01(\rR\tbandwidth\x12#\n" +
-	"\rspread_factor\x18\x04 \x01(\rR\fspreadFactor\x12\x1f\n" +
-	"\vcoding_rate\x18\x05 \x01(\rR\n" +
+	"use_preset\x18\x01 \x01(\bBl\xca\xf3\x18h:\n" +
+	"Use PresetBZUse the modem preset settings instead of a manual bandwidth, spread factor and coding rateR\tusePreset\x12[\n" +
+	"\fmodem_preset\x18\x02 \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetB\r\xca\xf3\x18\t:\aPresetsR\vmodemPreset\x122\n" +
+	"\tbandwidth\x18\x03 \x01(\rB\x14\xca\xf3\x18\x10*\x03kHz:\tBandwidthR\tbandwidth\x12\x83\x01\n" +
+	"\rspread_factor\x18\x04 \x01(\rB^\xca\xf3\x18Z\x19\x00\x00\x00\x00\x00\x00\x14@!\x00\x00\x00\x00\x00\x00(@:\rSpread FactorB7Number of chirps per symbol, as 2 raised to this value.R\fspreadFactor\x12\xaf\x01\n" +
+	"\vcoding_rate\x18\x05 \x01(\rB\x8d\x01\xca\xf3\x18\x88\x01:\vCoding RateByError-correction redundancy, as the denominator of 4/n. Higher values survive noisier links but make every packet longer.R\n" +
 	"codingRate\x12)\n" +
-	"\x10frequency_offset\x18\x06 \x01(\x02R\x0ffrequencyOffset\x12@\n" +
-	"\x06region\x18\a \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\x06region\x12\x1b\n" +
-	"\thop_limit\x18\b \x01(\rR\bhopLimit\x12\x1d\n" +
+	"\x10frequency_offset\x18\x06 \x01(\x02R\x0ffrequencyOffset\x12\x7f\n" +
+	"\x06region\x18\a \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeB=\xca\xf3\x189:\x06RegionB/The region where you will be using your radios.R\x06region\x12\xa7\x01\n" +
+	"\thop_limit\x18\b \x01(\rB\x89\x01\xca\xf3\x18\x84\x01\x19\x00\x00\x00\x00\x00\x00\x00\x00!\x00\x00\x00\x00\x00\x00\x1c@:\tHop LimitBIHow many times a message may be repeated before it stops being forwarded.J\x1ahops|ttl|range|rebroadcastR\bhopLimit\x12\x8f\x01\n" +
 	"\n" +
-	"tx_enabled\x18\t \x01(\bR\ttxEnabled\x12\x19\n" +
+	"tx_enabled\x18\t \x01(\bBp\xca\xf3\x18l:\x10Transmit EnabledBXAllow the LoRa radio to transmit. Turn off while hot-swapping antennas or bench testing.R\ttxEnabled\x12\xdc\x01\n" +
 	"\btx_power\x18\n" +
-	" \x01(\x05R\atxPower\x12\x1f\n" +
-	"\vchannel_num\x18\v \x01(\rR\n" +
-	"channelNum\x12.\n" +
-	"\x13override_duty_cycle\x18\f \x01(\bR\x11overrideDutyCycle\x123\n" +
-	"\x16sx126x_rx_boosted_gain\x18\r \x01(\bR\x13sx126xRxBoostedGain\x12-\n" +
-	"\x12override_frequency\x18\x0e \x01(\x02R\x11overrideFrequency\x12&\n" +
-	"\x0fpa_fan_disabled\x18\x0f \x01(\bR\rpaFanDisabled\x12'\n" +
-	"\x0fignore_incoming\x18g \x03(\rR\x0eignoreIncoming\x12\x1f\n" +
-	"\vignore_mqtt\x18h \x01(\bR\n" +
-	"ignoreMqtt\x12)\n" +
-	"\x11config_ok_to_mqtt\x18i \x01(\bR\x0econfigOkToMqtt\x12L\n" +
-	"\ffem_lna_mode\x18j \x01(\x0e2*.meshtastic.Config.LoRaConfig.FEM_LNA_ModeR\n" +
+	" \x01(\x05B\xc0\x01\xca\xf3\x18\xbb\x01\x19\x00\x00\x00\x00\x00\x00\x00\x00!\x00\x00\x00\x00\x00\x00>@*\x03dBm:\x0eTransmit PowerBxRadio transmit power. Leave at zero to use the highest level legal for the region, which is what most radios should use.J\x18tx|power|dbm|output|gainR\atxPower\x12\xec\x01\n" +
+	"\vchannel_num\x18\v \x01(\rB\xca\x01\xca\xf3\x18\xc5\x01:\x0eFrequency SlotB\xb2\x01Your node’s operating frequency is calculated based on the region, modem preset, and this field. When 0, the slot is automatically calculated based on the primary channel name.R\n" +
+	"channelNum\x12I\n" +
+	"\x13override_duty_cycle\x18\f \x01(\bB\x19\xca\xf3\x18\x15:\x13Override Duty CycleR\x11overrideDutyCycle\x12~\n" +
+	"\x16sx126x_rx_boosted_gain\x18\r \x01(\bBI\xca\xf3\x18E:\x0fRX Boosted GainB2Enable RX boosted gain mode on SX126X based radiosR\x13sx126xRxBoostedGain\x12G\n" +
+	"\x12override_frequency\x18\x0e \x01(\x02B\x18\xca\xf3\x18\x14:\x12Frequency OverrideR\x11overrideFrequency\x12=\n" +
+	"\x0fpa_fan_disabled\x18\x0f \x01(\bB\x15\xca\xf3\x18\x11:\x0fPA Fan DisabledR\rpaFanDisabled\x12>\n" +
+	"\x0fignore_incoming\x18g \x03(\rB\x15\xca\xf3\x18\x11:\x0fIgnore IncomingR\x0eignoreIncoming\x12\x85\x01\n" +
+	"\vignore_mqtt\x18h \x01(\bBd\xca\xf3\x18`:\vIgnore MQTTBQIgnore packets received over LoRa that travelled via MQTT anywhere on their path.R\n" +
+	"ignoreMqtt\x12;\n" +
+	"\x11config_ok_to_mqtt\x18i \x01(\bB\x10\xca\xf3\x18\f:\n" +
+	"Ok to MQTTR\x0econfigOkToMqtt\x12Z\n" +
+	"\ffem_lna_mode\x18j \x01(\x0e2*.meshtastic.Config.LoRaConfig.FEM_LNA_ModeB\f\xca\xf3\x18\bR\x062.7.20R\n" +
 	"femLnaMode\x12&\n" +
-	"\x0fserial_hal_only\x18k \x01(\bR\rserialHalOnly\"\xc8\x03\n" +
+	"\x0fserial_hal_only\x18k \x01(\bR\rserialHalOnly\"\x86\v\n" +
 	"\n" +
-	"RegionCode\x12\t\n" +
-	"\x05UNSET\x10\x00\x12\x06\n" +
-	"\x02US\x10\x01\x12\n" +
-	"\n" +
-	"\x06EU_433\x10\x02\x12\n" +
-	"\n" +
-	"\x06EU_868\x10\x03\x12\x06\n" +
-	"\x02CN\x10\x04\x12\x06\n" +
-	"\x02JP\x10\x05\x12\a\n" +
-	"\x03ANZ\x10\x06\x12\x06\n" +
-	"\x02KR\x10\a\x12\x06\n" +
-	"\x02TW\x10\b\x12\x06\n" +
-	"\x02RU\x10\t\x12\x06\n" +
+	"RegionCode\x12$\n" +
+	"\x05UNSET\x10\x00\x1a\x19\xca\xf3\x18\x15:\x13Please set a region\x12\x1b\n" +
+	"\x02US\x10\x01\x1a\x13\xca\xf3\x18\x0f:\rUnited States\x12'\n" +
+	"\x06EU_433\x10\x02\x1a\x1b\xca\xf3\x18\x17:\x15European Union 433MHz\x12'\n" +
+	"\x06EU_868\x10\x03\x1a\x1b\xca\xf3\x18\x17:\x15European Union 868MHz\x12\x13\n" +
+	"\x02CN\x10\x04\x1a\v\xca\xf3\x18\a:\x05China\x12\x13\n" +
+	"\x02JP\x10\x05\x1a\v\xca\xf3\x18\a:\x05Japan\x12&\n" +
+	"\x03ANZ\x10\x06\x1a\x1d\xca\xf3\x18\x19:\x17Australia / New Zealand\x12\x13\n" +
+	"\x02KR\x10\a\x1a\v\xca\xf3\x18\a:\x05Korea\x12\x14\n" +
+	"\x02TW\x10\b\x1a\f\xca\xf3\x18\b:\x06Taiwan\x12\x14\n" +
+	"\x02RU\x10\t\x1a\f\xca\xf3\x18\b:\x06Russia\x12\x13\n" +
 	"\x02IN\x10\n" +
-	"\x12\n" +
+	"\x1a\v\xca\xf3\x18\a:\x05India\x12$\n" +
+	"\x06NZ_865\x10\v\x1a\x18\xca\xf3\x18\x14:\x12New Zealand 865MHz\x12\x16\n" +
+	"\x02TH\x10\f\x1a\x0e\xca\xf3\x18\n" +
+	":\bThailand\x12\x1a\n" +
+	"\aLORA_24\x10\r\x1a\r\xca\xf3\x18\t:\a2.4 Ghz\x12 \n" +
+	"\x06UA_433\x10\x0e\x1a\x14\xca\xf3\x18\x10:\x0eUkraine 433MHz\x12\"\n" +
+	"\x06UA_868\x10\x0f\x1a\x16\xca\xf3\x18\x10:\x0eUkraine 868MHz\b\x01\x12!\n" +
+	"\x06MY_433\x10\x10\x1a\x15\xca\xf3\x18\x11:\x0fMalaysia 433MHz\x12!\n" +
+	"\x06MY_919\x10\x11\x1a\x15\xca\xf3\x18\x11:\x0fMalaysia 919MHz\x12\"\n" +
+	"\x06SG_923\x10\x12\x1a\x16\xca\xf3\x18\x12:\x10Singapore 923MHz\x12$\n" +
+	"\x06PH_433\x10\x13\x1a\x18\xca\xf3\x18\x14:\x12Philippines 433MHz\x12$\n" +
+	"\x06PH_868\x10\x14\x1a\x18\xca\xf3\x18\x14:\x12Philippines 868MHz\x12$\n" +
+	"\x06PH_915\x10\x15\x1a\x18\xca\xf3\x18\x14:\x12Philippines 915MHz\x121\n" +
+	"\aANZ_433\x10\x16\x1a$\xca\xf3\x18 :\x1eAustralia / New Zealand 433MHz\x12#\n" +
+	"\x06KZ_433\x10\x17\x1a\x17\xca\xf3\x18\x13:\x11Kazakhstan 433MHz\x12#\n" +
+	"\x06KZ_863\x10\x18\x1a\x17\xca\xf3\x18\x13:\x11Kazakhstan 863MHz\x12\x1e\n" +
+	"\x06NP_865\x10\x19\x1a\x12\xca\xf3\x18\x0e:\fNepal 865MHz\x12\x1f\n" +
+	"\x06BR_902\x10\x1a\x1a\x13\xca\xf3\x18\x0f:\rBrazil 902MHz\x12,\n" +
+	"\aITU1_2M\x10\x1b\x1a\x1f\xca\xf3\x18\x1b:\x19ITU Region 1 / Amateur 2m\x12,\n" +
+	"\aITU2_2M\x10\x1c\x1a\x1f\xca\xf3\x18\x1b:\x19ITU Region 2 / Amateur 2m\x12'\n" +
+	"\x06EU_866\x10\x1d\x1a\x1b\xca\xf3\x18\x17:\x15European Union 866MHz\x12'\n" +
+	"\x06EU_874\x10\x1e\x1a\x1b\xca\xf3\x18\x17:\x15European Union 874MHz\x12'\n" +
+	"\x06EU_917\x10\x1f\x1a\x1b\xca\xf3\x18\x17:\x15European Union 917MHz\x122\n" +
+	"\bEU_N_868\x10 \x1a$\xca\xf3\x18 :\x1eEuropean Union 868MHz (Narrow)\x12,\n" +
+	"\aITU3_2M\x10!\x1a\x1f\xca\xf3\x18\x1b:\x19ITU Region 3 / Amateur 2m\x120\n" +
+	"\tITU1_70CM\x10\"\x1a!\xca\xf3\x18\x1d:\x1bITU Region 1 / Amateur 70cm\x120\n" +
+	"\tITU2_70CM\x10#\x1a!\xca\xf3\x18\x1d:\x1bITU Region 2 / Amateur 70cm\x120\n" +
+	"\tITU3_70CM\x10$\x1a!\xca\xf3\x18\x1d:\x1bITU Region 3 / Amateur 70cm\x122\n" +
 	"\n" +
-	"\x06NZ_865\x10\v\x12\x06\n" +
-	"\x02TH\x10\f\x12\v\n" +
-	"\aLORA_24\x10\r\x12\n" +
+	"ITU2_125CM\x10%\x1a\"\xca\xf3\x18\x1e:\x1cITU Region 2 / Amateur 1.25m\"\xd9\x05\n" +
+	"\vModemPreset\x128\n" +
+	"\tLONG_FAST\x10\x00\x1a)\xca\xf3\x18%:\x11Long Range - FastJ\x10longfast|default\x12(\n" +
+	"\tLONG_SLOW\x10\x01\x1a\x19\xca\xf3\x18\x13:\x11Long Range - Slow\b\x01\x122\n" +
+	"\x0eVERY_LONG_SLOW\x10\x02\x1a\x1e\xca\xf3\x18\x18:\x16Very Long Range - Slow\b\x01\x12*\n" +
+	"\vMEDIUM_SLOW\x10\x03\x1a\x19\xca\xf3\x18\x15:\x13Medium Range - Slow\x12*\n" +
+	"\vMEDIUM_FAST\x10\x04\x1a\x19\xca\xf3\x18\x15:\x13Medium Range - Fast\x12(\n" +
 	"\n" +
-	"\x06UA_433\x10\x0e\x12\x0e\n" +
-	"\x06UA_868\x10\x0f\x1a\x02\b\x01\x12\n" +
+	"SHORT_SLOW\x10\x05\x1a\x18\xca\xf3\x18\x14:\x12Short Range - Slow\x12(\n" +
 	"\n" +
-	"\x06MY_433\x10\x10\x12\n" +
+	"SHORT_FAST\x10\x06\x1a\x18\xca\xf3\x18\x14:\x12Short Range - Fast\x12.\n" +
+	"\rLONG_MODERATE\x10\a\x1a\x1b\xca\xf3\x18\x17:\x15Long Range - Moderate\x12*\n" +
+	"\vSHORT_TURBO\x10\b\x1a\x19\xca\xf3\x18\x15:\x13Short Range - Turbo\x12(\n" +
 	"\n" +
-	"\x06MY_919\x10\x11\x12\n" +
-	"\n" +
-	"\x06SG_923\x10\x12\x12\n" +
-	"\n" +
-	"\x06PH_433\x10\x13\x12\n" +
-	"\n" +
-	"\x06PH_868\x10\x14\x12\n" +
-	"\n" +
-	"\x06PH_915\x10\x15\x12\v\n" +
-	"\aANZ_433\x10\x16\x12\n" +
-	"\n" +
-	"\x06KZ_433\x10\x17\x12\n" +
-	"\n" +
-	"\x06KZ_863\x10\x18\x12\n" +
-	"\n" +
-	"\x06NP_865\x10\x19\x12\n" +
-	"\n" +
-	"\x06BR_902\x10\x1a\x12\v\n" +
-	"\aITU1_2M\x10\x1b\x12\v\n" +
-	"\aITU2_2M\x10\x1c\x12\n" +
-	"\n" +
-	"\x06EU_866\x10\x1d\x12\n" +
-	"\n" +
-	"\x06EU_874\x10\x1e\x12\n" +
-	"\n" +
-	"\x06EU_917\x10\x1f\x12\f\n" +
-	"\bEU_N_868\x10 \x12\v\n" +
-	"\aITU3_2M\x10!\x12\r\n" +
-	"\tITU1_70CM\x10\"\x12\r\n" +
-	"\tITU2_70CM\x10#\x12\r\n" +
-	"\tITU3_70CM\x10$\x12\x0e\n" +
-	"\n" +
-	"ITU2_125CM\x10%\"\xad\x02\n" +
-	"\vModemPreset\x12\r\n" +
-	"\tLONG_FAST\x10\x00\x12\x11\n" +
-	"\tLONG_SLOW\x10\x01\x1a\x02\b\x01\x12\x16\n" +
-	"\x0eVERY_LONG_SLOW\x10\x02\x1a\x02\b\x01\x12\x0f\n" +
-	"\vMEDIUM_SLOW\x10\x03\x12\x0f\n" +
-	"\vMEDIUM_FAST\x10\x04\x12\x0e\n" +
-	"\n" +
-	"SHORT_SLOW\x10\x05\x12\x0e\n" +
-	"\n" +
-	"SHORT_FAST\x10\x06\x12\x11\n" +
-	"\rLONG_MODERATE\x10\a\x12\x0f\n" +
-	"\vSHORT_TURBO\x10\b\x12\x0e\n" +
-	"\n" +
-	"LONG_TURBO\x10\t\x12\r\n" +
+	"LONG_TURBO\x10\t\x1a\x18\xca\xf3\x18\x14:\x12Long Range - Turbo\x12 \n" +
 	"\tLITE_FAST\x10\n" +
-	"\x12\r\n" +
-	"\tLITE_SLOW\x10\v\x12\x0f\n" +
-	"\vNARROW_FAST\x10\f\x12\x0f\n" +
-	"\vNARROW_SLOW\x10\r\x12\r\n" +
-	"\tTINY_FAST\x10\x0e\x12\r\n" +
-	"\tTINY_SLOW\x10\x0f\x12\x10\n" +
-	"\fMEDIUM_TURBO\x10\x10\":\n" +
+	"\x1a\x11\xca\xf3\x18\r:\vLite - Fast\x12 \n" +
+	"\tLITE_SLOW\x10\v\x1a\x11\xca\xf3\x18\r:\vLite - Slow\x12$\n" +
+	"\vNARROW_FAST\x10\f\x1a\x13\xca\xf3\x18\x0f:\rNarrow - Fast\x12$\n" +
+	"\vNARROW_SLOW\x10\r\x1a\x13\xca\xf3\x18\x0f:\rNarrow - Slow\x12 \n" +
+	"\tTINY_FAST\x10\x0e\x1a\x11\xca\xf3\x18\r:\vTiny - Fast\x12 \n" +
+	"\tTINY_SLOW\x10\x0f\x1a\x11\xca\xf3\x18\r:\vTiny - Slow\x12,\n" +
+	"\fMEDIUM_TURBO\x10\x10\x1a\x1a\xca\xf3\x18\x16:\x14Medium Range - Turbo\":\n" +
 	"\fFEM_LNA_Mode\x12\f\n" +
 	"\bDISABLED\x10\x00\x12\v\n" +
 	"\aENABLED\x10\x01\x12\x0f\n" +
-	"\vNOT_PRESENT\x10\x02\x1a\xc6\x01\n" +
-	"\x0fBluetoothConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x12B\n" +
-	"\x04mode\x18\x02 \x01(\x0e2..meshtastic.Config.BluetoothConfig.PairingModeR\x04mode\x12\x1b\n" +
-	"\tfixed_pin\x18\x03 \x01(\rR\bfixedPin\"8\n" +
-	"\vPairingMode\x12\x0e\n" +
+	"\vNOT_PRESENT\x10\x02\x1a\xcb\x03\n" +
+	"\x0fBluetoothConfig\x12Q\n" +
+	"\aenabled\x18\x01 \x01(\bB7\xca\xf3\x183:\x11Bluetooth EnabledB\x1eEnable Bluetooth on the deviceR\aenabled\x12r\n" +
+	"\x04mode\x18\x02 \x01(\x0e2..meshtastic.Config.BluetoothConfig.PairingModeB.\xca\xf3\x18*:\fPairing ModeB\x1aBluetooth pairing strategyR\x04mode\x12y\n" +
+	"\tfixed_pin\x18\x03 \x01(\rB\\\xca\xf3\x18X:\tFixed PinBKFixed PIN for Bluetooth pairing. Used when pairing mode is set to fixed PINR\bfixedPin\"v\n" +
+	"\vPairingMode\x12 \n" +
 	"\n" +
-	"RANDOM_PIN\x10\x00\x12\r\n" +
-	"\tFIXED_PIN\x10\x01\x12\n" +
+	"RANDOM_PIN\x10\x00\x1a\x10\xca\xf3\x18\f:\n" +
+	"Random Pin\x12\x1e\n" +
+	"\tFIXED_PIN\x10\x01\x1a\x0f\xca\xf3\x18\v:\tFixed Pin\x12%\n" +
+	"\x06NO_PIN\x10\x02\x1a\x19\xca\xf3\x18\x15:\x13No PIN (Just Works)\x1a\xbd\f\n" +
+	"\x0eSecurityConfig\x12\xa7\x01\n" +
 	"\n" +
-	"\x06NO_PIN\x10\x02\x1a\x97\x04\n" +
-	"\x0eSecurityConfig\x12\x1d\n" +
+	"public_key\x18\x01 \x01(\fB\x87\x01\xca\xf3\x18\x82\x01:\n" +
+	"Public KeyBtGenerated from your private key and sent out to other nodes on the mesh to allow them to compute a shared secret keyR\tpublicKey\x12d\n" +
+	"\vprivate_key\x18\x02 \x01(\fBC\xca\xf3\x18?:\vPrivate KeyB0Used to create a shared key with a remote deviceR\n" +
+	"privateKey\x12k\n" +
+	"\tadmin_key\x18\x03 \x03(\fBN\xca\xf3\x18J:\tAdmin KeyB=The public key authorized to send admin messages to this nodeR\badminKey\x12\x98\x01\n" +
 	"\n" +
-	"public_key\x18\x01 \x01(\fR\tpublicKey\x12\x1f\n" +
-	"\vprivate_key\x18\x02 \x01(\fR\n" +
-	"privateKey\x12\x1b\n" +
-	"\tadmin_key\x18\x03 \x03(\fR\badminKey\x12\x1d\n" +
-	"\n" +
-	"is_managed\x18\x04 \x01(\bR\tisManaged\x12%\n" +
-	"\x0eserial_enabled\x18\x05 \x01(\bR\rserialEnabled\x121\n" +
-	"\x15debug_log_api_enabled\x18\x06 \x01(\bR\x12debugLogApiEnabled\x122\n" +
-	"\x15admin_channel_enabled\x18\b \x01(\bR\x13adminChannelEnabled\x12o\n" +
-	"\x17packet_signature_policy\x18\t \x01(\x0e27.meshtastic.Config.SecurityConfig.PacketSignaturePolicyR\x15packetSignaturePolicy\"\x89\x01\n" +
-	"\x15PacketSignaturePolicy\x12&\n" +
-	"\"PACKET_SIGNATURE_POLICY_COMPATIBLE\x10\x00\x12$\n" +
-	" PACKET_SIGNATURE_POLICY_BALANCED\x10\x01\x12\"\n" +
-	"\x1ePACKET_SIGNATURE_POLICY_STRICT\x10\x02\x1a\x12\n" +
+	"is_managed\x18\x04 \x01(\bBy\xca\xf3\x18u:\x0eManaged DeviceBcDevice is managed by a mesh administrator, the user is unable to access any of the device settings.R\tisManaged\x12`\n" +
+	"\x0eserial_enabled\x18\x05 \x01(\bB9\xca\xf3\x185:\x0eSerial ConsoleB#Serial Console over the Stream API.R\rserialEnabled\x12\xa9\x01\n" +
+	"\x15debug_log_api_enabled\x18\x06 \x01(\bBv\xca\xf3\x18r:\n" +
+	"Debug LogsBdOutput live debug logging over serial, view and export position-redacted device logs over Bluetooth.R\x12debugLogApiEnabled\x122\n" +
+	"\x15admin_channel_enabled\x18\b \x01(\bR\x13adminChannelEnabled\x12|\n" +
+	"\x17packet_signature_policy\x18\t \x01(\x0e27.meshtastic.Config.SecurityConfig.PacketSignaturePolicyB\v\xca\xf3\x18\aR\x052.8.0R\x15packetSignaturePolicy\"\xd2\x04\n" +
+	"\x15PacketSignaturePolicy\x12\xc5\x01\n" +
+	"\"PACKET_SIGNATURE_POLICY_COMPATIBLE\x10\x00\x1a\x9c\x01\xca\xf3\x18\x97\x01:\x1cCompatible - Accept UnsignedBwAccept unsigned traffic for maximum compatibility. A signature that can be checked and is wrong still drops the packet.\x12\xac\x01\n" +
+	" PACKET_SIGNATURE_POLICY_BALANCED\x10\x01\x1a\x85\x01\xca\xf3\x18\x80\x01:\x1fBalanced - Prefer AuthenticatedB]Prefer authenticated packets, but still accept unsigned traffic from nodes not known to sign.\x12\xc1\x01\n" +
+	"\x1ePACKET_SIGNATURE_POLICY_STRICT\x10\x02\x1a\x9c\x01\xca\xf3\x18\x97\x01:\x1fStrict - Require AuthenticationBtAccept only packets with a verified signature or successful PKI decryption. Packets from older nodes may be ignored.\x1a\x12\n" +
 	"\x10SessionkeyConfigB\x11\n" +
 	"\x0fpayload_variantBc\n" +
 	"\x14org.meshtastic.protoB\fConfigProtosZ#github.com/meshtastic/go/meshtastic\xaa\x02\x14Meshtastic.Protobufs\xba\x02\x00b\x06proto3"
@@ -3249,6 +3258,7 @@ func file_meshtastic_config_proto_init() {
 		return
 	}
 	file_meshtastic_device_ui_proto_init()
+	file_meshtastic_field_metadata_proto_init()
 	file_meshtastic_config_proto_msgTypes[0].OneofWrappers = []any{
 		(*Config_Device)(nil),
 		(*Config_Position)(nil),

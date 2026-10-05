@@ -2181,8 +2181,8 @@ func (x *Nau7802Config) GetCalibrationFactor() float32 {
 	return 0
 }
 
-// AS3935 lightning sensor configuration, for saving to flash
-type AS3935Config struct {
+// AS3935 lightning sensor state, for saving to flash
+type AS3935State struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Antenna tuning capacitance in pF, 0 to 120 in steps of 8. The chip does not retain
 	// this across power loss, so it is stored here and re-applied on every boot.
@@ -2191,20 +2191,20 @@ type AS3935Config struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AS3935Config) Reset() {
-	*x = AS3935Config{}
+func (x *AS3935State) Reset() {
+	*x = AS3935State{}
 	mi := &file_meshtastic_telemetry_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AS3935Config) String() string {
+func (x *AS3935State) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AS3935Config) ProtoMessage() {}
+func (*AS3935State) ProtoMessage() {}
 
-func (x *AS3935Config) ProtoReflect() protoreflect.Message {
+func (x *AS3935State) ProtoReflect() protoreflect.Message {
 	mi := &file_meshtastic_telemetry_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2216,12 +2216,12 @@ func (x *AS3935Config) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AS3935Config.ProtoReflect.Descriptor instead.
-func (*AS3935Config) Descriptor() ([]byte, []int) {
+// Deprecated: Use AS3935State.ProtoReflect.Descriptor instead.
+func (*AS3935State) Descriptor() ([]byte, []int) {
 	return file_meshtastic_telemetry_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *AS3935Config) GetTuningCapPf() uint32 {
+func (x *AS3935State) GetTuningCapPf() uint32 {
 	if x != nil {
 		return x.TuningCapPf
 	}
@@ -2736,8 +2736,8 @@ const file_meshtastic_telemetry_proto_rawDesc = "" +
 	"\n" +
 	"zeroOffset\x18\x01 \x01(\x05R\n" +
 	"zeroOffset\x12,\n" +
-	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor\"2\n" +
-	"\fAS3935Config\x12\"\n" +
+	"\x11calibrationFactor\x18\x02 \x01(\x02R\x11calibrationFactor\"1\n" +
+	"\vAS3935State\x12\"\n" +
 	"\rtuning_cap_pf\x18\x01 \x01(\rR\vtuningCapPf\"\xce\x02\n" +
 	"\n" +
 	"SEN5XState\x12,\n" +
@@ -2864,7 +2864,7 @@ var file_meshtastic_telemetry_proto_goTypes = []any{
 	(*HostMetrics)(nil),            // 9: meshtastic.HostMetrics
 	(*Telemetry)(nil),              // 10: meshtastic.Telemetry
 	(*Nau7802Config)(nil),          // 11: meshtastic.Nau7802Config
-	(*AS3935Config)(nil),           // 12: meshtastic.AS3935Config
+	(*AS3935State)(nil),            // 12: meshtastic.AS3935State
 	(*SEN5XState)(nil),             // 13: meshtastic.SEN5XState
 	(*SEN6XState)(nil),             // 14: meshtastic.SEN6XState
 }

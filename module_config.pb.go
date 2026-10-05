@@ -331,6 +331,8 @@ const (
 	// Logs mesh traffic to the serial pins, ideal for logging via openLog or similar.
 	ModuleConfig_SerialConfig_LOG     ModuleConfig_SerialConfig_Serial_Mode = 9  // includes other packets
 	ModuleConfig_SerialConfig_LOGTEXT ModuleConfig_SerialConfig_Serial_Mode = 10 // only text (channel & DM)
+	// Modbus-RTU master, polls an RS485 sensor and sends telemetry
+	ModuleConfig_SerialConfig_MODBUS ModuleConfig_SerialConfig_Serial_Mode = 11
 )
 
 // Enum value maps for ModuleConfig_SerialConfig_Serial_Mode.
@@ -347,6 +349,7 @@ var (
 		8:  "MS_CONFIG",
 		9:  "LOG",
 		10: "LOGTEXT",
+		11: "MODBUS",
 	}
 	ModuleConfig_SerialConfig_Serial_Mode_value = map[string]int32{
 		"DEFAULT":   0,
@@ -360,6 +363,7 @@ var (
 		"MS_CONFIG": 8,
 		"LOG":       9,
 		"LOGTEXT":   10,
+		"MODBUS":    11,
 	}
 )
 
@@ -2574,7 +2578,16 @@ type ModuleConfig_MeshBeaconConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Bitwise-OR of Flags values (listen / broadcast / legacy-split toggles).
 	Flags uint32 `protobuf:"varint,1,opt,name=flags,proto3" json:"flags,omitempty"`
-	// Message to include in each beacon broadcast. Max 100 bytes enforced by firmware.
+	// Frequency slot to advertise, 1-based, matching Config.LoRaConfig.channel_num.
+	// Unset means the receiver derives it from the advertised region, channel name and
+	// preset, which covers a region that mandates a slot and a mesh on the default hash.
+	// Set it only where the mesh deliberately pins a non-default slot. Do not send 0.
+	BroadcastOfferFrequencySlot *uint32 `protobuf:"varint,2,opt,name=broadcast_offer_frequency_slot,json=broadcastOfferFrequencySlot,proto3,oneof" json:"broadcast_offer_frequency_slot,omitempty"`
+	// Message to include in each beacon broadcast.
+	// Every beacon copy carries this on the air, so it is the largest single cost in both
+	// this config and the packet it produces. Held to 60 bytes for that reason. The nanopb
+	// max_size is 61 because it counts the terminator, which is what leaves a client a
+	// round 60.
 	BroadcastMessage string `protobuf:"bytes,4,opt,name=broadcast_message,json=broadcastMessage,proto3" json:"broadcast_message,omitempty"`
 	// Optional channel (name + PSK) to advertise in the MeshBeacon offer_channel field.
 	BroadcastOfferChannel *ChannelSettings `protobuf:"bytes,5,opt,name=broadcast_offer_channel,json=broadcastOfferChannel,proto3" json:"broadcast_offer_channel,omitempty"`
@@ -2629,6 +2642,13 @@ func (*ModuleConfig_MeshBeaconConfig) Descriptor() ([]byte, []int) {
 func (x *ModuleConfig_MeshBeaconConfig) GetFlags() uint32 {
 	if x != nil {
 		return x.Flags
+	}
+	return 0
+}
+
+func (x *ModuleConfig_MeshBeaconConfig) GetBroadcastOfferFrequencySlot() uint32 {
+	if x != nil && x.BroadcastOfferFrequencySlot != nil {
+		return *x.BroadcastOfferFrequencySlot
 	}
 	return 0
 }
@@ -2745,7 +2765,12 @@ type ModuleConfig_MeshBeaconConfig_BroadcastTarget struct {
 	// transmit this target's beacon on. The referenced channel must already be configured
 	// on the node (its key is needed to encrypt). If unset, the default channel for the
 	// preset is used.
-	ChannelIndex  *uint32 `protobuf:"varint,4,opt,name=channel_index,json=channelIndex,proto3,oneof" json:"channel_index,omitempty"`
+	ChannelIndex *uint32 `protobuf:"varint,4,opt,name=channel_index,json=channelIndex,proto3,oneof" json:"channel_index,omitempty"`
+	// Frequency slot to transmit this target's beacon on, 1-based, matching
+	// Config.LoRaConfig.channel_num. Unset means derive it the way any node on this
+	// channel would: the region's override slot if it has one, otherwise the hash of the
+	// target channel's name. Do not send 0 - it is the same as unset.
+	FrequencySlot *uint32 `protobuf:"varint,5,opt,name=frequency_slot,json=frequencySlot,proto3,oneof" json:"frequency_slot,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2801,12 +2826,19 @@ func (x *ModuleConfig_MeshBeaconConfig_BroadcastTarget) GetChannelIndex() uint32
 	return 0
 }
 
+func (x *ModuleConfig_MeshBeaconConfig_BroadcastTarget) GetFrequencySlot() uint32 {
+	if x != nil && x.FrequencySlot != nil {
+		return *x.FrequencySlot
+	}
+	return 0
+}
+
 var File_meshtastic_module_config_proto protoreflect.FileDescriptor
 
 const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\n" +
 	"\x1emeshtastic/module_config.proto\x12\n" +
-	"meshtastic\x1a\x15meshtastic/atak.proto\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\"\xacD\n" +
+	"meshtastic\x1a\x15meshtastic/atak.proto\x1a\x18meshtastic/channel.proto\x1a\x17meshtastic/config.proto\x1a\x1fmeshtastic/field_metadata.proto\"\xed\x88\x01\n" +
 	"\fModuleConfig\x129\n" +
 	"\x04mqtt\x18\x01 \x01(\v2#.meshtastic.ModuleConfig.MQTTConfigH\x00R\x04mqtt\x12?\n" +
 	"\x06serial\x18\x02 \x01(\v2%.meshtastic.ModuleConfig.SerialConfigH\x00R\x06serial\x12j\n" +
@@ -2824,245 +2856,267 @@ const file_meshtastic_module_config_proto_rawDesc = "" +
 	"\x10detection_sensor\x18\f \x01(\v2..meshtastic.ModuleConfig.DetectionSensorConfigH\x00R\x0fdetectionSensor\x12K\n" +
 	"\n" +
 	"paxcounter\x18\r \x01(\v2).meshtastic.ModuleConfig.PaxcounterConfigH\x00R\n" +
-	"paxcounter\x12T\n" +
-	"\rstatusmessage\x18\x0e \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigH\x00R\rstatusmessage\x12a\n" +
-	"\x12traffic_management\x18\x0f \x01(\v20.meshtastic.ModuleConfig.TrafficManagementConfigH\x00R\x11trafficManagement\x126\n" +
-	"\x03tak\x18\x10 \x01(\v2\".meshtastic.ModuleConfig.TAKConfigH\x00R\x03tak\x12L\n" +
-	"\vmesh_beacon\x18\x11 \x01(\v2).meshtastic.ModuleConfig.MeshBeaconConfigH\x00R\n" +
-	"meshBeacon\x1a\xca\x03\n" +
+	"paxcounter\x12b\n" +
+	"\rstatusmessage\x18\x0e \x01(\v2,.meshtastic.ModuleConfig.StatusMessageConfigB\f\xca\xf3\x18\bR\x062.7.20H\x00R\rstatusmessage\x12n\n" +
+	"\x12traffic_management\x18\x0f \x01(\v20.meshtastic.ModuleConfig.TrafficManagementConfigB\v\xca\xf3\x18\aR\x052.8.0H\x00R\x11trafficManagement\x12C\n" +
+	"\x03tak\x18\x10 \x01(\v2\".meshtastic.ModuleConfig.TAKConfigB\v\xca\xf3\x18\aR\x052.8.0H\x00R\x03tak\x12Y\n" +
+	"\vmesh_beacon\x18\x11 \x01(\v2).meshtastic.ModuleConfig.MeshBeaconConfigB\v\xca\xf3\x18\aR\x052.8.0H\x00R\n" +
+	"meshBeacon\x1a\xf9\b\n" +
 	"\n" +
-	"MQTTConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x18\n" +
-	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x1a\n" +
-	"\busername\x18\x03 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x04 \x01(\tR\bpassword\x12-\n" +
-	"\x12encryption_enabled\x18\x05 \x01(\bR\x11encryptionEnabled\x12%\n" +
-	"\fjson_enabled\x18\x06 \x01(\bB\x02\x18\x01R\vjsonEnabled\x12\x1f\n" +
-	"\vtls_enabled\x18\a \x01(\bR\n" +
-	"tlsEnabled\x12\x12\n" +
-	"\x04root\x18\b \x01(\tR\x04root\x125\n" +
-	"\x17proxy_to_client_enabled\x18\t \x01(\bR\x14proxyToClientEnabled\x122\n" +
+	"MQTTConfig\x12A\n" +
+	"\aenabled\x18\x01 \x01(\bB'\xca\xf3\x18#:\fMQTT EnabledB\x13Enable MQTT gatewayR\aenabled\x12<\n" +
+	"\aaddress\x18\x02 \x01(\tB\"\xca\xf3\x18\x1e:\aAddressB\x13MQTT server addressR\aaddress\x129\n" +
+	"\busername\x18\x03 \x01(\tB\x1d\xca\xf3\x18\x19:\bUsernameB\rMQTT usernameR\busername\x129\n" +
+	"\bpassword\x18\x04 \x01(\tB\x1d\xca\xf3\x18\x19:\bPasswordB\rMQTT passwordR\bpassword\x12g\n" +
+	"\x12encryption_enabled\x18\x05 \x01(\bB8\xca\xf3\x184:\x12Encryption EnabledB\x1eSend encrypted packets to MQTTR\x11encryptionEnabled\x120\n" +
+	"\fjson_enabled\x18\x06 \x01(\bB\r\xca\xf3\x18\aZ\x052.8.0\x18\x01R\vjsonEnabled\x12j\n" +
+	"\vtls_enabled\x18\a \x01(\bBI\xca\xf3\x18E:\vTLS EnabledB6TLS is required for the public Meshtastic MQTT server.R\n" +
+	"tlsEnabled\x125\n" +
+	"\x04root\x18\b \x01(\tB!\xca\xf3\x18\x1d:\n" +
+	"Root TopicB\x0fMQTT root topicR\x04root\x12\x91\x01\n" +
+	"\x17proxy_to_client_enabled\x18\t \x01(\bBZ\xca\xf3\x18V:\x11MQTT Client ProxyBAUtilizes the network connection on your phone to connect to MQTT.R\x14proxyToClientEnabled\x12\xc5\x02\n" +
 	"\x15map_reporting_enabled\x18\n" +
-	" \x01(\bR\x13mapReportingEnabled\x12Z\n" +
-	"\x13map_report_settings\x18\v \x01(\v2*.meshtastic.ModuleConfig.MapReportSettingsR\x11mapReportSettings\x1a\xac\x01\n" +
-	"\x11MapReportSettings\x122\n" +
-	"\x15publish_interval_secs\x18\x01 \x01(\rR\x13publishIntervalSecs\x12-\n" +
-	"\x12position_precision\x18\x02 \x01(\rR\x11positionPrecision\x124\n" +
-	"\x16should_report_location\x18\x03 \x01(\bR\x14shouldReportLocation\x1a\xb3\x01\n" +
+	" \x01(\bB\x90\x02\xca\xf3\x18\x8b\x02:\rMap ReportingB\xf9\x01Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, short and long name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name.R\x13mapReportingEnabled\x12Z\n" +
+	"\x13map_report_settings\x18\v \x01(\v2*.meshtastic.ModuleConfig.MapReportSettingsR\x11mapReportSettings\x1a\x89\x03\n" +
+	"\x11MapReportSettings\x12w\n" +
+	"\x15publish_interval_secs\x18\x01 \x01(\rBC\xca\xf3\x18?*\x01s:\x14Map Publish IntervalB$How often a map report is published.R\x13publishIntervalSecs\x12-\n" +
+	"\x12position_precision\x18\x02 \x01(\rR\x11positionPrecision\x12\xcb\x01\n" +
+	"\x16should_report_location\x18\x03 \x01(\bB\x94\x01\xca\xf3\x18\x8f\x01:\x0fReport LocationBuI have read and understand the above. I voluntarily consent to the unencrypted transmission of my node data via MQTT.R\x052.6.8R\x14shouldReportLocation\x1a\xb3\x01\n" +
 	"\x14RemoteHardwareConfig\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12;\n" +
 	"\x1aallow_undefined_pin_access\x18\x02 \x01(\bR\x17allowUndefinedPinAccess\x12D\n" +
-	"\x0eavailable_pins\x18\x03 \x03(\v2\x1d.meshtastic.RemoteHardwarePinR\ravailablePins\x1a\x85\x01\n" +
-	"\x12NeighborInfoConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x12'\n" +
-	"\x0fupdate_interval\x18\x02 \x01(\rR\x0eupdateInterval\x12,\n" +
-	"\x12transmit_over_lora\x18\x03 \x01(\bR\x10transmitOverLora\x1a\x87\x04\n" +
-	"\x15DetectionSensorConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x124\n" +
-	"\x16minimum_broadcast_secs\x18\x02 \x01(\rR\x14minimumBroadcastSecs\x120\n" +
-	"\x14state_broadcast_secs\x18\x03 \x01(\rR\x12stateBroadcastSecs\x12\x1b\n" +
-	"\tsend_bell\x18\x04 \x01(\bR\bsendBell\x12\x12\n" +
-	"\x04name\x18\x05 \x01(\tR\x04name\x12\x1f\n" +
-	"\vmonitor_pin\x18\x06 \x01(\rR\n" +
-	"monitorPin\x12p\n" +
-	"\x16detection_trigger_type\x18\a \x01(\x0e2:.meshtastic.ModuleConfig.DetectionSensorConfig.TriggerTypeR\x14detectionTriggerType\x12\x1d\n" +
+	"\x0eavailable_pins\x18\x03 \x03(\v2\x1d.meshtastic.RemoteHardwarePinR\ravailablePins\x1a\x8c\x04\n" +
+	"\x12NeighborInfoConfig\x12\xbb\x01\n" +
+	"\aenabled\x18\x01 \x01(\bB\xa0\x01\xca\xf3\x18\x9b\x01:\x15Neighbor Info EnabledB\x81\x01Enable neighbor info broadcasting. Periodically sends information about directly-heard neighbors to help visualize mesh topology.R\aenabled\x12h\n" +
+	"\x0fupdate_interval\x18\x02 \x01(\rB?\xca\xf3\x18;*\x01s:\x0fUpdate IntervalB%How often to broadcast neighbor info.R\x0eupdateInterval\x12\xcd\x01\n" +
+	"\x12transmit_over_lora\x18\x03 \x01(\bB\x9e\x01\xca\xf3\x18\x99\x01:\x12Transmit over LoRaB\x82\x01Whether to transmit neighbor info over LoRa in addition to MQTT and PhoneAPI. Not available on channels with default key and name.R\x10transmitOverLora\x1a\xe4\v\n" +
+	"\x15DetectionSensorConfig\x12\x8c\x02\n" +
+	"\aenabled\x18\x01 \x01(\bB\xf1\x01\xca\xf3\x18\xec\x01:\x18Detection Sensor EnabledB\xcf\x01Enables the detection sensor module, it needs to be enabled on both the node with the sensor, and any nodes that you want to receive detection sensor text messages or view the detection sensor log and chart.R\aenabled\x12\x94\x01\n" +
+	"\x16minimum_broadcast_secs\x18\x02 \x01(\rB^\xca\xf3\x18Z*\x01s:)Minimum time between detection broadcastsB*Minimum time between detection broadcasts.R\x14minimumBroadcastSecs\x12\xb5\x01\n" +
+	"\x14state_broadcast_secs\x18\x03 \x01(\rB\x82\x01\xca\xf3\x18~*\x01s:\x18State Broadcast IntervalB_How often to send the detection sensor state to the mesh, whether or not anything was detected.R\x12stateBroadcastSecs\x12\x86\x01\n" +
+	"\tsend_bell\x18\x04 \x01(\bBi\xca\xf3\x18e:\tSend BellBXSend ASCII bell with alert message. Useful for triggering external notification on bell.R\bsendBell\x12=\n" +
+	"\x04name\x18\x05 \x01(\tB)\xca\xf3\x18%:\x04NameB\x1dSensor name for mesh messagesR\x04name\x12_\n" +
+	"\vmonitor_pin\x18\x06 \x01(\rB>\xca\xf3\x18::\x13GPIO Pin to monitorB#GPIO pin watched for state changes.R\n" +
+	"monitorPin\x12\x9a\x01\n" +
+	"\x16detection_trigger_type\x18\a \x01(\x0e2:.meshtastic.ModuleConfig.DetectionSensorConfig.TriggerTypeB(\xca\xf3\x18$:\vTriggerTypeB\x15Type of trigger eventR\x14detectionTriggerType\x12\xae\x01\n" +
 	"\n" +
-	"use_pullup\x18\b \x01(\bR\tusePullup\"\x88\x01\n" +
-	"\vTriggerType\x12\r\n" +
-	"\tLOGIC_LOW\x10\x00\x12\x0e\n" +
+	"use_pullup\x18\b \x01(\bB\x8e\x01\xca\xf3\x18\x89\x01:\x14Uses pullup resistorBqWhether or not use INPUT_PULLUP mode for GPIO pin. Only applicable if the board uses pull-up resistors on the pinR\tusePullup\"\xf5\x01\n" +
+	"\vTriggerType\x12\x18\n" +
+	"\tLOGIC_LOW\x10\x00\x1a\t\xca\xf3\x18\x05:\x03Low\x12\x1a\n" +
 	"\n" +
-	"LOGIC_HIGH\x10\x01\x12\x10\n" +
-	"\fFALLING_EDGE\x10\x02\x12\x0f\n" +
-	"\vRISING_EDGE\x10\x03\x12\x1a\n" +
-	"\x16EITHER_EDGE_ACTIVE_LOW\x10\x04\x12\x1b\n" +
-	"\x17EITHER_EDGE_ACTIVE_HIGH\x10\x05\x1a\xcb\x03\n" +
-	"\vAudioConfig\x12%\n" +
-	"\x0ecodec2_enabled\x18\x01 \x01(\bR\rcodec2Enabled\x12\x17\n" +
-	"\aptt_pin\x18\x02 \x01(\rR\x06pttPin\x12I\n" +
-	"\abitrate\x18\x03 \x01(\x0e2/.meshtastic.ModuleConfig.AudioConfig.Audio_BaudR\abitrate\x12\x15\n" +
-	"\x06i2s_ws\x18\x04 \x01(\rR\x05i2sWs\x12\x15\n" +
-	"\x06i2s_sd\x18\x05 \x01(\rR\x05i2sSd\x12\x17\n" +
-	"\ai2s_din\x18\x06 \x01(\rR\x06i2sDin\x12\x17\n" +
-	"\ai2s_sck\x18\a \x01(\rR\x06i2sSck\"\xd0\x01\n" +
+	"LOGIC_HIGH\x10\x01\x1a\n" +
+	"\xca\xf3\x18\x06:\x04High\x12$\n" +
+	"\fFALLING_EDGE\x10\x02\x1a\x12\xca\xf3\x18\x0e:\fFalling Edge\x12\"\n" +
+	"\vRISING_EDGE\x10\x03\x1a\x11\xca\xf3\x18\r:\vRising Edge\x121\n" +
+	"\x16EITHER_EDGE_ACTIVE_LOW\x10\x04\x1a\x15\xca\xf3\x18\x11:\x0fEither Edge Low\x123\n" +
+	"\x17EITHER_EDGE_ACTIVE_HIGH\x10\x05\x1a\x16\xca\xf3\x18\x12:\x10Either Edge High\x1a\xb1\a\n" +
+	"\vAudioConfig\x12\x89\x01\n" +
+	"\x0ecodec2_enabled\x18\x01 \x01(\bBb\xca\xf3\x18^:\x0eCodec2 EnabledBLEnable Codec2 audio encoding/decoding for voice communication over the mesh.R\rcodec2Enabled\x12E\n" +
+	"\aptt_pin\x18\x02 \x01(\rB,\xca\xf3\x18(:\aPTT PinB\x1dPush-to-talk GPIO pin number.R\x06pttPin\x12\xd3\x01\n" +
+	"\abitrate\x18\x03 \x01(\x0e2/.meshtastic.ModuleConfig.AudioConfig.Audio_BaudB\x87\x01\xca\xf3\x18\x82\x01:\aBitrateBwThe Codec2 bitrate to use. The sample rate is always 8 kHz. Lower bitrates use less bandwidth but reduce audio quality.R\abitrate\x12#\n" +
+	"\x06i2s_ws\x18\x04 \x01(\rB\f\xca\xf3\x18\b:\x06I2S WSR\x05i2sWs\x12#\n" +
+	"\x06i2s_sd\x18\x05 \x01(\rB\f\xca\xf3\x18\b:\x06I2S SDR\x05i2sSd\x12&\n" +
+	"\ai2s_din\x18\x06 \x01(\rB\r\xca\xf3\x18\t:\aI2S DINR\x06i2sDin\x12&\n" +
+	"\ai2s_sck\x18\a \x01(\rB\r\xca\xf3\x18\t:\aI2S SCKR\x06i2sSck\"\xde\x02\n" +
 	"\n" +
-	"Audio_Baud\x12\x12\n" +
-	"\x0eCODEC2_DEFAULT\x10\x00\x12\x0f\n" +
-	"\vCODEC2_3200\x10\x01\x12\x0f\n" +
-	"\vCODEC2_2400\x10\x02\x12\x0f\n" +
-	"\vCODEC2_1600\x10\x03\x12\x0f\n" +
-	"\vCODEC2_1400\x10\x04\x12\x0f\n" +
-	"\vCODEC2_1300\x10\x05\x12\x0f\n" +
-	"\vCODEC2_1200\x10\x06\x12\x12\n" +
+	"Audio_Baud\x12!\n" +
+	"\x0eCODEC2_DEFAULT\x10\x00\x1a\r\xca\xf3\x18\t:\aDefault\x12\x1f\n" +
+	"\vCODEC2_3200\x10\x01\x1a\x0e\xca\xf3\x18\n" +
+	":\b3200 bps\x12\x1f\n" +
+	"\vCODEC2_2400\x10\x02\x1a\x0e\xca\xf3\x18\n" +
+	":\b2400 bps\x12\x1f\n" +
+	"\vCODEC2_1600\x10\x03\x1a\x0e\xca\xf3\x18\n" +
+	":\b1600 bps\x12\x1f\n" +
+	"\vCODEC2_1400\x10\x04\x1a\x0e\xca\xf3\x18\n" +
+	":\b1400 bps\x12\x1f\n" +
+	"\vCODEC2_1300\x10\x05\x1a\x0e\xca\xf3\x18\n" +
+	":\b1300 bps\x12\x1f\n" +
+	"\vCODEC2_1200\x10\x06\x1a\x0e\xca\xf3\x18\n" +
+	":\b1200 bps\x12\x12\n" +
 	"\n" +
 	"CODEC2_700\x10\a\x1a\x02\b\x01\x12\x13\n" +
-	"\vCODEC2_700B\x10\b\x1a\x02\b\x01\x12\x0f\n" +
-	"\vCODEC2_700C\x10\t\x12\x0e\n" +
+	"\vCODEC2_700B\x10\b\x1a\x02\b\x01\x12\x1f\n" +
+	"\vCODEC2_700C\x10\t\x1a\x0e\xca\xf3\x18\n" +
+	":\b700C bps\x12\x1d\n" +
 	"\n" +
 	"CODEC2_450\x10\n" +
-	"\x1a\xb6\x01\n" +
-	"\x10PaxcounterConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x12<\n" +
-	"\x1apaxcounter_update_interval\x18\x02 \x01(\rR\x18paxcounterUpdateInterval\x12%\n" +
-	"\x0ewifi_threshold\x18\x03 \x01(\x05R\rwifiThreshold\x12#\n" +
-	"\rble_threshold\x18\x04 \x01(\x05R\fbleThreshold\x1a\xbb\x04\n" +
-	"\x17TrafficManagementConfig\x12;\n" +
-	"\x1aposition_min_interval_secs\x18\x04 \x01(\rR\x17positionMinIntervalSecs\x12H\n" +
-	"!nodeinfo_direct_response_max_hops\x18\x06 \x01(\rR\x1dnodeinfoDirectResponseMaxHops\x123\n" +
-	"\x16rate_limit_window_secs\x18\b \x01(\rR\x13rateLimitWindowSecs\x123\n" +
-	"\x16rate_limit_max_packets\x18\t \x01(\rR\x13rateLimitMaxPackets\x128\n" +
-	"\x18unknown_packet_threshold\x18\v \x01(\rR\x16unknownPacketThresholdJ\x04\b\x01\x10\x02J\x04\b\x02\x10\x03J\x04\b\x03\x10\x04J\x04\b\x05\x10\x06J\x04\b\a\x10\bJ\x04\b\n" +
-	"\x10\vJ\x04\b\f\x10\rJ\x04\b\r\x10\x0eJ\x04\b\x0e\x10\x0fR\aenabledR\x16position_dedup_enabledR\x17position_precision_bitsR\x18nodeinfo_direct_responseR\x12rate_limit_enabledR\x14drop_unknown_enabledR\x15exhaust_hop_telemetryR\x14exhaust_hop_positionR\x14router_preserve_hops\x1a\xec\x05\n" +
-	"\fSerialConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x12\n" +
-	"\x04echo\x18\x02 \x01(\bR\x04echo\x12\x10\n" +
-	"\x03rxd\x18\x03 \x01(\rR\x03rxd\x12\x10\n" +
-	"\x03txd\x18\x04 \x01(\rR\x03txd\x12E\n" +
-	"\x04baud\x18\x05 \x01(\x0e21.meshtastic.ModuleConfig.SerialConfig.Serial_BaudR\x04baud\x12\x18\n" +
-	"\atimeout\x18\x06 \x01(\rR\atimeout\x12E\n" +
-	"\x04mode\x18\a \x01(\x0e21.meshtastic.ModuleConfig.SerialConfig.Serial_ModeR\x04mode\x12?\n" +
-	"\x1coverride_console_serial_port\x18\b \x01(\bR\x19overrideConsoleSerialPort\"\x8a\x02\n" +
-	"\vSerial_Baud\x12\x10\n" +
-	"\fBAUD_DEFAULT\x10\x00\x12\f\n" +
-	"\bBAUD_110\x10\x01\x12\f\n" +
-	"\bBAUD_300\x10\x02\x12\f\n" +
-	"\bBAUD_600\x10\x03\x12\r\n" +
-	"\tBAUD_1200\x10\x04\x12\r\n" +
-	"\tBAUD_2400\x10\x05\x12\r\n" +
-	"\tBAUD_4800\x10\x06\x12\r\n" +
-	"\tBAUD_9600\x10\a\x12\x0e\n" +
+	"\x1a\r\xca\xf3\x18\t:\a450 bps\x1a\xe9\x04\n" +
+	"\x10PaxcounterConfig\x12\xde\x01\n" +
+	"\aenabled\x18\x01 \x01(\bB\xc3\x01\xca\xf3\x18\xbe\x01:\x13PAX Counter EnabledB\xa6\x01When enabled the PAX Counter module counts the number of people passing by using WiFi and Bluetooth. Both WiFI and Bluetooth must be disabled for PAX counter to work.R\aenabled\x12\x9d\x01\n" +
+	"\x1apaxcounter_update_interval\x18\x02 \x01(\rB_\xca\xf3\x18[*\x01s:\x0fUpdate IntervalBEHow often we can send a message to the mesh when people are detected.R\x18paxcounterUpdateInterval\x12k\n" +
+	"\x0ewifi_threshold\x18\x03 \x01(\x05BD\xca\xf3\x18@*\x03dBm:\x0eWiFi ThresholdB)RSSI threshold for counting WiFi devices.R\rwifiThreshold\x12g\n" +
+	"\rble_threshold\x18\x04 \x01(\x05BB\xca\xf3\x18>*\x03dBm:\rBLE ThresholdB(RSSI threshold for counting BLE devices.R\fbleThreshold\x1a\xdf\a\n" +
+	"\x17TrafficManagementConfig\x12\xa4\x01\n" +
+	"\x1aposition_min_interval_secs\x18\x04 \x01(\rBg\xca\xf3\x18c*\x01s:\x19Minimum Position IntervalBCPositions from the same node arriving sooner than this are dropped.R\x17positionMinIntervalSecs\x12\x97\x01\n" +
+	"!nodeinfo_direct_response_max_hops\x18\x06 \x01(\rBM\xca\xf3\x18I:\x18Direct NodeInfo Max HopsB-Only answer requestors within this many hops.R\x1dnodeinfoDirectResponseMaxHops\x12z\n" +
+	"\x16rate_limit_window_secs\x18\b \x01(\rBE\xca\xf3\x18A*\x01s:\x11Rate Limit WindowB)The time window packets are counted over.R\x13rateLimitWindowSecs\x12\x81\x01\n" +
+	"\x16rate_limit_max_packets\x18\t \x01(\rBL\xca\xf3\x18H:\x16Rate Limit Max PacketsB.The most packets one node may send per window.R\x13rateLimitMaxPackets\x12\x8b\x01\n" +
+	"\x18unknown_packet_threshold\x18\v \x01(\rBQ\xca\xf3\x18M:\x18Unknown Packet ThresholdB1How many per window before the sender is dropped.R\x16unknownPacketThresholdJ\x04\b\x01\x10\x02J\x04\b\x02\x10\x03J\x04\b\x03\x10\x04J\x04\b\x05\x10\x06J\x04\b\a\x10\bJ\x04\b\n" +
+	"\x10\vJ\x04\b\f\x10\rJ\x04\b\r\x10\x0eJ\x04\b\x0e\x10\x0fR\aenabledR\x16position_dedup_enabledR\x17position_precision_bitsR\x18nodeinfo_direct_responseR\x12rate_limit_enabledR\x14drop_unknown_enabledR\x15exhaust_hop_telemetryR\x14exhaust_hop_positionR\x14router_preserve_hops\x1a\xf1\v\n" +
+	"\fSerialConfig\x12D\n" +
+	"\aenabled\x18\x01 \x01(\bB*\xca\xf3\x18&:\x0eSerial EnabledB\x14Enable serial moduleR\aenabled\x12`\n" +
+	"\x04echo\x18\x02 \x01(\bBL\xca\xf3\x18H:\x04EchoB@If set, any packets you send will be echoed back to your device.R\x04echo\x12B\n" +
+	"\x03rxd\x18\x03 \x01(\rB0\xca\xf3\x18,:\x1bReceive data (rxd) GPIO pinB\rRX pin numberR\x03rxd\x12C\n" +
+	"\x03txd\x18\x04 \x01(\rB1\xca\xf3\x18-:\x1cTransmit data (txd) GPIO pinB\rTX pin numberR\x03txd\x12c\n" +
+	"\x04baud\x18\x05 \x01(\x0e21.meshtastic.ModuleConfig.SerialConfig.Serial_BaudB\x1c\xca\xf3\x18\x18:\x04BaudB\x10Serial baud rateR\x04baud\x12k\n" +
+	"\atimeout\x18\x06 \x01(\rBQ\xca\xf3\x18M:\aTimeoutBBThe amount of time to wait before we consider your packet as done.R\atimeout\x12o\n" +
+	"\x04mode\x18\a \x01(\x0e21.meshtastic.ModuleConfig.SerialConfig.Serial_ModeB(\xca\xf3\x18$:\x04ModeB\x1cSerial module operation modeR\x04mode\x12?\n" +
+	"\x1coverride_console_serial_port\x18\b \x01(\bR\x19overrideConsoleSerialPort\"\xa2\x04\n" +
+	"\vSerial_Baud\x12\x1f\n" +
+	"\fBAUD_DEFAULT\x10\x00\x1a\r\xca\xf3\x18\t:\aDefault\x12\x1c\n" +
+	"\bBAUD_110\x10\x01\x1a\x0e\xca\xf3\x18\n" +
+	":\b110 Baud\x12\x1c\n" +
+	"\bBAUD_300\x10\x02\x1a\x0e\xca\xf3\x18\n" +
+	":\b300 Baud\x12\x1c\n" +
+	"\bBAUD_600\x10\x03\x1a\x0e\xca\xf3\x18\n" +
+	":\b600 Baud\x12\x1e\n" +
+	"\tBAUD_1200\x10\x04\x1a\x0f\xca\xf3\x18\v:\t1200 Baud\x12\x1e\n" +
+	"\tBAUD_2400\x10\x05\x1a\x0f\xca\xf3\x18\v:\t2400 Baud\x12\x1e\n" +
+	"\tBAUD_4800\x10\x06\x1a\x0f\xca\xf3\x18\v:\t4800 Baud\x12\x1e\n" +
+	"\tBAUD_9600\x10\a\x1a\x0f\xca\xf3\x18\v:\t9600 Baud\x12 \n" +
 	"\n" +
-	"BAUD_19200\x10\b\x12\x0e\n" +
+	"BAUD_19200\x10\b\x1a\x10\xca\xf3\x18\f:\n" +
+	"19200 Baud\x12 \n" +
 	"\n" +
-	"BAUD_38400\x10\t\x12\x0e\n" +
+	"BAUD_38400\x10\t\x1a\x10\xca\xf3\x18\f:\n" +
+	"38400 Baud\x12 \n" +
 	"\n" +
 	"BAUD_57600\x10\n" +
-	"\x12\x0f\n" +
-	"\vBAUD_115200\x10\v\x12\x0f\n" +
-	"\vBAUD_230400\x10\f\x12\x0f\n" +
-	"\vBAUD_460800\x10\r\x12\x0f\n" +
-	"\vBAUD_576000\x10\x0e\x12\x0f\n" +
-	"\vBAUD_921600\x10\x0f\"\x93\x01\n" +
-	"\vSerial_Mode\x12\v\n" +
-	"\aDEFAULT\x10\x00\x12\n" +
-	"\n" +
-	"\x06SIMPLE\x10\x01\x12\t\n" +
-	"\x05PROTO\x10\x02\x12\v\n" +
-	"\aTEXTMSG\x10\x03\x12\b\n" +
-	"\x04NMEA\x10\x04\x12\v\n" +
-	"\aCALTOPO\x10\x05\x12\b\n" +
+	"\x1a\x10\xca\xf3\x18\f:\n" +
+	"57600 Baud\x12\"\n" +
+	"\vBAUD_115200\x10\v\x1a\x11\xca\xf3\x18\r:\v115200 Baud\x12\"\n" +
+	"\vBAUD_230400\x10\f\x1a\x11\xca\xf3\x18\r:\v230400 Baud\x12\"\n" +
+	"\vBAUD_460800\x10\r\x1a\x11\xca\xf3\x18\r:\v460800 Baud\x12\"\n" +
+	"\vBAUD_576000\x10\x0e\x1a\x11\xca\xf3\x18\r:\v576000 Baud\x12\"\n" +
+	"\vBAUD_921600\x10\x0f\x1a\x11\xca\xf3\x18\r:\v921600 Baud\"\x86\x02\n" +
+	"\vSerial_Mode\x12\x1a\n" +
+	"\aDEFAULT\x10\x00\x1a\r\xca\xf3\x18\t:\aDefault\x12\x18\n" +
+	"\x06SIMPLE\x10\x01\x1a\f\xca\xf3\x18\b:\x06Simple\x12\x1a\n" +
+	"\x05PROTO\x10\x02\x1a\x0f\xca\xf3\x18\v:\tProtobufs\x12\x1f\n" +
+	"\aTEXTMSG\x10\x03\x1a\x12\xca\xf3\x18\x0e:\fText Message\x12\x1e\n" +
+	"\x04NMEA\x10\x04\x1a\x14\xca\xf3\x18\x10:\x0eNMEA Positions\x12\x1a\n" +
+	"\aCALTOPO\x10\x05\x1a\r\xca\xf3\x18\t:\aCALTOPO\x12\b\n" +
 	"\x04WS85\x10\x06\x12\r\n" +
 	"\tVE_DIRECT\x10\a\x12\r\n" +
 	"\tMS_CONFIG\x10\b\x12\a\n" +
 	"\x03LOG\x10\t\x12\v\n" +
 	"\aLOGTEXT\x10\n" +
-	"\x1a\xac\x04\n" +
-	"\x1aExternalNotificationConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x1b\n" +
-	"\toutput_ms\x18\x02 \x01(\rR\boutputMs\x12\x16\n" +
-	"\x06output\x18\x03 \x01(\rR\x06output\x12!\n" +
-	"\foutput_vibra\x18\b \x01(\rR\voutputVibra\x12#\n" +
-	"\routput_buzzer\x18\t \x01(\rR\foutputBuzzer\x12\x16\n" +
-	"\x06active\x18\x04 \x01(\bR\x06active\x12#\n" +
-	"\ralert_message\x18\x05 \x01(\bR\falertMessage\x12.\n" +
-	"\x13alert_message_vibra\x18\n" +
-	" \x01(\bR\x11alertMessageVibra\x120\n" +
-	"\x14alert_message_buzzer\x18\v \x01(\bR\x12alertMessageBuzzer\x12\x1d\n" +
+	"\x12\n" +
 	"\n" +
-	"alert_bell\x18\x06 \x01(\bR\talertBell\x12(\n" +
-	"\x10alert_bell_vibra\x18\f \x01(\bR\x0ealertBellVibra\x12*\n" +
-	"\x11alert_bell_buzzer\x18\r \x01(\bR\x0falertBellBuzzer\x12\x17\n" +
-	"\ause_pwm\x18\a \x01(\bR\x06usePwm\x12\x1f\n" +
-	"\vnag_timeout\x18\x0e \x01(\rR\n" +
-	"nagTimeout\x12)\n" +
-	"\x11use_i2s_as_buzzer\x18\x0f \x01(\bR\x0euseI2sAsBuzzer\x1a\xe5\x01\n" +
-	"\x12StoreForwardConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x1c\n" +
-	"\theartbeat\x18\x02 \x01(\bR\theartbeat\x12\x18\n" +
-	"\arecords\x18\x03 \x01(\rR\arecords\x12,\n" +
-	"\x12history_return_max\x18\x04 \x01(\rR\x10historyReturnMax\x122\n" +
-	"\x15history_return_window\x18\x05 \x01(\rR\x13historyReturnWindow\x12\x1b\n" +
-	"\tis_server\x18\x06 \x01(\bR\bisServer\x1a\x7f\n" +
-	"\x0fRangeTestConfig\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x16\n" +
-	"\x06sender\x18\x02 \x01(\rR\x06sender\x12\x12\n" +
-	"\x04save\x18\x03 \x01(\bR\x04save\x12&\n" +
-	"\x0fclear_on_reboot\x18\x04 \x01(\bR\rclearOnReboot\x1a\xf6\x06\n" +
-	"\x0fTelemetryConfig\x124\n" +
-	"\x16device_update_interval\x18\x01 \x01(\rR\x14deviceUpdateInterval\x12>\n" +
-	"\x1benvironment_update_interval\x18\x02 \x01(\rR\x19environmentUpdateInterval\x12F\n" +
-	"\x1fenvironment_measurement_enabled\x18\x03 \x01(\bR\x1denvironmentMeasurementEnabled\x12<\n" +
-	"\x1aenvironment_screen_enabled\x18\x04 \x01(\bR\x18environmentScreenEnabled\x12D\n" +
-	"\x1eenvironment_display_fahrenheit\x18\x05 \x01(\bR\x1cenvironmentDisplayFahrenheit\x12.\n" +
-	"\x13air_quality_enabled\x18\x06 \x01(\bR\x11airQualityEnabled\x120\n" +
-	"\x14air_quality_interval\x18\a \x01(\rR\x12airQualityInterval\x12:\n" +
-	"\x19power_measurement_enabled\x18\b \x01(\bR\x17powerMeasurementEnabled\x122\n" +
-	"\x15power_update_interval\x18\t \x01(\rR\x13powerUpdateInterval\x120\n" +
+	"\x06MODBUS\x10\v\x1a\xe2\x0e\n" +
+	"\x1aExternalNotificationConfig\x12\\\n" +
+	"\aenabled\x18\x01 \x01(\bBB\xca\xf3\x18>:\x1dExternal Notification EnabledB\x1dEnable external notificationsR\aenabled\x12j\n" +
+	"\toutput_ms\x18\x02 \x01(\rBM\xca\xf3\x18I*\x02ms:\x14GPIO Output DurationB-In GPIO mode, how long to keep the output on.R\boutputMs\x12{\n" +
+	"\x06output\x18\x03 \x01(\rBc\xca\xf3\x18_:\x0fOutput pin GPIOBLGPIO pin driven on notification. Defaults to the board's EXT_NOTIFY_OUT pin.R\x06output\x12Z\n" +
+	"\foutput_vibra\x18\b \x01(\rB7\xca\xf3\x183:\x15Output pin vibra GPIOB\x1aVibration motor output pinR\voutputVibra\x12T\n" +
+	"\routput_buzzer\x18\t \x01(\rB/\xca\xf3\x18+:\x16Output pin buzzer GPIOB\x11Buzzer output pinR\foutputBuzzer\x12y\n" +
+	"\x06active\x18\x04 \x01(\bBa\xca\xf3\x18]:\x06ActiveBSIf enabled, the 'output' Pin will be pulled active high, disabled means active low.R\x06active\x12d\n" +
+	"\ralert_message\x18\x05 \x01(\bB?\xca\xf3\x18;:\x1eAlert when receiving a messageB\x19Alert on incoming messageR\falertMessage\x12x\n" +
+	"\x13alert_message_vibra\x18\n" +
+	" \x01(\bBH\xca\xf3\x18D:\x11Vibra Motor AlertB/Alert GPIO vibra motor when receiving a messageR\x11alertMessageVibra\x12|\n" +
+	"\x14alert_message_buzzer\x18\v \x01(\bBJ\xca\xf3\x18F:*Alert GPIO buzzer when receiving a messageB\x18Buzz on incoming messageR\x12alertMessageBuzzer\x12Y\n" +
+	"\n" +
+	"alert_bell\x18\x06 \x01(\bB:\xca\xf3\x186:\x1bAlert when receiving a bellB\x17Alert on bell characterR\talertBell\x12w\n" +
+	"\x10alert_bell_vibra\x18\f \x01(\bBM\xca\xf3\x18I:,Alert GPIO vibra motor when receiving a bellB\x19Vibrate on bell characterR\x0ealertBellVibra\x12q\n" +
+	"\x11alert_bell_buzzer\x18\r \x01(\bBE\xca\xf3\x18A:'Alert GPIO buzzer when receiving a bellB\x16Buzz on bell characterR\x0falertBellBuzzer\x12\xf6\x01\n" +
+	"\ause_pwm\x18\a \x01(\bB\xdc\x01\xca\xf3\x18\xd7\x01:\x0eUse PWM BuzzerB\xc4\x01Use a PWM output (like the RAK Buzzer) for tunes instead of an on/off output. This will ignore the output, output duration and active settings and use the device config buzzer GPIO option instead.R\x06usePwm\x12W\n" +
+	"\vnag_timeout\x18\x0e \x01(\rB6\xca\xf3\x182*\x01s:\vNag TimeoutB How long the notification lasts.R\n" +
+	"nagTimeout\x12\xd8\x01\n" +
+	"\x11use_i2s_as_buzzer\x18\x0f \x01(\bB\xac\x01\xca\xf3\x18\xa7\x01:\x11Use I2S As BuzzerB\x91\x01Enables devices with native I2S audio output to use the RTTTL over speaker like a buzzer. T-Watch S3 and T-Deck for example have this capability.R\x0euseI2sAsBuzzer\x1a\xb0\x04\n" +
+	"\x12StoreForwardConfig\x12`\n" +
+	"\aenabled\x18\x01 \x01(\bBF\xca\xf3\x18B:\x19Store and Forward EnabledB%Enables the store and forward module.R\aenabled\x12h\n" +
+	"\theartbeat\x18\x02 \x01(\bBJ\xca\xf3\x18F:\x0eSend HeartbeatB4Send a heartbeat to advertise the server's presence.R\theartbeat\x121\n" +
+	"\arecords\x18\x03 \x01(\rB\x17\xca\xf3\x18\x13:\x11Number of recordsR\arecords\x12F\n" +
+	"\x12history_return_max\x18\x04 \x01(\rB\x18\xca\xf3\x18\x14:\x12History Return MaxR\x10historyReturnMax\x12O\n" +
+	"\x15history_return_window\x18\x05 \x01(\rB\x1b\xca\xf3\x18\x17:\x15History Return WindowR\x13historyReturnWindow\x12\x81\x01\n" +
+	"\tis_server\x18\x06 \x01(\bBd\xca\xf3\x18`:\x06ServerBVEnable this device as a Store and Forward server. Requires an ESP32 device with PSRAM.R\bisServer\x1a\xa0\x03\n" +
+	"\x0fRangeTestConfig\x12L\n" +
+	"\aenabled\x18\x01 \x01(\bB2\xca\xf3\x18.:\x12Range Test EnabledB\x18Enable range test moduleR\aenabled\x12y\n" +
+	"\x06sender\x18\x02 \x01(\rBa\xca\xf3\x18]*\x01s:\x0fSender IntervalBGThis device will send out range test messages on the selected interval.R\x06sender\x12\x8d\x01\n" +
+	"\x04save\x18\x03 \x01(\bBy\xca\xf3\x18u:\x04SaveBmSaves a CSV with the range test message details, currently only available on ESP32 devices with a web server.R\x04save\x124\n" +
+	"\x0fclear_on_reboot\x18\x04 \x01(\bB\f\xca\xf3\x18\bR\x062.7.11R\rclearOnReboot\x1a\x84\x0e\n" +
+	"\x0fTelemetryConfig\x12\x88\x01\n" +
+	"\x16device_update_interval\x18\x01 \x01(\rBR\xca\xf3\x18N*\x01s:\x17Device Metrics IntervalB0How often device metrics are sent over the mesh.R\x14deviceUpdateInterval\x12\x9c\x01\n" +
+	"\x1benvironment_update_interval\x18\x02 \x01(\rB\\\xca\xf3\x18X*\x01s:\x1cEnvironment Metrics IntervalB5How often environment metrics are sent over the mesh.R\x19environmentUpdateInterval\x12\x8b\x01\n" +
+	"\x1fenvironment_measurement_enabled\x18\x03 \x01(\bBC\xca\xf3\x18?:\x1bEnvironment Metrics EnabledB Collect environment measurementsR\x1denvironmentMeasurementEnabled\x12\x85\x01\n" +
+	"\x1aenvironment_screen_enabled\x18\x04 \x01(\bBG\xca\xf3\x18C:\x15Show on device screenB*Display environment measurements on deviceR\x18environmentScreenEnabled\x12\x81\x01\n" +
+	"\x1eenvironment_display_fahrenheit\x18\x05 \x01(\bB;\xca\xf3\x187:\x12Display FahrenheitB!Display environment in FahrenheitR\x1cenvironmentDisplayFahrenheit\x12n\n" +
+	"\x13air_quality_enabled\x18\x06 \x01(\bB>\xca\xf3\x18::\x1bAir Quality Metrics EnabledB\x1bCollect air quality metricsR\x11airQualityEnabled\x12\x8e\x01\n" +
+	"\x14air_quality_interval\x18\a \x01(\rB\\\xca\xf3\x18X*\x01s:\x1cAir Quality Metrics IntervalB5How often air quality metrics are sent over the mesh.R\x12airQualityInterval\x12r\n" +
+	"\x19power_measurement_enabled\x18\b \x01(\bB6\xca\xf3\x182:\x19Power Measurement EnabledB\x15Collect power metricsR\x17powerMeasurementEnabled\x12\x84\x01\n" +
+	"\x15power_update_interval\x18\t \x01(\rBP\xca\xf3\x18L*\x01s:\x16Power Metrics IntervalB/How often power metrics are sent over the mesh.R\x13powerUpdateInterval\x12e\n" +
 	"\x14power_screen_enabled\x18\n" +
-	" \x01(\bR\x12powerScreenEnabled\x12<\n" +
+	" \x01(\bB3\xca\xf3\x18/:\fPower ScreenB\x1fDisplay power metrics on deviceR\x12powerScreenEnabled\x12<\n" +
 	"\x1ahealth_measurement_enabled\x18\v \x01(\bR\x18healthMeasurementEnabled\x124\n" +
 	"\x16health_update_interval\x18\f \x01(\rR\x14healthUpdateInterval\x122\n" +
-	"\x15health_screen_enabled\x18\r \x01(\bR\x13healthScreenEnabled\x128\n" +
-	"\x18device_telemetry_enabled\x18\x0e \x01(\bR\x16deviceTelemetryEnabled\x12;\n" +
-	"\x1aair_quality_screen_enabled\x18\x0f \x01(\bR\x17airQualityScreenEnabled\x1a\x9a\x06\n" +
-	"\x13CannedMessageConfig\x12'\n" +
-	"\x0frotary1_enabled\x18\x01 \x01(\bR\x0erotary1Enabled\x12*\n" +
-	"\x11inputbroker_pin_a\x18\x02 \x01(\rR\x0finputbrokerPinA\x12*\n" +
-	"\x11inputbroker_pin_b\x18\x03 \x01(\rR\x0finputbrokerPinB\x122\n" +
-	"\x15inputbroker_pin_press\x18\x04 \x01(\rR\x13inputbrokerPinPress\x12m\n" +
-	"\x14inputbroker_event_cw\x18\x05 \x01(\x0e2;.meshtastic.ModuleConfig.CannedMessageConfig.InputEventCharR\x12inputbrokerEventCw\x12o\n" +
-	"\x15inputbroker_event_ccw\x18\x06 \x01(\x0e2;.meshtastic.ModuleConfig.CannedMessageConfig.InputEventCharR\x13inputbrokerEventCcw\x12s\n" +
-	"\x17inputbroker_event_press\x18\a \x01(\x0e2;.meshtastic.ModuleConfig.CannedMessageConfig.InputEventCharR\x15inputbrokerEventPress\x12'\n" +
-	"\x0fupdown1_enabled\x18\b \x01(\bR\x0eupdown1Enabled\x12\x1c\n" +
-	"\aenabled\x18\t \x01(\bB\x02\x18\x01R\aenabled\x120\n" +
+	"\x15health_screen_enabled\x18\r \x01(\bR\x13healthScreenEnabled\x12\xd6\x01\n" +
+	"\x18device_telemetry_enabled\x18\x0e \x01(\bB\x9b\x01\xca\xf3\x18\x96\x01:\x18Broadcast Device MetricsBrEnable broadcasting device metrics to the mesh network. When disabled, metrics are only sent to connected clients.R\x062.7.13R\x16deviceTelemetryEnabled\x12I\n" +
+	"\x1aair_quality_screen_enabled\x18\x0f \x01(\bB\f\xca\xf3\x18\bR\x062.7.18R\x17airQualityScreenEnabled\x1a\x8c\v\n" +
+	"\x13CannedMessageConfig\x12N\n" +
+	"\x0frotary1_enabled\x18\x01 \x01(\bB%\xca\xf3\x18!:\bRotary 1B\x15Enable rotary encoderR\x0erotary1Enabled\x12\\\n" +
+	"\x11inputbroker_pin_a\x18\x02 \x01(\rB0\xca\xf3\x18,:\x05Pin AB#GPIO pin for rotary encoder A port.R\x0finputbrokerPinA\x12\\\n" +
+	"\x11inputbroker_pin_b\x18\x03 \x01(\rB0\xca\xf3\x18,:\x05Pin BB#GPIO pin for rotary encoder B port.R\x0finputbrokerPinB\x12l\n" +
+	"\x15inputbroker_pin_press\x18\x04 \x01(\rB8\xca\xf3\x184:\tPress PinB'GPIO pin for rotary encoder Press port.R\x13inputbrokerPinPress\x12\xaf\x01\n" +
+	"\x14inputbroker_event_cw\x18\x05 \x01(\x0e2;.meshtastic.ModuleConfig.CannedMessageConfig.InputEventCharB@\xca\xf3\x18<:\x16Clockwise Rotary EventB\"Input event for clockwise rotationR\x12inputbrokerEventCw\x12\xc1\x01\n" +
+	"\x15inputbroker_event_ccw\x18\x06 \x01(\x0e2;.meshtastic.ModuleConfig.CannedMessageConfig.InputEventCharBP\xca\xf3\x18L:\x1eCounter Clockwise Rotary EventB*Input event for counter-clockwise rotationR\x13inputbrokerEventCcw\x12\xad\x01\n" +
+	"\x17inputbroker_event_press\x18\a \x01(\x0e2;.meshtastic.ModuleConfig.CannedMessageConfig.InputEventCharB8\xca\xf3\x184:\x13Encoder Press EventB\x1dInput event for encoder pressR\x15inputbrokerEventPress\x12U\n" +
+	"\x0fupdown1_enabled\x18\b \x01(\bB,\xca\xf3\x18(:\tUp Down 1B\x1bEnable up/down/select inputR\x0eupdown1Enabled\x12'\n" +
+	"\aenabled\x18\t \x01(\bB\r\xca\xf3\x18\aZ\x052.7.0\x18\x01R\aenabled\x12;\n" +
 	"\x12allow_input_source\x18\n" +
-	" \x01(\tB\x02\x18\x01R\x10allowInputSource\x12\x1b\n" +
-	"\tsend_bell\x18\v \x01(\bR\bsendBell\"c\n" +
-	"\x0eInputEventChar\x12\b\n" +
-	"\x04NONE\x10\x00\x12\x06\n" +
-	"\x02UP\x10\x11\x12\b\n" +
-	"\x04DOWN\x10\x12\x12\b\n" +
-	"\x04LEFT\x10\x13\x12\t\n" +
-	"\x05RIGHT\x10\x14\x12\n" +
-	"\n" +
+	" \x01(\tB\r\xca\xf3\x18\aZ\x052.7.0\x18\x01R\x10allowInputSource\x12O\n" +
+	"\tsend_bell\x18\v \x01(\bB2\xca\xf3\x18.:\tSend BellB!Send bell character with messagesR\bsendBell\"\xc6\x01\n" +
+	"\x0eInputEventChar\x12\x14\n" +
+	"\x04NONE\x10\x00\x1a\n" +
+	"\xca\xf3\x18\x06:\x04None\x12\x10\n" +
+	"\x02UP\x10\x11\x1a\b\xca\xf3\x18\x04:\x02Up\x12\x14\n" +
+	"\x04DOWN\x10\x12\x1a\n" +
+	"\xca\xf3\x18\x06:\x04Down\x12\x14\n" +
+	"\x04LEFT\x10\x13\x1a\n" +
+	"\xca\xf3\x18\x06:\x04Left\x12\x16\n" +
+	"\x05RIGHT\x10\x14\x1a\v\xca\xf3\x18\a:\x05Right\x12\x18\n" +
 	"\x06SELECT\x10\n" +
-	"\x12\b\n" +
-	"\x04BACK\x10\x1b\x12\n" +
-	"\n" +
-	"\x06CANCEL\x10\x18\x1a\x8a\x01\n" +
-	"\x15AmbientLightingConfig\x12\x1b\n" +
-	"\tled_state\x18\x01 \x01(\bR\bledState\x12\x18\n" +
-	"\acurrent\x18\x02 \x01(\rR\acurrent\x12\x10\n" +
-	"\x03red\x18\x03 \x01(\rR\x03red\x12\x14\n" +
-	"\x05green\x18\x04 \x01(\rR\x05green\x12\x12\n" +
-	"\x04blue\x18\x05 \x01(\rR\x04blue\x1a6\n" +
+	"\x1a\f\xca\xf3\x18\b:\x06Select\x12\x14\n" +
+	"\x04BACK\x10\x1b\x1a\n" +
+	"\xca\xf3\x18\x06:\x04Back\x12\x18\n" +
+	"\x06CANCEL\x10\x18\x1a\f\xca\xf3\x18\b:\x06Cancel\x1a\xf8\x04\n" +
+	"\x15AmbientLightingConfig\x12K\n" +
+	"\tled_state\x18\x01 \x01(\bB.\xca\xf3\x18*:\tLED StateB\x1dThe state of the LED (on/off)R\bledState\x12}\n" +
+	"\acurrent\x18\x02 \x01(\rBc\xca\xf3\x18_\x19\x00\x00\x00\x00\x00\x00\x00\x00!\x00\x00\x00\x00\x00\x00?@:\aCurrentB!Drive current for the LED output.J\x1fled|brightness|ambient|lightingR\acurrent\x12\x80\x01\n" +
+	"\x03red\x18\x03 \x01(\rBn\xca\xf3\x18j\x19\x00\x00\x00\x00\x00\x00\x00\x00!\x00\x00\x00\x00\x00\xe0o@:\x03RedB*The red level of the ambient lighting LED.J%color|colour|rgb|led|ambient|lightingR\x03red\x12\x88\x01\n" +
+	"\x05green\x18\x04 \x01(\rBr\xca\xf3\x18n\x19\x00\x00\x00\x00\x00\x00\x00\x00!\x00\x00\x00\x00\x00\xe0o@:\x05GreenB,The green level of the ambient lighting LED.J%color|colour|rgb|led|ambient|lightingR\x05green\x12\x84\x01\n" +
+	"\x04blue\x18\x05 \x01(\rBp\xca\xf3\x18l\x19\x00\x00\x00\x00\x00\x00\x00\x00!\x00\x00\x00\x00\x00\xe0o@:\x04BlueB+The blue level of the ambient lighting LED.J%color|colour|rgb|led|ambient|lightingR\x04blue\x1a6\n" +
 	"\x13StatusMessageConfig\x12\x1f\n" +
 	"\vnode_status\x18\x01 \x01(\tR\n" +
-	"nodeStatus\x1a\xe4\a\n" +
+	"nodeStatus\x1a\xf3\t\n" +
 	"\x10MeshBeaconConfig\x12\x14\n" +
-	"\x05flags\x18\x01 \x01(\rR\x05flags\x12+\n" +
-	"\x11broadcast_message\x18\x04 \x01(\tR\x10broadcastMessage\x12S\n" +
+	"\x05flags\x18\x01 \x01(\rR\x05flags\x12H\n" +
+	"\x1ebroadcast_offer_frequency_slot\x18\x02 \x01(\rH\x00R\x1bbroadcastOfferFrequencySlot\x88\x01\x01\x12Y\n" +
+	"\x11broadcast_message\x18\x04 \x01(\tB,\xca\xf3\x18(:\aMessageB\x1dMessage for beacon broadcastsR\x10broadcastMessage\x12S\n" +
 	"\x17broadcast_offer_channel\x18\x05 \x01(\v2\x1b.meshtastic.ChannelSettingsR\x15broadcastOfferChannel\x12^\n" +
 	"\x16broadcast_offer_region\x18\x06 \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\x14broadcastOfferRegion\x12d\n" +
-	"\x16broadcast_offer_preset\x18\a \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x00R\x14broadcastOfferPreset\x88\x01\x01\x126\n" +
-	"\x17broadcast_interval_secs\x18\v \x01(\rR\x15broadcastIntervalSecs\x12f\n" +
-	"\x11broadcast_targets\x18\r \x03(\v29.meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTargetR\x10broadcastTargets\x1a\xe2\x01\n" +
+	"\x16broadcast_offer_preset\x18\a \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x01R\x14broadcastOfferPreset\x88\x01\x01\x12k\n" +
+	"\x17broadcast_interval_secs\x18\v \x01(\rB3\xca\xf3\x18/*\x01s:\bIntervalB How often a beacon is broadcast.R\x15broadcastIntervalSecs\x12f\n" +
+	"\x11broadcast_targets\x18\r \x03(\v29.meshtastic.ModuleConfig.MeshBeaconConfig.BroadcastTargetR\x10broadcastTargets\x1a\xa1\x02\n" +
 	"\x0fBroadcastTarget\x12F\n" +
 	"\x06preset\x18\x01 \x01(\x0e2).meshtastic.Config.LoRaConfig.ModemPresetH\x00R\x06preset\x88\x01\x01\x12@\n" +
 	"\x06region\x18\x02 \x01(\x0e2(.meshtastic.Config.LoRaConfig.RegionCodeR\x06region\x12(\n" +
-	"\rchannel_index\x18\x04 \x01(\rH\x01R\fchannelIndex\x88\x01\x01B\t\n" +
+	"\rchannel_index\x18\x04 \x01(\rH\x01R\fchannelIndex\x88\x01\x01\x12*\n" +
+	"\x0efrequency_slot\x18\x05 \x01(\rH\x02R\rfrequencySlot\x88\x01\x01B\t\n" +
 	"\a_presetB\x10\n" +
-	"\x0e_channel_index\"b\n" +
+	"\x0e_channel_indexB\x11\n" +
+	"\x0f_frequency_slot\"b\n" +
 	"\x05Flags\x12\r\n" +
 	"\tFLAG_NONE\x10\x00\x12\x17\n" +
 	"\x13FLAG_LISTEN_ENABLED\x10\x01\x12\x1a\n" +
 	"\x16FLAG_BROADCAST_ENABLED\x10\x02\x12\x15\n" +
-	"\x11FLAG_LEGACY_SPLIT\x10\x04B\x19\n" +
+	"\x11FLAG_LEGACY_SPLIT\x10\x04B!\n" +
+	"\x1f_broadcast_offer_frequency_slotB\x19\n" +
 	"\x17_broadcast_offer_presetJ\x04\b\x03\x10\x04J\x04\b\b\x10\tJ\x04\b\t\x10\n" +
 	"J\x04\b\n" +
-	"\x10\vR\x16broadcast_send_as_nodeR\x14broadcast_on_channelR\x13broadcast_on_regionR\x13broadcast_on_preset\x1a]\n" +
-	"\tTAKConfig\x12$\n" +
-	"\x04team\x18\x01 \x01(\x0e2\x10.meshtastic.TeamR\x04team\x12*\n" +
-	"\x04role\x18\x02 \x01(\x0e2\x16.meshtastic.MemberRoleR\x04roleB\x11\n" +
+	"\x10\vR\x16broadcast_send_as_nodeR\x14broadcast_on_channelR\x13broadcast_on_regionR\x13broadcast_on_preset\x1a\x96\x01\n" +
+	"\tTAKConfig\x12@\n" +
+	"\x04team\x18\x01 \x01(\x0e2\x10.meshtastic.TeamB\x1a\xca\xf3\x18\x16:\x04TeamB\x0eTAK team colorR\x04team\x12G\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x16.meshtastic.MemberRoleB\x1b\xca\xf3\x18\x17:\x04RoleB\x0fTAK member roleR\x04roleB\x11\n" +
 	"\x0fpayload_variant\"y\n" +
 	"\x11RemoteHardwarePin\x12\x19\n" +
 	"\bgpio_pin\x18\x01 \x01(\rR\agpioPin\x12\x12\n" +
@@ -3174,6 +3228,7 @@ func file_meshtastic_module_config_proto_init() {
 	file_meshtastic_atak_proto_init()
 	file_meshtastic_channel_proto_init()
 	file_meshtastic_config_proto_init()
+	file_meshtastic_field_metadata_proto_init()
 	file_meshtastic_module_config_proto_msgTypes[0].OneofWrappers = []any{
 		(*ModuleConfig_Mqtt)(nil),
 		(*ModuleConfig_Serial)(nil),
